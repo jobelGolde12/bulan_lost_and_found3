@@ -1,7 +1,7 @@
-
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import vue from '@vitejs/plugin-vue';
+import path from 'path'; // <- make sure to import this
 
 export default defineConfig({
     plugins: [
@@ -18,12 +18,11 @@ export default defineConfig({
             },
         }),
     ],
-    // server: {
-    //     host: '0.0.0.0',   Accept connections from network
-    //     port: 5173,        Or any port you prefer
-    //     strictPort: true,  Avoid fallback to random port
-    //     hmr: {
-    //         host: '192.168.1.3',
-    //     }
-    // },
+    resolve: {
+        alias: {
+            '@': path.resolve(__dirname, 'resources/js'),
+            '@components': path.resolve(__dirname, 'resources/js/components'),
+            '@views': path.resolve(__dirname, 'resources/js/views'),
+        },
+    },
 });

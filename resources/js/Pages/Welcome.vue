@@ -1,6 +1,8 @@
 <script setup>
 import { Head, Link } from "@inertiajs/vue3";
 import lostAndFoundLogo from "../../images/lost_and_found_logo.png";
+import AboutSection from "@/Components/welcome_page/AboutSection.vue";
+import HowItWorksSection from "@/Components/welcome_page/HowItWorksSection.vue";
 </script>
 
 <template>
@@ -122,118 +124,12 @@ import lostAndFoundLogo from "../../images/lost_and_found_logo.png";
             </div>
         </section>
 
-        <section id="about">
-            <div class="container text-center pt-5">
-                <!-- <h1 class="text-dark fw-bolder">About Us!</h1> -->
-
-                <div class="about-hero-section mt-5">
-                    <div class="container custom-container">
-                        <div class="row align-items-center">
-                            <div class="col-lg-6 text-left">
-                                <h1 class="hero-title">
-                                    Welcome to the Bulan Lost and Found Website!
-                                </h1>
-                                <p class="hero-subtitle">
-                                    This platform was created to help the people
-                                    of Bulan reconnect with their lost items and
-                                    recover valuables. Our goal is to make it
-                                    easier for individuals to report lost or
-                                    found items and promote a more connected,
-                                    responsible community.
-                                </p>
-                            </div>
-                            <div
-                                class="col-lg-6 text-left about-image-container"
-                            >
-                                <img
-                                    src="../../images/happy.svg"
-                                    alt="Image "
-                                    class="d about-image"
-                                />
-                                <!-- <h5 class="text-dark">Our Mission</h5>
-                            <p class="d-block text-dark">We aim to provide a simple, user-friendly online service that bridges the gap between those who have lost something and those who have found it.</p> -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="howItsWork">
-            <div class="stats-section pt-5 mt-5">
-                <h1 class="text-dark text-center fw-bolder pt-5 mb-3">
-                    How It Works?
-                </h1>
-                <div class="container custom-container mt-5 pt-5">
-                    <div class="row justify-content-center">
-                        <!-- Card 1 -->
-                        <div class="col-lg-3 col-md-6 mb-4">
-                            <div class="stats-card text-center">
-                                <img src="../../images/announce.svg" alt="" />
-                                <div class="stats-title mt-3">
-                                    Report a Lost Item
-                                </div>
-                                <div class="stats-label">
-                                    Post details about your missing item,
-                                    including a description, last known
-                                    location, and contact information.
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Card 2 -->
-                        <div class="col-lg-3 col-md-6 mb-4">
-                            <div class="stats-card text-center">
-                                <img src="../../images/found.svg" alt="" />
-                                <div class="stats-title mt-3">
-                                    Report a Found Item
-                                </div>
-                                <div class="stats-label">
-                                    Post details of what you found to help the
-                                    rightful owner claim their lost property.
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Card 3 -->
-                        <div class="col-lg-3 col-md-6 mb-4">
-                            <div class="stats-card text-center">
-                                <img src="../../images/brows.svg" alt="" />
-                                <div class="stats-title mt-3">
-                                    Browse Lost or Found Listings
-                                </div>
-                                <div class="stats-label">
-                                    Check listings to see if your item has been
-                                    found or if someone is looking for what you
-                                    found.
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Card 4 -->
-                        <div class="col-lg-3 col-md-6 mb-4">
-                            <div class="stats-card text-center">
-                                <img src="../../images/claim.svg" alt="" />
-                                <div class="stats-title mt-3">
-                                    Reclaim or Return Items
-                                </div>
-                                <div class="stats-label">
-                                    Contact the person and arrange the return
-                                    once an item matches.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+        <AboutSection />
+        <HowItWorksSection />
 
         <footer id="footer" class="footer mt-5 pt-5">
             <div class="container">
                 <div class="row">
-                    <!-- <div class="col-md-4">
-    <div class="logo-section">
-      <p>Find and Report Lost or Found
-        Items in Bulan easily</p>
-    </div>
-  </div> -->
                     <div class="col-md-3">
                         <h5>Contact Info.</h5>
                         <ul class="list-unstyled">
@@ -298,12 +194,6 @@ import lostAndFoundLogo from "../../images/lost_and_found_logo.png";
                             <a href="#"><i class="fab fa-linkedin"></i></a>
                         </div>
                     </div>
-                    <!-- <div class="col-md-8 text-md-end">
-    <form class="subscribe-form">
-      <input type="email" class="form-control" placeholder="Enter email address">
-      <button class="btn btn-primary">Subscribe</button>
-    </form>
-  </div> -->
                 </div>
             </div>
         </footer>
