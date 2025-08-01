@@ -1,7 +1,5 @@
 
 <script setup>
-//TODO kapag nag report c user d nag enable ang button (submiting... perme)
-import AdminLayout from "@/Layouts/AdminLayout.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import {useForm} from "@inertiajs/vue3";
 import { usePage, Head } from "@inertiajs/vue3";
@@ -70,24 +68,36 @@ const submitForm = () => {
   isSubmitting.value = true;
 
   form.transform((data) => {
-    const formData = new FormData();
-    for (const key in data) {
-      formData.append(key, data[key]);
-    }
-    return formData;
-  }).post(route("addItem"), {
+  const formData = new FormData();
+  for (const key in data) {
+    if (key === 'image' && !data[key]) continue; 
+    // Kapag wara in provide c user na image eh continue nalang para maging null sa backend para ma butangan default na image
+    formData.append(key, data[key]);
+  }
+  return formData;
+}).post(route("addItem"), {
     onSuccess: () => {
+    isSubmitting.value = false;
       alert("Submitted!");
       // setTimeout(() => {
       //   isSubmitting.value = false;
       // }, 3000);
     },
-    onError: () => {
-      // isSubmitting.value = false;
+    onError: (e) => {
+       isSubmitting.value = false;
+       console.error("An error while posting item: ", e)
     },
   });
 };
 </script>
+
+<style scoped>
+.main-container {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+}
+</style>
 
 
 <template>
@@ -218,10 +228,3 @@ const submitForm = () => {
   <!-- <LoadingComponent v-if="isSubmitting" /> -->
 </template>
 
-<style scoped>
-.main-container {
-  width: 100%;
-  height: 100%;
-  overflow-x: hidden;
-}
-</style>

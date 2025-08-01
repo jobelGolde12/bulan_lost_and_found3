@@ -111,7 +111,7 @@ overViewData.value = {
       <div class="container-fluid px-0 d-flex flex-row justify-content-between align-items-center d-none d-lg-block">
         <div class="container-top container-fluid pe-0 d-flex flex-row justify-content-between" style="min-height: 300px;  max-height: 200px;" >
             <div class=" pt-4 ps-0 header">
-              <h1 class="fw-bold">Lost & Found Admin Dashboard</h1>
+              <h1 class="fw-bold mb-2">Lost & Found Admin Dashboard</h1>
               <p class="text-muted">Manage reports, users, and system settings effectively.</p>
           </div>
 
