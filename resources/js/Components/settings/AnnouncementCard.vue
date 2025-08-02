@@ -1,5 +1,6 @@
 <script setup>
-import { defineProps, ref, watch } from 'vue';
+import { usePage } from '@inertiajs/vue3';
+import { defineProps, ref, watch, defineModel } from 'vue';
 
 const props = defineProps({
     announcement: {
@@ -8,12 +9,15 @@ const props = defineProps({
     },
 })
 const getAnnouncement = ref({});
+let selectedAnnouncementId = defineModel('selected')
 
+
+const page = usePage();
+const auth = page.props.auth;
 watch(
     () => props.announcement,
     (ann) => {
         getAnnouncement.value = ann;
-        console.log("Announcement data:", getAnnouncement.value);
     }, {
         immediate: true
     }
@@ -42,7 +46,10 @@ const openDeleteModal = (id) => {
         <button
           class="delete-btn"
           @click="openDeleteModal(getAnnouncement.id)"
+          data-bs-toggle="modal"
+          data-bs-target="#exampleModal"
           aria-label="Delete announcement"
+          v-if="auth.user.role === 'admin'"
         >
           <i class="bi bi-trash"></i>
         </button>

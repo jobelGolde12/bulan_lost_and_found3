@@ -53,8 +53,7 @@ class SettingsController extends Controller
 
     public function announcements()
     {
-        $ann = AnnouncementModel::with(['user:id,name', 'userProfile:id,profile_pic'])->get();
-        Log::info("Announcements fetched: ", $ann->toArray());
+        $ann = AnnouncementModel::with(['user:id,name,role', 'userProfile:id,profile_pic'])->get();
         if(Auth::user()->role == 'admin'){
             return Inertia::render('Settings/admin/Announcement', [
                 'ann' => $ann,

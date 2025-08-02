@@ -66,6 +66,7 @@ const deleteAnnouncement = () => {
         >
          <AnnouncementCard 
          :announcement="announcement"
+         :key="announcement.id"
          v-model:selected="selectedAnnouncementId"
          />
         </div>
@@ -80,7 +81,6 @@ const deleteAnnouncement = () => {
     </div>
   </AdminSettingsLayout>
 
-  <!-- Bootstrap Modal -->
   <div
     class="modal fade"
     id="exampleModal"
