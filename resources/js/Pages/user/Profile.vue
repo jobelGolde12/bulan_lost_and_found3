@@ -35,7 +35,7 @@ onMounted(() => {
         class="container-fluid d-flex flex-column justify-content-center align-items-center pt-5 gap-2"
       >
         <div class="profile-pic shadow-sm">
-          <img v-if="getUserInfo?.profile_pic" :src="`/storage/${getUserInfo.profile_pic}` || '../.././../images/profile.jpeg'" alt="Profile pic" />
+          <img v-if="getUserInfo?.profile_pic" :src="`/storage/${getUserInfo.profile_pic}` || '../../../../images/profile.jpeg'" alt="Profile pic" />
         </div>
 
         <div>
@@ -55,9 +55,9 @@ onMounted(() => {
                      {{ user.email ?? 'N/A' }}
                 </div>
 
-                <div v-if="getUserInfo?.contact !== null" class="name text-start text-dark fw-light">
+                <div class="name text-start text-dark fw-light">
                     <span class="fw-semibold me-2"><i class="bi bi-telephone"></i></span>
-                     {{ getUserInfo?.contact ?? 'N/A' }}
+                     {{ getUserInfo?.contact ?? 'No phone provided.' }}
                 </div>
        </div>
 
@@ -73,10 +73,10 @@ onMounted(() => {
 
           <tbody>
             <tr v-for="item in itemsContainer" :key="item.id">
-              <td>{{ item.title }}</td>
-              <td>{{ item.description }}</td>
-              <td>{{ item.status }}</td>
-              <td class="text-end">
+              <td class="bg-light">{{ item.title }}</td>
+              <td class="bg-light">{{ item.description }}</td>
+              <td class="bg-light">{{ item.status }}</td>
+              <td class="text-end bg-light">
                 <Link 
                   :href="route('viewItem', { id: item.id })"
                   class="btn btn-primary ms-0"

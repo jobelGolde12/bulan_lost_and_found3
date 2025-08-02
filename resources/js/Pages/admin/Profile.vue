@@ -61,14 +61,14 @@ watch(
                      {{ user.email ?? 'N/A' }}
                 </div>
 
-                <div v-if="getUserInfo?.contact !== null" class="name text-start text-dark fw-light">
+                <div class="name text-start text-dark fw-light">
                     <span class="fw-semibold me-2"><i class="bi bi-telephone"></i></span>
-                     {{ getUserInfo?.contact ?? 'N/A' }}
+                     {{ getUserInfo?.contact ?? 'No phone provided.' }}
                 </div>
       </div>
 
       <div class="container" v-if="itemsContainer">
-        <h3 class="text-muted fw-light mt-3">My Items</h3>
+        <h3 class="text-muted fw-light mt-5 mb-3">My Items</h3>
         <table class="table table-responsive">
           <thead>
             <th>Name</th>
@@ -79,10 +79,12 @@ watch(
 
           <tbody>
             <tr v-for="item in itemsContainer" :key="item.id">
-              <td>{{ item.title }}</td>
-              <td>{{ item.description }}</td>
-              <td>{{ item.status }}</td>
-              <td class="text-end">
+              <td class="bg-light">{{ item.title }}</td>
+              <td class="bg-light">{{ item.description }}</td>
+              <td class="bg-light"
+              :class="item.status == 'Lost' ? 'text-danger' : item.status == 'Found' ? 'text-dark' : 'text-success'"
+              >{{ item.status }}</td>
+              <td class="text-end bg-light">
                 <Link 
                   :href="route('viewItem', { id: item.id })"
                   class="btn btn-primary ms-0"
