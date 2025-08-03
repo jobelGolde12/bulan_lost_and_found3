@@ -176,8 +176,10 @@ const deleteComment = (getId) => {
          <div class="container my-3 px-0 mx-0 comment-container d-flex flex-column gap-2" v-if="getComment">
             <div class="comment p-3 rounded" v-for="data in getComment" :key="data.id">
               <div class="d-flex flex-row justify-content-between align-items-center">
-                <div class="profile-in-comment">
-                  <img src="../../../images/profile.jpeg" alt="">
+                <div class="">
+                  <img src="../../../images/profile.jpeg" alt=""
+                  class="profile-in-comment2"
+                  >
                 </div>
                 <div class="date d-flex align-items-center gap-2">
                   <p class="d-inline-block">{{ formatDate(data.created_at) || "No date available"}}</p>
@@ -212,89 +214,11 @@ const deleteComment = (getId) => {
 </AdminLayout>  
 </template>
 <style scoped>
-*{
-  font-family: 'Poppins', sans-serif;
-}
-.image-item{
-  width: 60%;
-  max-height: 30%;
+@import "../../../css/viewItemInfo.css";
+.profile-in-comment2{
   position: relative;
-}
-.main-container{
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: row;
-  overflow-y: scroll;
-}
-.main-container .container{
-  position: relative;
-  width: 600px; 
-  max-height: 400px;
-}
-.container img{
-  position: relative;
-  width: 100%;
-  max-height: 400px;
-}
-.profile-pic {
-  max-width: 35px;
-  min-width: 35px;
-  height: 35px;
-}
-/* para sa comment  */
-.comment-container{
-  position: relative;
-  overflow: hidden;
-  max-width: 100%;
-  left: 0;
-  display: flex;
-  flex-direction: row;
-  gap: 1rem;
-  overflow-y: scroll;
-}
-.comment-container::-webkit-scrollbar {
-  display: none; 
-}
-
-.comment{
-  background: #EFF2FC;
-  position: relative;
-  width: 100%;
-}
-.date p{
-  font-size: .8rem;
-  transform: translateY(40%);
-}
-.profile-in-comment img{
-  position: relative;
-  min-width: 35px;
-  height: 35px;
-  border-radius: 50%;
-}
-.action-in-comment{
-  cursor: pointer;
-}
-.action-in-comment:hover{
-  color: #198754;
-}
-.action-container{
-  position: absolute;
-  right: 10%;
-  background: #ece8e8;
-  cursor: pointer;
-}
-.action-container:hover{
-  background: #dfdada;
-}
-@media screen and (max-width: 768px){
-  .image-item{
-    max-width: 350px;
-    height: 300px;
-    margin: 0;
-  }
-  .header, .mark-as-resolve-container , .comment-main-container{
-    max-width: 350px;
-  }
+  width: 45px;
+  min-width: 45px;
+  height: 45px;
 }
 </style>

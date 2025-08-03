@@ -4,6 +4,7 @@ import { Link, useForm, Head, router, usePage } from "@inertiajs/vue3";
 import CustomModal from "@/Components/CustomModal.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Inertia } from "@inertiajs/inertia";
+import ViewItemInfoHeader from "@/Components/ViewItemInfoHeader.vue";
 const props = defineProps({
   item: {
     type: Object,
@@ -125,28 +126,13 @@ const deleteComment = (getId) => {
     <div class="bg-white rounded-lg shadow-md w-full max-w-3xl p-6">
       <div v-if="Object.keys(data).length > 0">
          
-        <div class="container-fluid d-column flex-row align-items-center px-0">
-           <div class="mb-2">
-            <Link :href="route('view.userAsUser', {id: props.created_by.id})" class="text-decoration-none d-flex align-items-center gap-2">
-            <img
-              :src="getProfile == 'NA' ? '../../images/profile.jpeg' : `/storage/${getProfile}`"
-              alt="User"
-              class="profile-pic rounded-full"
-            />
-
-            <span class="text-sm font-medium text-gray-700">{{ created_by.name }}</span>
-          </Link>
-           </div>
-
-        <div class="flex justify-between items-center mb-4 header">
-          <div class="d-flex flex-column ">
-            <h2 class="text-xl font-semibold mb-0 d-block">{{ data?.title || "Unnamed Item" }}</h2>
-            <p class="description">{{ data?.description || 'No description'}}</p>
-          </div>
- 
-        </div>
-
-        </div>
+        <ViewItemInfoHeader
+          :created_by="props.created_by"
+          :getProfile="getProfile"
+          :data="data"
+          :title="data.title"
+          :description="data.description"
+        />
         <div class="mb-6">
           <img
             :src="data.image_url"
@@ -229,92 +215,5 @@ const deleteComment = (getId) => {
 </AuthenticatedLayout>  
 </template>
 <style scoped>
-*{
-  font-family: 'Poppins', sans-serif;
-}
-.image-item{
-  width: 60%;
-  max-height: 30%;
-  position: relative;
-}
-.main-container{
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: row;
-  overflow-y: scroll;
-}
-.main-container .container{
-  position: relative;
-  width: 600px; 
-  max-height: 400px;
-}
-.container img{
-  position: relative;
-  width: 100%;
-  max-height: 400px;
-}
-.description{
-  font-size: .8rem;
-}
-.profile-pic{
-  max-width: 35px;
-  height: 35px;
-}
-/* para sa comment  */
-.comment-container{
-  position: relative;
-  overflow: hidden;
-  max-width: 100%;
-  left: 0;
-  display: flex;
-  flex-direction: row;
-  gap: 1rem;
-  overflow-y: scroll;
-}
-.comment-container::-webkit-scrollbar {
-  display: none; 
-}
-
-.comment{
-  background: #EFF2FC;
-  position: relative;
-  width: 100%;
-}
-.date p{
-  font-size: .8rem;
-  transform: translateY(40%);
-}
-:deep(.profile-pic-in-comment), .profile-in-comment img{
-  position: relative;
-  width: 45px;
-  min-width: 45px;
-  height: 45px;
-  border-radius: 50%;
-}
-.action-in-comment{
-  cursor: pointer;
-}
-.action-in-comment:hover{
-  color: #198754;
-}
-.action-container{
-  position: absolute;
-  right: 10%;
-  background: #ece8e8;
-  cursor: pointer;
-}
-.action-container:hover{
-  background: #dfdada;
-}
-@media screen and (max-width: 768px){
-  .image-item{
-    max-width: 350px;
-    height: 300px;
-    margin: 0;
-  }
-  .header, .mark-as-resolve-container , .comment-main-container{
-    max-width: 350px;
-  }
-}
+@import "../../css/viewItemInfo.css";
 </style>
