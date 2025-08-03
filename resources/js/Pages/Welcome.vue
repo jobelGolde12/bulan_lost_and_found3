@@ -3,6 +3,7 @@ import { Head, Link } from "@inertiajs/vue3";
 import lostAndFoundLogo from "../../images/lost_and_found_logo.png";
 import AboutSection from "@/Components/welcome_page/AboutSection.vue";
 import HowItWorksSection from "@/Components/welcome_page/HowItWorksSection.vue";
+import BulanMap from "@/Components/welcome_page/BulanMap.vue";
 </script>
 
 <template>
@@ -126,7 +127,7 @@ import HowItWorksSection from "@/Components/welcome_page/HowItWorksSection.vue";
 
         <AboutSection />
         <HowItWorksSection />
-
+        <BulanMap />
         <footer id="footer" class="footer mt-5 pt-5">
             <div class="container">
                 <div class="row">
