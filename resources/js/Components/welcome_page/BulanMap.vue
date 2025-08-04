@@ -3,7 +3,7 @@
 
 <template>
   <div class="container-fluid py-5">
-    <h1 class="text-dark text-center fw-bolder mb-4">
+    <h1 class="text-dark text-center fw-bolder mb-5">
       Bulan, Sorsogon Lost and Found Map
     </h1>
 
