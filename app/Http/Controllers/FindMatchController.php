@@ -1,9 +1,10 @@
 <?php
-// TODO saro lang na pair na match item ang in re return
+
 namespace App\Http\Controllers;
 
 use App\Models\ItemModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
@@ -11,62 +12,65 @@ class FindMatchController extends Controller
 {
     public function index(Request $request)
     {
-        $keyword = $request->input('keyword');
+        $keyword = strtolower(trim($request->input('keyword')));
 
+        // Load all lost items
         $lostItems = ItemModel::with(['user', 'user.userInfo' => function ($query) {
             $query->select('id', 'profile_pic', 'user_id');
         }])
         ->where('status', 'Lost')
         ->get();
 
+        // Load all found items
         $foundItems = ItemModel::with(['user', 'user.userInfo' => function ($query) {
             $query->select('id', 'profile_pic', 'user_id');
         }])
         ->where('status', 'Found')
         ->get();
 
-        // Match the item
-        $matches = $foundItems->map(function ($foundItem) use ($lostItems, $keyword) {
+        $matches = [];
+
+        foreach ($foundItems as $foundItem) {
             $matchedLostItems = $lostItems->filter(function ($lostItem) use ($foundItem, $keyword) {
-                // Basic matching: same category + location
-                $basicMatch = strtolower($lostItem->category) === strtolower($foundItem->category) &&
-                              strtolower($lostItem->location) === strtolower($foundItem->location);
+                // Normalize location
+                $lostLocation = strtolower(trim($lostItem->location));
+                $foundLocation = strtolower(trim($foundItem->location));
 
-                // Keyword matching: if keyword appears in any field of either item
-                $keywordMatch = false;
-                if ($keyword) {
-                    $keyword = strtolower($keyword);
-                    $allFields = [
-                        strtolower($lostItem->title),
-                        strtolower($lostItem->description),
-                        strtolower($lostItem->location),
-                        strtolower($lostItem->category),
-                        strtolower($foundItem->title),
-                        strtolower($foundItem->description),
-                        strtolower($foundItem->location),
-                        strtolower($foundItem->category),
-                    ];
+                // Require location match
+                $locationMatch = $lostLocation === $foundLocation;
 
-                    foreach ($allFields as $field) {
-                        if ($field && Str::contains($field, $keyword)) {
-                            $keywordMatch = true;
-                            break;
-                        }
+                // Combine text fields for similarity
+                $lostText = strtolower($lostItem->title . ' ' . $lostItem->description);
+                $foundText = strtolower($foundItem->title . ' ' . $foundItem->description);
+
+                // Use keyword if provided, otherwise fallback to found item's title
+                $searchKeyword = $keyword ?: strtolower($foundItem->title);
+
+                // Check if keyword appears in either item's text
+                $keywordMatch = Str::contains($lostText, $searchKeyword) || Str::contains($foundText, $searchKeyword);
+
+                // Check for shared keywords like "bike", "black", etc.
+                $commonWords = ['bike', 'black', 'mountain', 'bag', 'phone', 'wallet'];
+                $textMatch = false;
+                foreach ($commonWords as $word) {
+                    if (Str::contains($lostText, $word) && Str::contains($foundText, $word)) {
+                        $textMatch = true;
+                        break;
                     }
                 }
 
-                return $basicMatch || $keywordMatch;
+                return $locationMatch && ($keywordMatch || $textMatch);
             });
 
             if ($matchedLostItems->isNotEmpty()) {
-                return [
+                $matches[] = [
                     'foundItem' => $foundItem,
                     'matchedLostItems' => $matchedLostItems->values()
                 ];
-            }
 
-            return null; // skip if no match
-        })->filter(); // remove nulls
+                Log::info("Found item ID {$foundItem->id} matched with " . $matchedLostItems->count() . " lost items.");
+            }
+        }
 
         return Inertia::render('admin/FindMatch', [
             'matches' => $matches,
