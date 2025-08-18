@@ -18,14 +18,12 @@ let itemNameContainer = ref([]);
 let itemContainer = ref([]);
 const searchForm = useForm({ query: "" });
 
-console.log("All items", JSON.stringify(props.allItems));
 
 watch(
   () => props.matches,
   (newMatches) => {
     itemContainer.value = newMatches;
     itemNameContainer.value = newMatches.map(match => match.foundItem.title).filter(Boolean);
-    // console.log("item from props: ", props.matches)
   },
   { immediate: true }
 );

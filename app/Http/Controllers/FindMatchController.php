@@ -68,7 +68,7 @@ class FindMatchController extends Controller
                     'matchedLostItems' => $matchedLostItems->values()
                 ];
 
-                Log::info("Found item ID {$foundItem->id} matched with " . $matchedLostItems->count() . " lost items.");
+                // Log::info("Found item ID {$foundItem->id} matched with " . $matchedLostItems->count() . " lost items.");
             }
         }
 

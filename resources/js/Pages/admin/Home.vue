@@ -2,7 +2,7 @@
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import FilterComponent from "@/Components/user/FilterComponent.vue";
 import { Head, useForm } from "@inertiajs/vue3";
-import { defineProps, ref, watch } from "vue";
+import { defineProps, ref, watch, computed } from "vue";
 import CategoriesList from "@/Components/user/CategoriesList.vue";
 import ItemCardForAdmin from "@/Components/admin/ItemCardForAdmin.vue";
 import FindMatch from "@/Components/admin/dashboard/FindMatchButton.vue";
@@ -28,11 +28,11 @@ const categoriesContainer = ref([
 
 const selectedCategory = ref("");
 const filterStatus = ref("all");
-
 const searchForm = useForm({ query: "" });
-
 const getItems = ref([...props.items]);
-
+const getCurrentItemCategory = computed(() => {
+  return [...new Set(getItems.value.map(item => item.category))];
+});
 const filterItems = () => {
   getItems.value = props.items.filter((item) => {
     const category = props.categories.find((cat) => cat.id === item.category_id);
@@ -110,6 +110,7 @@ const handleSearch = () => {
       <!-- Category & Filter -->
       <CategoriesList
         :categories="categoriesContainer"
+        :currentItem="getCurrentItemCategory"
         @categorySelected="handleCategoryChange"
       />
 

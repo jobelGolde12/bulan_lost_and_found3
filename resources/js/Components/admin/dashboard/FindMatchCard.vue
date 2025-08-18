@@ -16,7 +16,6 @@ watch(
   () => props.items,
   (newItem) => {
     itemContainer.value = newItem;
-    console.log("items: ", JSON.stringify(props.items, null, 2));
   },
   { immediate: true }
 );
