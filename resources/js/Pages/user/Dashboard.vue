@@ -2,7 +2,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import FilterComponent from "@/Components/user/FilterComponent.vue";
 import { Head, useForm } from "@inertiajs/vue3";
-import { defineProps, ref } from "vue";
+import { defineProps, ref, computed } from "vue";
 import CategoriesList from "@/Components/user/CategoriesList.vue";
 import ItemCard from "@/Components/ItemCard.vue";
 
@@ -29,6 +29,9 @@ const filterStatus = ref("all");
 const searchForm = useForm({ query: "" });
 
 const getItems = ref([...props.items]);
+const getCurrentItemCategory = computed(() => {
+  return [...new Set(getItems.value.map(item => item.category))];
+});
 
 const filterItems = () => {
   getItems.value = props.items.filter((item) => {
@@ -107,6 +110,7 @@ const handleSearch = () => {
       <!-- Category & Filter -->
       <CategoriesList
         :categories="categoriesContainer"
+         :currentItem="getCurrentItemCategory"
         @categorySelected="handleCategoryChange"
       />
 

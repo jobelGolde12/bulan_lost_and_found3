@@ -146,9 +146,7 @@ overViewData.value = {
           </div>
 
       <!-- Cards Section -->
-      <div class="card-bottom d-flex justify-content-between align-items-center rounded"
-      style="background: linear-gradient(0deg, #f3d9fb, #d0f5ee); padding: 1rem; border-radius: 0 0 12px 12px;"
->
+      <div class="card-bottom d-flex justify-content-between align-items-center rounded">
       
 
         <Overview :data="overViewData"/>
@@ -185,14 +183,17 @@ overViewData.value = {
   width: 100px;
   height: 100px;
   border-radius: 50%;
-  background: conic-gradient(var(--progress, 0%) #4CAF50, #e0e0e0 0%);
+  background: url("../../../images/overview-bg.jpg") no-repeat center center fixed;
+  background-size: cover;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 1.2rem;
   font-weight: bold;
-  color: #333;
+  color: #fff; 
+  overflow: hidden;
 }
+
 .progress-circle span {
   position: absolute;
 }
