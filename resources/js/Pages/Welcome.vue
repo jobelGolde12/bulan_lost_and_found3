@@ -17,7 +17,7 @@ import HeroSection from "@/Components/welcome_page/HeroSection.vue";
         >
             <div class="d-flex flex-row gap-2 align-items-center">
                 <div class="logo">
-                    <img :src="lostAndFoundLogo" alt="Application logo" />
+                    <img :src="lostAndFoundLogo" alt="Application logo"/>
                 </div>
                 <div><p class="text-dark laf-text">Lost and found</p></div>
             </div>

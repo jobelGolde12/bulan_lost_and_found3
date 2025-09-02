@@ -49,7 +49,8 @@ const agreeInTermsAndPolicy = ref(false);
   position: absolute;
   width: 100vw;
   height: 100vh;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y:scroll;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -94,7 +95,7 @@ const agreeInTermsAndPolicy = ref(false);
   <Head title="Register" />
   <div class="main-container bg-light">
     <form @submit.prevent="submit" class="form">
-      <h2 class="text-dark text-center fw-semibold">Register now!</h2>
+      <h2 class="text-dark text-center fw-semibold mt-5">Register now!</h2>
 
       <div>
         <InputLabel for="name" value="Name" />

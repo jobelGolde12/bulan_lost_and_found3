@@ -10,6 +10,7 @@ use App\Models\NotificationModel;
 use App\Models\PendingRequest;
 use App\Models\User;
 use App\Models\UserInfo;
+use App\Services\SemaphoreService;
 use App\Services\TwilioService;
 use Exception;
 use Illuminate\Http\Request;
@@ -167,38 +168,53 @@ class ItemController extends Controller
     }
 
     //para sa resolve na item
-    public function markAsResolve($id, $userId){
-        $item = ItemModel::find($id);
+public function markAsResolve($id, $userId)
+{
+    $item = ItemModel::find($id);
 
-        if (!$item) {
-            return response()->json(['error' => 'Item not found'], 404);
-        }
-        if (!$userId) {
-            return response()->json(['error' => 'user_id not found'], 404);
-        }
-
-        $item->status = 'Claimed';
-        $item->resolved_at = now();
-        $item->save();
-        $categories = ItemCategories::all();
-        $items = ItemModel::all();
-
-        NotificationModel::create([
-            'title' => 'Item Marked as Resolved',
-            'user_id' => $userId,
-            'message' => 'The item you reported has been marked as resolved by the administrator. Thank you for using our service!',
-            'read_status' => 0,
-        ]);
-
-         $user = UserInfo::where('user_id', $userId)->first();
-         //TODO comment muna ang twilio habang wara pa signal
-        // if ($user && $user->contact) {
-        //     $twilio = new TwilioService();
-        //     $twilio->sendSMS($user->contact, 'Hi! Your reported item has been resolved. Thank you for using our service.');
-        // }
-
-    return redirect()->back()->with(['message' => 'resolve sucessfully'], 201);
+    if (!$item) {
+        return response()->json(['error' => 'Item not found'], 404);
     }
+    if (!$userId) {
+        return response()->json(['error' => 'user_id not found'], 404);
+    }
+
+    $item->status = 'Claimed';
+    $item->resolved_at = now();
+    $item->save();
+
+    NotificationModel::create([
+        'title' => 'Item Marked as Resolved',
+        'user_id' => $userId,
+        'message' => 'The item you reported has been marked as resolved by the administrator. Thank you for using our service!',
+        'read_status' => 0,
+    ]);
+
+    $user = UserInfo::where('user_id', $userId)->first();
+    
+    if ($user->contact || $item->owner_phone_number) {
+        $contact = $user->contact ?: $item->owner_phone_number;
+
+        if (preg_match('/^0\d+$/', $contact)) {
+            $contact = '+63' . substr($contact, 1); // Convert 0917... -> +63917...
+        }
+
+        $semaphore = new SemaphoreService();
+        $smsResponse = $semaphore->sendSMS(
+            $contact,
+            'Bulan Lost and Found: The item you reported has been marked as resolved by the administrator. Thank you for using our service!'
+        );
+
+        Log::info('Semaphore SMS sent on markAsResolve', [
+            'user_id' => $userId,
+            'to'      => $contact,
+            'response' => $smsResponse,
+        ]);
+    }
+
+    return redirect()->back()->with(['message' => 'resolve successfully'], 201);
+}
+
 
        //     return Inertia::render('admin/Home', [
     //         'categories' => $categories,

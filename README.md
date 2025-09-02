@@ -44,7 +44,7 @@ This system improves communication, transparency, and accessibility by providing
 ### Steps
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/online-lost-and-found.git
+git clone https://github.com/jobelGolde12/bulan_lost_and_found2.git
 
 # Navigate into the project folder
 cd online-lost-and-found

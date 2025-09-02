@@ -1,5 +1,7 @@
-<script setup>
 
+
+<script setup>
+import {Link} from "@inertiajs/vue3";
 </script>
 <template>
   <div>
@@ -14,7 +16,7 @@
                             <li><a href="#">Bonga, Bulan, Sor</a></li>
                         </ul>
                     </div>
-                    <div class="col-md-3">
+                    <!-- <div class="col-md-3">
                         <h5>Social media</h5>
                         <ul class="list-unstyled">
                             <li>
@@ -42,7 +44,7 @@
                                 >
                             </li>
                         </ul>
-                    </div>
+                    </div> -->
                     <div class="col-md-3">
                         <h5>Quick Links</h5>
                         <ul class="list-unstyled">
