@@ -202,7 +202,7 @@ const closePopup = () => {
         <div class="d-flex align-items-center">
           <img v-if="getMessage?.data1?.user_info?.profile_pic"
                 :src="`/storage/${getMessage?.data1?.user_info?.profile_pic}` || '../../images/profile.jpeg'"
-                class="rounded-circle me-2" width="40" height="40" />
+                class="rounded-circle me-2" width="41" height="40" style="max-height: 42px; min-height: 40px; max-width: 40px;" />
           <div>
             <span class="d-block fw-semibold username">{{ getMessage?.data1?.name }}</span>
             <small class="text-success online-text">Online</small>

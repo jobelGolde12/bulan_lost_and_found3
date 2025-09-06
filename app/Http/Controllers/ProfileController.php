@@ -100,43 +100,43 @@ class ProfileController extends Controller
 
     //kapag in update ni admin or user ang kaniya profile information (EditProfile.vue)
     public function userUpdate(Request $request, $id)
-    {
-
-        if (Auth::id() !== (int) $id) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
-    
-        $validated = $request->validate([
-            'profile_pic' => 'nullable|image|mimes:jpg,png,jpeg|max:5120',
-            'address' => 'nullable|string|max:255',
-            'bio' => 'nullable|string|max:1000',
-            'contact' => 'nullable|string|max:15',
-            'facebook_link' => 'nullable|url|max:255',
-        ]);
-
-    
-        $userInfo = UserInfo::where('user_id', $id)->firstOrFail();
-    
-        if ($request->hasFile('profile_pic')) {
-            // Delete old file if it exists
-            if ($userInfo->profile_pic) {
-                Storage::delete($userInfo->profile_pic);
-            }
-    
-            // Store new profile picture
-            $userInfo->profile_pic = $request->file('profile_pic')->store('profile_pics');
-        }
-    
-        // Update other fields using mass assignment
-        $userInfo->update([
-            'address' => $validated['address'] ?? $userInfo->address,
-            'bio' => $validated['bio'] ?? $userInfo->bio,
-            'contact' => $validated['contact'] ?? $userInfo->contact,
-            'facebook_links' => $validated['facebook_link'] ?? $userInfo->facebook_link,
-        ]);
-    
-        return response()->json(['message' => 'Profile updated successfully!'], 200);
+{
+    if (Auth::id() !== (int) $id) {
+        return response()->json(['error' => 'Unauthorized'], 403);
     }
+
+    $validated = $request->validate([
+        'profile_pic' => 'nullable|image|mimes:jpg,png,jpeg|max:5120',
+        'address' => 'nullable|string|max:255',
+        'bio' => 'nullable|string|max:1000',
+        'contact' => 'nullable|string|max:15',
+        'facebook_link' => 'nullable|url|max:255',
+    ]);
+
+    $userInfo = UserInfo::where('user_id', $id)->firstOrFail();
+
+    // Enhance the logic for image storage
+    if ($request->hasFile('profile_pic')) {
+        // Delete old file if it exists
+        if ($userInfo->profile_pic) {
+            Storage::disk('public')->delete($userInfo->profile_pic);
+        }
+
+        // Store new profile picture in the public disk with a unique name
+        $path = $request->file('profile_pic')->storePublicly('profile_pics', 'public');
+        $userInfo->profile_pic = $path;
+    }
+
+    // Update other fields using mass assignment
+    $userInfo->update([
+        'address' => $validated['address'] ?? $userInfo->address,
+        'bio' => $validated['bio'] ?? $userInfo->bio,
+        'contact' => $validated['contact'] ?? $userInfo->contact,
+        'facebook_links' => $validated['facebook_link'] ?? $userInfo->facebook_link,
+    ]);
+
+    return response()->json(['message' => 'Profile updated successfully!'], 200);
+}
     
     public function userUpdatePost(Request $request, $id)
 {

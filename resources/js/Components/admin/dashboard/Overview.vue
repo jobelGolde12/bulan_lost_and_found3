@@ -14,7 +14,7 @@
         </div>
 
         <!-- Bottom labels in a row -->
-        <div class="d-flex flex-row justify-content-start flex-wrap gap-4 mt-3">
+        <!-- <div class="d-flex flex-row justify-content-start flex-wrap gap-4 mt-3">
           <div class="d-flex align-items-center legend">
             <span class="rounded-circle me-2" style="background-color: #FFC043;"></span>
             Lost items
@@ -27,7 +27,7 @@
             <span class="rounded-circle me-2" style="background-color: #7ED957;"></span>
             Resolved cases
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>

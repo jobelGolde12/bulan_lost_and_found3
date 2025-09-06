@@ -43,8 +43,10 @@ watch(
         class="container-fluid d-flex flex-column justify-content-center align-items-center pt-5 gap-2"
       >
         <div class="profile-pic shadow-sm">
-          <img v-if="getUserInfo?.profile_pic" :src="`/storage/${getUserInfo.profile_pic}`" alt="Profile pic" />
-          <img v-else src="../../../images/profile.jpeg" alt="Profile pic" />
+          <img
+          :src="getUserInfo?.profile_pic ? `/storage/${getUserInfo.profile_pic}` : `../../../images/profile.jpeg`"
+          alt="Profile pic"
+        />
         </div>
 
         <div>
