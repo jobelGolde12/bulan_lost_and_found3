@@ -1,4 +1,3 @@
-
 <script setup>
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import {useForm} from "@inertiajs/vue3";
@@ -34,6 +33,9 @@ const locations = computed(() => props.locations);
 const dragState = ref(false);
 const fileInput = ref(null);
 const isSubmitting = ref(false);
+const errorMessage = ref(null); // error state for image
+const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+const allowedTypes = ["image/jpeg", "image/png", "image/jpg", "image/gif", "image/svg+xml"];
 
 const preventDefault = (e) => {
   e.preventDefault();
@@ -44,19 +46,41 @@ const updateDragState = (state) => {
   dragState.value = state;
 };
 
+const validateFile = (file) => {
+  // Reset error
+  errorMessage.value = null;
+
+  // Validate type
+  if (!allowedTypes.includes(file.type)) {
+    errorMessage.value = "Invalid file type. Only JPEG, PNG, JPG, GIF, or SVG are allowed.";
+    form.image = null;
+    return;
+  }
+
+  // Validate size
+  if (file.size > maxSize) {
+    errorMessage.value = "Image must not be larger than 5MB.";
+    form.image = null;
+    return;
+  }
+
+  // If valid
+  form.image = file;
+};
+
 const handleFileDrop = (e) => {
   e.preventDefault();
   updateDragState(false);
   const files = e.dataTransfer.files;
   if (files.length) {
-    form.image = files[0];
+    validateFile(files[0]);
   }
 };
 
 const handleFileChange = (e) => {
   const files = e.target.files;
   if (files.length) {
-    form.image = files[0];
+    validateFile(files[0]);
   }
 };
 
@@ -68,24 +92,20 @@ const submitForm = () => {
   isSubmitting.value = true;
 
   form.transform((data) => {
-  const formData = new FormData();
-  for (const key in data) {
-    if (key === 'image' && !data[key]) continue; 
-    // Kapag wara in provide c user na image eh continue nalang para maging null sa backend para ma butangan default na image
-    formData.append(key, data[key]);
-  }
-  return formData;
-}).post(route("addItem"), {
+    const formData = new FormData();
+    for (const key in data) {
+      if (key === 'image' && !data[key]) continue;
+      formData.append(key, data[key]);
+    }
+    return formData;
+  }).post(route("addItem"), {
     onSuccess: () => {
-    isSubmitting.value = false;
+      isSubmitting.value = false;
       alert("Submitted!");
-      // setTimeout(() => {
-      //   isSubmitting.value = false;
-      // }, 3000);
     },
     onError: (e) => {
-       isSubmitting.value = false;
-       console.error("An error while posting item: ", e)
+      isSubmitting.value = false;
+      console.error("An error while posting item: ", e)
     },
   });
 };
@@ -98,7 +118,6 @@ const submitForm = () => {
   overflow-x: hidden;
 }
 </style>
-
 
 <template>
   <Head title="Report Item" />
@@ -162,6 +181,11 @@ const submitForm = () => {
                   Browse
                 </button>
               </div>
+              <!-- Error message under the image -->
+              <p v-if="errorMessage" class="text-red-500 mt-2">
+                {{ errorMessage }}
+              </p>
+              <p class="text-muted mt-2">Maximum of 5MB</p>
             </div>
             <div>
               <label class="text-gray-600 block mb-2">Item Description</label>
@@ -185,7 +209,7 @@ const submitForm = () => {
                 <option
                   v-for="data in props.categories"
                   :key="data.id"
-                  :value="data.name"
+                  :value="data.id"
                 >
                   {{ data.name }}
                 </option>
@@ -227,4 +251,3 @@ const submitForm = () => {
 
   <!-- <LoadingComponent v-if="isSubmitting" /> -->
 </template>
-

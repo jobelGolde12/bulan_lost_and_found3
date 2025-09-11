@@ -85,6 +85,7 @@ const formatDate = (dateString) => {
               data-bs-toggle="modal"
               data-bs-target="#deleteModal"
               aria-label="Close"
+              @click="passIdToDelete(data.id)"
             ></button>
           </div>
           <p class="mb-2 text-muted" style="font-size: 0.95rem">
@@ -105,7 +106,7 @@ const formatDate = (dateString) => {
               data-bs-toggle="modal"
               data-bs-target="#viewNotification"
               @click.prevent="viewItem(index, data.id, data.read_status)"
-              >View</a
+              >Full View</a
             >
           </div>
         </div>

@@ -40,7 +40,11 @@ class ItemController extends Controller
             : null;
     
         $category = CategoryModel::find($request->category);
-        Log::info(['Category: ' => $category]);
+        if (!$category) {
+            return redirect()->back()->withErrors(['category' => 'Invalid category selected.'])->withInput();
+        }
+    
+         // Check if user is admin
         if(Auth::check() && Auth::user()->role == 'admin'){
             ItemModel::create([
                 'title' => $request->name,

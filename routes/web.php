@@ -138,6 +138,7 @@ Route::post('/submit-contact', [ContactAdminController::class, 'sendMessage'])->
 Route::get('/view-pending-request', [PendingRequestController::class, 'index'])->name('viewPendingRequest');
 Route::post('/approve-request/{item}', [PendingRequestController::class, 'approveRequest'])->name('approverequest');
 Route::get('/view-pending/{item}', [PendingRequestController::class, 'viewPending'])->name('view.pending');
+Route::get('/deny-request-view/{item}', [PendingRequestController::class, 'denyRequestView'])->name('deny.request.view');
 Route::delete('/deny-request/{item}', [PendingRequestController::class, 'denyRequest'])->name('deny.request');
 Route::post('/face-to-face/{item}', [PendingRequestController::class, 'faceTofaceVerification'])->name('f2f.verification');
 

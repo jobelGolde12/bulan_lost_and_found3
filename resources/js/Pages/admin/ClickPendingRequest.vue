@@ -12,7 +12,7 @@ const props = defineProps({
     type: Object,
     default: () => ({}),
   },
-  profile: {
+  profile_pic: {
     type: String,
     default: ''
   },
@@ -37,12 +37,12 @@ watch(
 );
 
 watch(
-  () => props.profile,
+  () => props.profile_pic,
   (newItem) => {
     getProfile.value = newItem;
   },
   {immediate: true}
-)
+);
 
 const approve = () => {
   router.post(route('approverequest', {item: data.value?.id}), {
@@ -51,12 +51,7 @@ const approve = () => {
 }
 
 const deny = () => {
-  const response = confirm("This action will delete the item. Are you sure you want to proceed?");
-  if(!response){ return 0; }
-  
-  router.delete(route('deny.request', {item: data.value?.id}), {
-    onSuccess: () => console.log("denied...")
-  })
+  router.visit(route('deny.request.view', {item: data.value?.id}));
 }
 
 const f2fVerification = () => {
@@ -76,7 +71,7 @@ const f2fVerification = () => {
         
         <div class="mb-6">
           <img
-            :src="data.image_url"
+            :src="data.image_url || '../../../images/noImage.jpg'"
             alt="Item Image"
             class="mx-auto rounded object-cover image-item"
           />
@@ -88,17 +83,10 @@ const f2fVerification = () => {
             <p class="description"><span class="fw-semibold">Description</span> {{ data?.description || 'No description'}}</p>
           </div>
           <Link :href="route('viewUserAsAdmin', {id: props.created_by.id})" class="text-decoration-none d-flex align-items-center justify-content-end gap-2  w-50">
-            <!-- kapag wara profile c user  -->
-            <img
-              v-if="getProfile === 'NA' || getProfile === ''"
-              src="../../../images/profile.jpeg"
-              alt="User"
-              class="profile-pic rounded-full"
-            />
-            <!-- kapag may profile c user  -->
+    
             <img
               v-if="getProfile != ''"
-              :src="props.profile"
+              :src="props.profile_pic ? `/storage/${props.profile_pic}` : `../../../images/noImage.jpg`"
               alt="User"
               class="profile-pic rounded-full"
             />

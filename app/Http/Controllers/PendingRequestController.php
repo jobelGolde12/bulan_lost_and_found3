@@ -8,6 +8,7 @@ use App\Models\PendingRequest;
 use App\Models\TrashModel;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
@@ -46,18 +47,43 @@ class PendingRequestController extends Controller
         public function viewPending($item){
             $getItem = PendingRequest::findOrFail($item);
             $created_by = User::find($getItem?->user_id);
+
+            $profile_pic = $created_by?->userInfo?->profile_pic ?? 'images/noImage.jpg';
             return Inertia::render('admin/ClickPendingRequest', [
                 'item' => $getItem,
-                'created_by' => $created_by
+                'created_by' => $created_by,
+                'profile_pic' => $profile_pic,
             ]);
         }
 
-        public function denyRequest($item){
-         $pending = PendingRequest::findOrFail($item);
-        $pending->delete(); 
-    
-        return redirect()->route('dashboard')->with('success', 'Item approved successfully.');
+        public function denyRequestView($item){
+            $getItem = PendingRequest::findOrFail($item);
+
+            return Inertia::render('admin/DenyPendingRequest', [
+                'item' => $getItem,
+            ]);
         }
+        public function denyRequest(Request $request, $item)
+            {
+                $pending = PendingRequest::findOrFail($item);
+
+                $reason = $request->input('reason');
+
+                $pending->save();
+
+                NotificationModel::create([
+                    'title' => 'Request Denied',
+                    'user_id' => $pending->user_id,
+                    'message' => 'Your item request (' . $pending->title . ') has been denied. Reason: ' . $reason,
+                    'read_status' => 0
+                ]);
+
+                $pending->delete();
+
+                return redirect()
+                    ->route('dashboard')
+                    ->with('success', 'Item denied successfully.');
+            }
 
         public function faceTofaceVerification($item){
             if(!$item){

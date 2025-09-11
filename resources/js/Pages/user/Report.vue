@@ -1,4 +1,3 @@
-
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import {useForm} from "@inertiajs/vue3";
@@ -34,6 +33,10 @@ const locations = computed(() => props.locations);
 const dragState = ref(false);
 const fileInput = ref(null);
 const isSubmitting = ref(false);
+const errorMessage = ref(null);
+
+const maxSize = 5 * 1024 * 1024; // 5 MB
+const allowedTypes = ["image/jpeg", "image/png", "image/jpg", "image/gif", "image/svg+xml"];
 
 const preventDefault = (e) => {
   e.preventDefault();
@@ -44,18 +47,33 @@ const updateDragState = (state) => {
   dragState.value = state;
 };
 
+const validateFile = (file) => {
+  if (!allowedTypes.includes(file.type)) {
+    errorMessage.value = "Invalid file format. Only jpeg, png, jpg, gif, and svg are allowed.";
+    form.image = null;
+    return false;
+  }
+  if (file.size > maxSize) {
+    errorMessage.value = "File too large. Maximum allowed size is 5MB.";
+    form.image = null;
+    return false;
+  }
+  errorMessage.value = null;
+  return true;
+};
+
 const handleFileDrop = (e) => {
   e.preventDefault();
   updateDragState(false);
   const files = e.dataTransfer.files;
-  if (files.length) {
+  if (files.length && validateFile(files[0])) {
     form.image = files[0];
   }
 };
 
 const handleFileChange = (e) => {
   const files = e.target.files;
-  if (files.length) {
+  if (files.length && validateFile(files[0])) {
     form.image = files[0];
   }
 };
@@ -65,27 +83,28 @@ const triggerFileInput = () => {
 };
 
 const submitForm = () => {
+  if (errorMessage.value) {
+    alert("Please fix the file error before submitting.");
+    return;
+  }
+
   isSubmitting.value = true;
 
   form.transform((data) => {
-  const formData = new FormData();
-  for (const key in data) {
-    if (key === 'image' && !data[key]) continue; 
-    // Kapag wara in provide c user na image eh continue nalang para maging null sa backend para ma butangan default na image
-    formData.append(key, data[key]);
-  }
-  return formData;
-}).post(route("addItem"), {
+    const formData = new FormData();
+    for (const key in data) {
+      if (key === 'image' && !data[key]) continue;
+      formData.append(key, data[key]);
+    }
+    return formData;
+  }).post(route("addItem"), {
     onSuccess: () => {
-    isSubmitting.value = false;
-      alert("Submitted!");
-      // setTimeout(() => {
-      //   isSubmitting.value = false;
-      // }, 3000);
+      isSubmitting.value = false;
+      alert("Submitted! your item will be reviewed by admin. We will notify you once your item is approved.");
     },
     onError: (e) => {
-       isSubmitting.value = false;
-       console.error("An error while posting item: ", e)
+      isSubmitting.value = false;
+      console.error("An error while posting item: ", e)
     },
   });
 };
@@ -99,7 +118,6 @@ const submitForm = () => {
 }
 </style>
 
-
 <template>
   <Head title="Report Item" />
   <AuthenticatedLayout>
@@ -108,6 +126,7 @@ const submitForm = () => {
 
       <div class="container mx-auto px-6 py-8">
         <form @submit.prevent="submitForm" class="form space-y-6">
+          <!-- Item Name & Location -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label class="text-gray-600 block mb-2">Item Name</label>
@@ -134,6 +153,7 @@ const submitForm = () => {
             </div>
           </div>
 
+          <!-- Image & Description -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label class="text-gray-600 block mb-2">Item Image (Optional)</label>
@@ -162,6 +182,8 @@ const submitForm = () => {
                   Browse
                 </button>
               </div>
+              <!-- Error message -->
+              <p v-if="errorMessage" class="text-red-500 mt-2">{{ errorMessage }}</p>
             </div>
             <div>
               <label class="text-gray-600 block mb-2">Item Description</label>
@@ -173,6 +195,7 @@ const submitForm = () => {
             </div>
           </div>
 
+          <!-- Category & Phone -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label class="text-gray-600 block mb-2">Category</label>
@@ -185,7 +208,7 @@ const submitForm = () => {
                 <option
                   v-for="data in props.categories"
                   :key="data.id"
-                  :value="data.name"
+                  :value="data.id"
                 >
                   {{ data.name }}
                 </option>
@@ -202,6 +225,7 @@ const submitForm = () => {
             </div>
           </div>
 
+          <!-- Status -->
           <div>
             <label class="text-gray-600 block mb-2">Status</label>
             <select
@@ -213,6 +237,7 @@ const submitForm = () => {
             </select>
           </div>
 
+          <!-- Submit -->
           <button
             type="submit"
             class="w-100 btn btn-dark py-3"
@@ -224,7 +249,4 @@ const submitForm = () => {
       </div>
     </div>
   </AuthenticatedLayout>
-
-  <!-- <LoadingComponent v-if="isSubmitting" /> -->
 </template>
-
