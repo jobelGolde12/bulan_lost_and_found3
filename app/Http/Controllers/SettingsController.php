@@ -39,7 +39,6 @@ class SettingsController extends Controller
     public function notifications()
     {
         $notification = NotificationModel::where("user_id", Auth::id())->get();
-        // dd("notifications => " . $notification);
         if(Auth::user()->role == 'admin'){
             return Inertia::render('Settings/admin/Notifications', [
                 'notification' => $notification,

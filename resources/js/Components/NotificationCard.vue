@@ -18,39 +18,48 @@ watch(
   { immediate: true }
 );
 
-const selectedNotification = ref(null);
-const modalResult = ref(null);
-const viewItemIndex = ref(null);
-
-const deleteNotification = () => {
-  modalResult.value = "yes";
+const deleteNotification = (id) => {
   router.delete(
-    route("settings.deleteNotification", { id: selectedNotification.value }),
+    route("settings.deleteNotification", { id }),
     {},
     {
-      onSuccess: alert("Notification Trashed."),
+      onSuccess: () => alert("Notification Trashed."),
     }
   );
 };
-
-const passIdToDelete = (id) => {
-  selectedNotification.value = id;
-};
-
-const viewItem = (index, id, readStatus) => {
-  viewItemIndex.value = index;
-  if (readStatus === 1) {
-    return 0;
-  }
-  router.put(
-    route("settings.modifyReadStatus", { notification: id }),
-    {},
-    {
+console.log(getData);
+const viewItem = (index, id, readStatus, title, itemId) => {
+  if (readStatus === 0) {
+    router.put(route("settings.modifyReadStatus", { notification: id }), {}, {
       onSuccess: () => {
         getData.value[index].read_status = 1;
       },
-    }
-  );
+    });
+  }
+
+  if(!itemId) {
+    alert("No associated item for this notification.");
+    return;
+  }
+
+  // Redirect based on title
+  if (title.includes("resolved")) {
+
+    router.visit(route("resolvedPage", { itemId }));
+
+  } else if (title.includes("denied")) {
+    alert("Cannot redirect to denied item as it has been deleted.");
+
+  } else if (title.includes("faceToFaceVerification")) {
+
+    router.visit(route("faceToFaceVerificationPage", { itemId }));
+
+  } else if (title.includes("approved")) {
+    router.get(route("viewItemInfo", { itemId }));
+
+  } else {
+    alert("No redirect page defined for this title.");
+  }
 };
 
 const formatDate = (dateString) => {
@@ -82,10 +91,8 @@ const formatDate = (dateString) => {
             <button
               type="button"
               class="btn-close ms-2"
-              data-bs-toggle="modal"
-              data-bs-target="#deleteModal"
               aria-label="Close"
-              @click="passIdToDelete(data.id)"
+              @click="deleteNotification(data.id)"
             ></button>
           </div>
           <p class="mb-2 text-muted" style="font-size: 0.95rem">
@@ -95,116 +102,15 @@ const formatDate = (dateString) => {
             <a
               href="#"
               class="me-3 text-decoration-none text-secondary"
-              data-bs-toggle="modal"
-              data-bs-target="#deleteModal"
-              @click="passIdToDelete(data.id)"
+              @click.prevent="deleteNotification(data.id)"
               >Delete</a
             >
             <a
               href="#"
               class="text-decoration-none fw-bold"
-              data-bs-toggle="modal"
-              data-bs-target="#viewNotification"
-              @click.prevent="viewItem(index, data.id, data.read_status)"
-              >Full View</a
+              @click.prevent="viewItem(index, data.id, data.read_status, data.title, data.item_id)"
+              >View</a
             >
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Delete Modal -->
-    <div
-      class="modal fade"
-      id="deleteModal"
-      tabindex="-1"
-      aria-labelledby="exampleModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h1 class="modal-title fs-5" id="exampleModalLabel">Dismiss</h1>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body">
-            This action can
-            <span class="text-danger">delete</span> the notification, are you
-            sure you want to proceed?
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
-              No
-            </button>
-            <button
-              type="button"
-              class="btn btn-info"
-              @click="deleteNotification"
-              data-bs-dismiss="modal"
-            >
-              Yes
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- View Modal -->
-    <div
-      class="modal fade"
-      id="viewNotification"
-      tabindex="-1"
-      aria-labelledby="exampleModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h1 class="modal-title fs-5" id="exampleModalLabel">
-              Notification details
-            </h1>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <div>
-              <p class="text-dark mb-0">
-                <span class="fw-bold">Title: </span>
-                {{ getData[viewItemIndex]?.title || "No title" }}
-              </p>
-
-              <p class="text-dark mb-0">
-                <span class="fw-bold">Message: </span>
-                {{ getData[viewItemIndex]?.message || "No description" }}
-              </p>
-
-              <p class="text-dark mb-0">
-                <span class="fw-bold">Date: </span>
-                {{ formatDate(getData[viewItemIndex]?.created_at) || "No date" }}
-              </p>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
-              Close
-            </button>
           </div>
         </div>
       </div>

@@ -38,6 +38,14 @@ class PendingRequestController extends Controller
             'reported_at',
         ]);
     
+        NotificationModel::create([
+            'title' => 'Request Approved',
+            'user_id' => $approveItem->user_id,
+            'message' => 'Your item request (' . $approveItem->title . ') has been approved and is now live on the platform.',
+            'read_status' => 0,
+            'item_id' => $approveItem->id,
+        ]);
+        
         ItemModel::create($data);
     
         $approveItem->delete(); 
@@ -75,7 +83,8 @@ class PendingRequestController extends Controller
                     'title' => 'Request Denied',
                     'user_id' => $pending->user_id,
                     'message' => 'Your item request (' . $pending->title . ') has been denied. Reason: ' . $reason,
-                    'read_status' => 0
+                    'read_status' => 0,
+                    'item_id' => $pending->id,
                 ]);
 
                 $pending->delete();
@@ -96,7 +105,8 @@ class PendingRequestController extends Controller
                 'title' => 'Face to Face Verification',
                 'user_id' => $pending->user_id,
                 'message' => 'Hi ' . $userName . ', ' . ' your item (' . $pending->title . ') needs to be verified face to face. We encourage you to visit the PNP for additional verification of the item you wish to post.',
-                'read_status' => 0
+                'read_status' => 0,
+                'item_id' => $pending->id,
             ]);
         return redirect()->route('dashboard')->with('success', 'Item approved successfully.');
         }
