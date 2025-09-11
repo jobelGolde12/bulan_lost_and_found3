@@ -14,17 +14,17 @@ const items = [
   {
     question: 'How do I report a lost item?',
     answer:
-      'Go to the "Report Lost Item" section, fill out the form with the item details and your contact info.',
+      'Go to the "Report" section, fill out the form with the item details and your contact info.',
   },
   {
     question: 'How do I report a found item?',
     answer:
-      'Visit the "Report Found Item" page, enter item description and where it was found.',
+      'Visit the "Report" page, enter item description and where it was found.',
   },
   {
     question: 'How does the verification process work?',
     answer:
-      'Claimants must answer verification questions and provide supporting evidence.',
+      'Claimants must answer verification questions and provide supporting evidence. (Can only claim in PNP Station)',
   },
 ]
 
@@ -40,7 +40,7 @@ function toggle(index) {
       <div class="container-fluid">
         <div class="d-flex align-items-center">
           <img src="../../images/lost_and_found_logo.png" class="rounded-circle me-2 logo" alt="Logo">
-          <span class="logo-text">Lost & Found</span>
+          <Link :href="route('dashboard')" class="logo-text text-decoration-none text-dark">Lost & Found</Link>
         </div>
         <Link :href="route('settings.notifications')" class="back-link text-decoration-none text-dark">Back <i class="bi bi-caret-right-fill back-link-i"></i></Link>
       </div>
@@ -53,20 +53,20 @@ function toggle(index) {
       </div>
 
       <div>
-        <h3 class="section-title">1. Introduction</h3>
-        <p>Welcome to the Bulan Lost and Found web app. Our platform is designed to help individuals report and recover lost and found items within the Municipality of Bulan. By using our services, you agree to comply with the following terms and policies.</p>
+        
+        <p class="text-center">Welcome to the Bulan Lost and Found web app. Our platform is designed to help individuals report and recover lost and found items within the Municipality of Bulan. By using our services, you agree to comply with the following terms and policies.</p>
 
         <h3 class="section-title">2. User Responsibilities</h3>
         <ul>
-          <li>Users must provide accurate information when reporting a lost or found item.</li>
-          <li>Any false or misleading reports may result in account suspension or removal.</li>
+          <li>Users must provide <span class="fw-bold">accurate information</span> when reporting a lost or found item.</li>
+          <li>Any false or misleading reports may result in account <span class="fw-bold">suspension or removal</span>.</li>
           <li>The platform is not responsible for verifying the ownership of lost items; it is the responsibility of the involved parties to communicate and validate ownership.</li>
         </ul>
 
         <h3 class="section-title">3. Reporting Lost and Found Items</h3>
         <ul>
-          <li>When reporting a <strong>lost item</strong> to the police, provide detailed descriptions, photos (if available), and the last known location.</li>
-          <li>When reporting a <strong>found item</strong> to the police, include clear details and a safe pickup location or return found item to the police station.</li>
+          <li>When reporting a <strong>lost item</strong>, provide detailed descriptions, photos (if available), and the last known location.</li>
+          <li>When reporting a <strong>found item</strong>, include clear details and a safe pickup location or return found item to the police station.</li>
           <li>Contact information should be provided for easier communication between the finder and the owner.</li>
         </ul>
 
@@ -175,7 +175,10 @@ function toggle(index) {
   margin: 4rem auto;
   padding: 0 1rem;
 }
-
+.main-container{
+  min-height: 100vh;
+  overflow-y: scroll;
+}
 .page-title {
   text-align: center;
   font-size: 1.75rem;
