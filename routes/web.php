@@ -179,6 +179,7 @@ Route::prefix('viewMoreUsers')->name('viewMoreUsers.')->middleware('auth')->grou
 //view user para sa user (diri admin)
 Route::get('/view-user-info/{id}', [UserController::class, 'viewUser'])->name('view.userAsUser'); //specific user
 Route::get('/my-pending-requests', [UserController::class, 'myPendingRequests'])->name('my.pending'); //specific user
+Route::get('/face-to-face/{id}', [UserController::class, 'faceToFace'])->name('face.to.face'); //specific user
 //Find Match
 Route::get('/find-match', [FindMatchController::class, 'index'])->name('findMatch.index');
 require __DIR__.'/auth.php';

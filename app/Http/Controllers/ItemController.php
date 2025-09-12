@@ -187,12 +187,15 @@ public function markAsResolve($id, $userId)
     $item->resolved_at = now();
     $item->save();
 
-    NotificationModel::create([
+    $notification = NotificationModel::create([
         'title' => 'Item Marked as Resolved',
         'user_id' => $userId,
         'message' => 'The item you reported has been marked as resolved by the administrator. Thank you for using our service!',
         'read_status' => 0,
     ]);
+
+    $notification->item_id = $item->id;
+    $notification->save();
 
     $user = UserInfo::where('user_id', $userId)->first();
     

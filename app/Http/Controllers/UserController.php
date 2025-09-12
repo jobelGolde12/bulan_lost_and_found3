@@ -96,4 +96,15 @@ class UserController extends Controller
         ]);
       
     }
+
+     public function faceToFace($id)
+    {
+        $items = PendingRequest::where('id', $id)->get();
+        // dd($items ? $items : "No items found");
+        return Inertia::render('user/FaceToFace', [
+            'title' => 'Face to Face Verification',
+            'requests' => $items
+        ]);
+      
+    }
 }

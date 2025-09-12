@@ -10,6 +10,9 @@ const props = defineProps({
 });
 
 const getData = ref([]);
+const alertMessage = ref("");
+const showAlert = ref(false);
+
 watch(
   () => props.notification,
   (i) => {
@@ -23,7 +26,14 @@ const deleteNotification = (id) => {
     route("settings.deleteNotification", { id }),
     {},
     {
-      onSuccess: () => alert("Notification Trashed."),
+      onSuccess: () => {
+        alertMessage.value = "Notification deleted successfully.";
+        showAlert.value = true;
+
+        setTimeout(() => {
+          showAlert.value = false;
+        }, 3000);
+      },
     }
   );
 };
@@ -37,26 +47,20 @@ const viewItem = (index, id, readStatus, title, itemId) => {
     });
   }
 
-  if(!itemId) {
+  if (title.toLowerCase().includes("denied")) {
+    alert("Cannot redirect to denied item as it has been deleted.");
+    return;
+  } else if (!itemId) {
     alert("No associated item for this notification.");
     return;
   }
 
-  // Redirect based on title
-  if (title.includes("resolved")) {
-
-    router.visit(route("resolvedPage", { itemId }));
-
-  } else if (title.includes("denied")) {
-    alert("Cannot redirect to denied item as it has been deleted.");
-
-  } else if (title.includes("faceToFaceVerification")) {
-
-    router.visit(route("faceToFaceVerificationPage", { itemId }));
-
-  } else if (title.includes("approved")) {
-    router.get(route("viewItemInfo", { itemId }));
-
+  if (title.toLowerCase().includes("resolved")) {
+    alert("Your reported item has been marked as resolved. Thank you for using our service!");
+  } else if (title.toLowerCase().includes("face to face")) {
+    router.get(route("face.to.face", { id: itemId }));
+  } else if (title.toLowerCase().includes("approved")) {
+    router.get(route("viewItemInfo", { item: itemId }));
   } else {
     alert("No redirect page defined for this title.");
   }
@@ -70,8 +74,13 @@ const formatDate = (dateString) => {
 
 <template>
   <div>
-    <!-- Flex container for cards -->
-    <div class="d-flex flex-wrap gap-3">
+    <!-- Bootstrap alert -->
+    <div v-if="showAlert" class="alert alert-success text-center" role="alert">
+      {{ alertMessage }}
+    </div>
+
+    <!-- Scrollable flex container -->
+    <div class="notification-container d-flex flex-wrap gap-3">
       <div
         class="card p-3 rounded"
         style="width: 500px"
@@ -127,5 +136,10 @@ const formatDate = (dateString) => {
 }
 .card {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.notification-container {
+  max-height: 500px;
+  overflow-y: auto;
+  padding-right: 8px;
 }
 </style>

@@ -25,6 +25,7 @@ class PendingRequestController extends Controller
         $approveItem = PendingRequest::findOrFail($item);
     
         $data = $approveItem->only([
+            'id',
             'user_id',
             'title',
             'description',
@@ -37,19 +38,20 @@ class PendingRequestController extends Controller
             'owner_phone_number',
             'reported_at',
         ]);
-    
-        NotificationModel::create([
+        Log::info(['Approved item data:' => $data]);
+        $notification = NotificationModel::create([
             'title' => 'Request Approved',
             'user_id' => $approveItem->user_id,
             'message' => 'Your item request (' . $approveItem->title . ') has been approved and is now live on the platform.',
             'read_status' => 0,
-            'item_id' => $approveItem->id,
         ]);
-        
-        ItemModel::create($data);
-    
-        $approveItem->delete(); 
-    
+       
+        $item = ItemModel::create($data);
+        $notification->item_id = $item->id;
+        $notification->save();
+
+        $approveItem->delete();
+
         return redirect()->route('dashboard')->with('success', 'Item approved successfully.');
     }
         public function viewPending($item){
@@ -79,13 +81,15 @@ class PendingRequestController extends Controller
 
                 $pending->save();
 
-                NotificationModel::create([
+                $notification = NotificationModel::create([
                     'title' => 'Request Denied',
                     'user_id' => $pending->user_id,
                     'message' => 'Your item request (' . $pending->title . ') has been denied. Reason: ' . $reason,
                     'read_status' => 0,
                     'item_id' => $pending->id,
                 ]);
+                $notification->item_id = $notification->id;
+                $notification->save();
 
                 $pending->delete();
 
@@ -101,13 +105,16 @@ class PendingRequestController extends Controller
             $pending = PendingRequest::findOrFail($item);
             $userName = User::find($pending->user_id)->name;
 
-            NotificationModel::create([
+            $notification =NotificationModel::create([
                 'title' => 'Face to Face Verification',
                 'user_id' => $pending->user_id,
                 'message' => 'Hi ' . $userName . ', ' . ' your item (' . $pending->title . ') needs to be verified face to face. We encourage you to visit the PNP for additional verification of the item you wish to post.',
                 'read_status' => 0,
                 'item_id' => $pending->id,
             ]);
+
+            $notification->item_id = $pending->id;
+              $notification->save();
         return redirect()->route('dashboard')->with('success', 'Item approved successfully.');
         }
 }
