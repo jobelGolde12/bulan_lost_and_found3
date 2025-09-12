@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DeniedRequest;
 use App\Models\ItemModel;
 use App\Models\NotificationModel;
 use App\Models\PendingRequest;
@@ -88,7 +89,14 @@ class PendingRequestController extends Controller
                     'read_status' => 0,
                     'item_id' => $pending->id,
                 ]);
-                $notification->item_id = $notification->id;
+               
+
+                $deniedRequest = DeniedRequest::create([
+                    'request_id' => $pending->id,
+                    'user_id' => $pending->user_id,
+                    'reason' => $reason,
+                ]);
+                $notification->item_id = $deniedRequest->request_id;
                 $notification->save();
 
                 $pending->delete();

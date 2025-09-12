@@ -8,7 +8,6 @@ const props = defineProps({
     default: () => [],
   },
 });
-console.log("Requests:", props.requests);
 </script>
 
 <template>
@@ -55,7 +54,7 @@ console.log("Requests:", props.requests);
               <i
                 :class="req.pending_status === 'pending' ? 'bi bi-clock' : 'bi bi-check-circle'"
               ></i>
-              {{ req.pending_status }}
+              {{ req.pending_status }} - Need face to face verification
             </span>
           </div>
           <div class="card-footer bg-light d-flex justify-content-between align-items-center">
@@ -76,9 +75,7 @@ console.log("Requests:", props.requests);
     </div>
 
     <div class=" mt-3">
-      <Link :href="route('dashboard')" class="btn btn-dark">
-        <i class="bi bi-arrow-left"></i> Back to Dashboard
-      </Link>
+              <Link :href="route('settings.index')" class="btn btn-dark mt-3">Go back</Link>
     </div>
   </div>
 </template>

@@ -20,7 +20,7 @@ watch(
   },
   { immediate: true }
 );
-
+console.log("Notifications:", props.notification);
 const deleteNotification = (id) => {
   router.delete(
     route("settings.deleteNotification", { id }),
@@ -36,9 +36,10 @@ const deleteNotification = (id) => {
       },
     }
   );
-};
-console.log(getData);
-const viewItem = (index, id, readStatus, title, itemId) => {
+};const viewItem = (index, id, readStatus, title, itemId) => {
+  const t = title.toLowerCase();
+
+  // mark as read if not already
   if (readStatus === 0) {
     router.put(route("settings.modifyReadStatus", { notification: id }), {}, {
       onSuccess: () => {
@@ -47,20 +48,33 @@ const viewItem = (index, id, readStatus, title, itemId) => {
     });
   }
 
-  if (title.toLowerCase().includes("denied")) {
-    alert("Cannot redirect to denied item as it has been deleted.");
-    return;
-  } else if (!itemId) {
+  if (!itemId) {
     alert("No associated item for this notification.");
     return;
   }
 
-  if (title.toLowerCase().includes("resolved")) {
-    alert("Your reported item has been marked as resolved. Thank you for using our service!");
-  } else if (title.toLowerCase().includes("face to face")) {
-    router.get(route("face.to.face", { id: itemId }));
-  } else if (title.toLowerCase().includes("approved")) {
-    router.get(route("viewItemInfo", { item: itemId }));
+  // mapping for notification actions
+  const actions = {
+    resolved: () => {
+      alert("Your reported item has been marked as resolved. Thank you for using our service!");
+    },
+    "face to face verification": () => {
+      console.log("called:", title);
+      router.get(route("face.to.face", { id: itemId }));
+    },
+    approved: () => {
+      router.get(route("viewItemInfo", { item: itemId }));
+    },
+    denied: () => {
+      router.get(route("deniedRequests.index", { itemId }));
+    },
+  };
+
+  // find a matching key in actions
+  const match = Object.keys(actions).find((key) => t.includes(key));
+
+  if (match) {
+    actions[match](); // call the matched action
   } else {
     alert("No redirect page defined for this title.");
   }

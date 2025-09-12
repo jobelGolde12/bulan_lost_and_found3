@@ -10,6 +10,7 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\TrashController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ContactAdminController;
+use App\Http\Controllers\DeniedRequestController;
 use App\Http\Controllers\FindMatchController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\MyPermissionController;
@@ -180,6 +181,11 @@ Route::prefix('viewMoreUsers')->name('viewMoreUsers.')->middleware('auth')->grou
 Route::get('/view-user-info/{id}', [UserController::class, 'viewUser'])->name('view.userAsUser'); //specific user
 Route::get('/my-pending-requests', [UserController::class, 'myPendingRequests'])->name('my.pending'); //specific user
 Route::get('/face-to-face/{id}', [UserController::class, 'faceToFace'])->name('face.to.face'); //specific user
+
+Route::prefix('deniedRequests')->name('deniedRequests.')->middleware('auth')->group(function (){
+    Route::get('/view-denied-requests/{itemId}', [DeniedRequestController::class, 'index'])->name('index');
+});
+
 //Find Match
 Route::get('/find-match', [FindMatchController::class, 'index'])->name('findMatch.index');
 require __DIR__.'/auth.php';
