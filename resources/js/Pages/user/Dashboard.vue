@@ -2,7 +2,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import FilterComponent from "@/Components/user/FilterComponent.vue";
 import { Head, useForm } from "@inertiajs/vue3";
-import { defineProps, ref, computed } from "vue";
+import { defineProps, ref, computed, defineEmits, onMounted } from "vue";
 import CategoriesList from "@/Components/user/CategoriesList.vue";
 import ItemCard from "@/Components/ItemCard.vue";
 
@@ -14,8 +14,13 @@ const props = defineProps({
   items: {
     type: Array,
     default: [],
-  }
+  },
+  isHavePending: {
+    type: Boolean,
+    default: false,
+  },
 });
+
 
 const itemNameContainer = ref(props.items.map((item) => item.title));
 const categoriesContainer = ref([
@@ -78,7 +83,7 @@ const handleSearch = () => {
 
 <template>
   <Head title="Dashboard" />
-  <AuthenticatedLayout>
+  <AuthenticatedLayout :isHavePending="props.isHavePending">
     <div class="main-container bg-light">
       <div class="container-fluid mt-4 d-flex flex-row justify-content-between align-items-center">
         <div class="logo d-none d-sm-block d-lg-block">Lost And Found</div>

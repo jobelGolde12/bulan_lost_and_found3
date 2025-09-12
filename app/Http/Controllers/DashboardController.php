@@ -34,9 +34,11 @@ class DashboardController extends Controller
         $query->where('user_id', $userId);
          }])->orderBy('created_at', 'desc')->get();
         
+         $isHavePending = PendingRequest::where('user_id', Auth::id())->exists();
             return Inertia::render('user/Dashboard', [
                 'categories' => $categories,
                 'items' => $items,
+                'isHavePending' => $isHavePending,
         ]); 
         }else if (Auth::check() && Auth::user()->role === 'admin') { 
             $userCount = User::count();

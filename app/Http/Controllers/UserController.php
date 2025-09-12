@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ItemCategories;
 use App\Models\LocationModel;
+use App\Models\PendingRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -86,5 +87,13 @@ class UserController extends Controller
 
     return redirect()->route('user.edit', $user)->with('success', 'User information updated successfully.');
 }
-
+    public function myPendingRequests()
+    {
+        $items = PendingRequest::where('user_id', Auth::id())->get();
+        return Inertia::render('user/MyPendingRequest', [
+            'title' => 'My Pending Requests',
+            'requests' => $items
+        ]);
+      
+    }
 }

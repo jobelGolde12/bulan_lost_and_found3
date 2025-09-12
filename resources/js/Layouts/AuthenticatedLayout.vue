@@ -1,10 +1,22 @@
 <script setup>
 import { usePage } from "@inertiajs/vue3";
 import { Link } from "@inertiajs/vue3";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, defineProps,watch } from "vue";
 import LogoutButton from "@/Components/user/LogoutButton.vue";
 const currentRoute = usePage().url;
 
+const props = defineProps({
+  isHavePending: {
+    type: Boolean,
+    default: false,
+  },
+});
+
+const hasPendingRequests = ref(false);
+
+watch(() => props.isHavePending, (newValue) => {
+  hasPendingRequests.value = newValue;
+});
 
 const user = usePage().props.auth?.user;
 const isSidebarOpen = ref(localStorage.getItem('isSidebarOpen') === 'true');
@@ -89,6 +101,15 @@ onMounted(() => {
           <span v-if="isSidebarOpen">Message</span>
         </Link>
 
+        <Link 
+        :href="route('my.pending')" 
+        :class="{ active: currentRoute === route('my.pending') }"
+        class="btn btn-primary bg-primary text-light" type="button" 
+        v-if="props.isHavePending"
+        >
+          <span class="spinner-grow spinner-grow-sm me-2" role="status" aria-hidden="true"></span>
+          <span v-if="isSidebarOpen">Pending Requests</span>
+        </Link>
         
       </div>
            <LogoutButton :modifyWidth="isSidebarOpen"/>
@@ -198,6 +219,7 @@ onMounted(() => {
 .sidebar.closed ~ .right {
   width: calc(100% - 5%);
 }
+
 
 /* Mobile View */
 @media screen and (max-width: 800px) {
