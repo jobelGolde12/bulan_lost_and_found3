@@ -16,6 +16,7 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\MyPermissionController;
 use App\Http\Controllers\NotificationTrashController;
 use App\Http\Controllers\PendingRequestController;
+use App\Http\Controllers\StorageCleaner;
 use App\Http\Controllers\TotalLostItem;
 use App\Http\Controllers\UserTrashController;
 use App\Http\Controllers\ViewLaterController;
@@ -185,6 +186,9 @@ Route::get('/face-to-face/{id}', [UserController::class, 'faceToFace'])->name('f
 Route::prefix('deniedRequests')->name('deniedRequests.')->middleware('auth')->group(function (){
     Route::get('/view-denied-requests/{itemId}', [DeniedRequestController::class, 'index'])->name('index');
 });
+
+Route::post('/storage-cleaner/delete-claimed', [StorageCleaner::class, 'deleteClaimed'])
+    ->name('storage-cleaner.delete-claimed');
 
 //Find Match
 Route::get('/find-match', [FindMatchController::class, 'index'])->name('findMatch.index');

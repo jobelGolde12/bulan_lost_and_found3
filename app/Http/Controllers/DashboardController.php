@@ -46,13 +46,22 @@ class DashboardController extends Controller
             $recentLostAndFound = ItemModel::whereMonth('created_at', Carbon::now()->month)
             ->whereYear('created_at', Carbon::now()->year)
             ->orderBy('created_at', 'desc')->get();
-            return Inertia::render('admin/Dashboard', [
+
+            // move to storage cleaner if more than 1000 items 
+            if($getItemAsAdmin->count() > 1000){
+                 return Inertia::render('admin/storageCleaner/Index', [
+                'totalItems' => $getItemAsAdmin->count(),
+           ]); 
+            }else{
+                 return Inertia::render('admin/Dashboard', [
                 'categories' => $categories,
                 'items' => $getItemAsAdmin,
                 'pending_request_count' => $pendingRequestCount,
                 'user_count' => $userCount,
                 'recentLostAndFound' => $recentLostAndFound,
         ]); 
+            }
+           
         }
     }
 }

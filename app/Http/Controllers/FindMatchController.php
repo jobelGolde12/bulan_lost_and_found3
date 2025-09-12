@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\ItemModel;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
@@ -32,34 +31,31 @@ class FindMatchController extends Controller
 
         foreach ($foundItems as $foundItem) {
             $matchedLostItems = $lostItems->filter(function ($lostItem) use ($foundItem, $keyword) {
-                // Normalize location
+                // Normalize location & category
                 $lostLocation = strtolower(trim($lostItem->location));
                 $foundLocation = strtolower(trim($foundItem->location));
+                $lostCategory = strtolower(trim($lostItem->category));
+                $foundCategory = strtolower(trim($foundItem->category));
 
-                // Require location match
-                $locationMatch = $lostLocation === $foundLocation;
-
-                // Combine text fields for similarity
-                $lostText = strtolower($lostItem->title . ' ' . $lostItem->description);
-                $foundText = strtolower($foundItem->title . ' ' . $foundItem->description);
-
-                // Use keyword if provided, otherwise fallback to found item's title
-                $searchKeyword = $keyword ?: strtolower($foundItem->title);
-
-                // Check if keyword appears in either item's text
-                $keywordMatch = Str::contains($lostText, $searchKeyword) || Str::contains($foundText, $searchKeyword);
-
-                // Check for shared keywords like "bike", "black", etc.
-                $commonWords = ['bike', 'black', 'mountain', 'bag', 'phone', 'wallet'];
-                $textMatch = false;
-                foreach ($commonWords as $word) {
-                    if (Str::contains($lostText, $word) && Str::contains($foundText, $word)) {
-                        $textMatch = true;
-                        break;
-                    }
+                // Require location + category match
+                if ($lostLocation !== $foundLocation || $lostCategory !== $foundCategory) {
+                    return false;
                 }
 
-                return $locationMatch && ($keywordMatch || $textMatch);
+                // Break titles into words
+                $lostTitleWords = array_unique(preg_split('/\s+/', strtolower($lostItem->title)));
+                $foundTitleWords = array_unique(preg_split('/\s+/', strtolower($foundItem->title)));
+
+                // Check if at least one word from found title exists in lost title
+                $sharedWords = array_intersect($lostTitleWords, $foundTitleWords);
+
+                // If keyword is provided, enforce that it must be present in title
+                $keywordMatch = true;
+                if ($keyword) {
+                    $keywordMatch = in_array($keyword, $lostTitleWords) || in_array($keyword, $foundTitleWords);
+                }
+
+                return !empty($sharedWords) && $keywordMatch;
             });
 
             if ($matchedLostItems->isNotEmpty()) {
@@ -67,8 +63,6 @@ class FindMatchController extends Controller
                     'foundItem' => $foundItem,
                     'matchedLostItems' => $matchedLostItems->values()
                 ];
-
-                // Log::info("Found item ID {$foundItem->id} matched with " . $matchedLostItems->count() . " lost items.");
             }
         }
 
