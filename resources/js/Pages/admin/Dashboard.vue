@@ -2,16 +2,13 @@
 import { Head } from '@inertiajs/vue3';
 import { computed, defineProps, ref, watch } from 'vue';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
-import TotalLostItemCard from '@/Components/admin/dashboard/TotalLostItemCard.vue';
-import TotalFoundItemCard from '@/Components/admin/dashboard/TotalFoundItemCard.vue';
 import ResolveCasesChart from '@/Components/admin/dashboard/ResolveCasesChart.vue';
 import ResolveCasesChartYearly from '@/Components/admin/dashboard/ResolveCasesChartYearly.vue';
-import PendingRequest from '@/Components/admin/dashboard/PendingRequest.vue';
-import PendingRequestCard from '@/Components/admin/dashboard/PendingRequestCard.vue';
 import UserRegistration from '@/Components/admin/dashboard/UserRegistration.vue';
 import { useFilterChart } from '@/piniaStore/FilterChart';
 import RecentLostAndFoundReports from './users/RecentLostAndFoundReports.vue';
 import Overview from '@/Components/admin/dashboard/Overview.vue';
+
 import * as echarts from 'echarts/core';
 import { PieChart } from 'echarts/charts';
 import {
@@ -20,6 +17,8 @@ import {
   LegendComponent,
 } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
+import TotalLostAndFound from '@/Components/admin/dashboard/TotalLostAndFound.vue';
+import { usePendingRequestStore } from "@/piniaStore/pendingRequestStore";
 
 echarts.use([PieChart, TitleComponent, TooltipComponent, LegendComponent, CanvasRenderer]);
 
@@ -55,6 +54,17 @@ const props = defineProps({
     default: () => []
   }
 });
+
+const store = usePendingRequestStore();
+watch(
+  () => props.pending_request_count,
+  (val) => {
+    if (val !== undefined) {
+      store.setCount(val);
+    }
+  },
+  { immediate: true }
+);
 
 const storageProgress = 75; // Sample value for resolved
 const storageDetails = [
@@ -107,40 +117,23 @@ overViewData.value = {
   <Head title="Dashboard" />
   <AdminLayout>
     <div class="dashboard-container">
-      <!-- para sa large screen  -->
-      <div class="container-fluid px-0 d-flex flex-row justify-content-between align-items-center d-none d-lg-block">
-        <div class="container-top container-fluid pe-0 d-flex flex-row justify-content-between" style="min-height: 300px;  max-height: 200px;" >
-            <div class=" pt-4 ps-0 header">
+        <div class="container-top container-fluid pe-0 d-flex justify-content-between" style="min-height: 300px;  max-height: 200px;" >
+            <div class=" header">
               <h1 class="fw-bold mb-2">Lost & Found Admin Dashboard</h1>
               <p class="text-muted">Manage reports, users, and system settings effectively.</p>
           </div>
 
-          <div class="d-flex flex-column w-50 h-50">
-            <div class=" d-flex flex-row gap-2 pe-0">
-           <TotalLostItemCard :lostItems="counts.lost" class="top-card"/>
-           <TotalFoundItemCard :foundItems="counts.found" class="top-card "/>
-          </div>
-          </div>
-      </div>
-      </div>
-      <!-- Para sa small screen  -->
-      <div class="container-fluid px-0 d-flex flex-column pt-2 justify-content-between align-items-center d-block d-lg-none">
-          <div class="container-fluid text-center">
-              <h1 class="fw-bold">Lost & Found Admin Dashboard</h1>
-              <p class="text-muted">Manage reports, users, and system settings effectively.</p>
-          </div>
-
-            <div class=" d-flex flex-row gap-2 pe-0">
-              <TotalLostItemCard :lostItems="counts.lost" class="top-card"/>
-              <TotalFoundItemCard :foundItems="counts.found" class="top-card "/>
+          <div class="total-lost-and-found d-flex flex-column  justify-content-center align-items-center">
+              <div class=" d-flex flex-row gap-2 pe-0">
+            <TotalLostAndFound 
+            :totalFoundItems="counts.found"
+            :totalLostItems="counts.lost"
+            />
             </div>
+          </div>
       </div>
 
-      <div class="container-fluid d-flex justify-content-end">
-            <PendingRequest :count="pending_request_count"/>
-      </div>
-
-      <div class="contaner-fluid">
+      <div class="contaner-fluid mt-5 pt-5">
             <ResolveCasesChart :resolve="getResolve" v-if="filterValue === 'month'"/>
             <ResolveCasesChartYearly :resolve="counts.claimed" v-if="filterValue === 'year'"/>
           </div>
@@ -168,7 +161,12 @@ overViewData.value = {
 <style scoped>
 .container-top{
   position: relative;
-  height: 70%;
+  flex-direction: row;
+  top: 10%;
+}
+.container-top .header, .container-top .total-lost-and-found{
+  max-width: 50%;
+  max-height: 50%;
 }
 .card-top{
   max-height: 10vh;
@@ -212,7 +210,24 @@ overViewData.value = {
 .card-bottom{
   flex-direction: row;
 }
-/* sm  */
+@media screen and (max-width: 893px){ 
+  .container-top{
+    flex-direction: column;
+    height: auto;
+    top: 0;
+  }
+  .container-top .header{
+    text-align: center;
+    margin-bottom: 1rem;
+    max-width: 100%;
+    max-height: 100%;
+  }
+  .container-top .total-lost-and-found{
+    max-width: 100%;
+    max-height: 100%;
+  }
+}
+
 @media screen and (max-width: 576px){ 
   .card-bottom{
     flex-direction: column;

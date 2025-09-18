@@ -6,10 +6,6 @@ import { Head, usePage, Link } from "@inertiajs/vue3";
 import { computed, defineProps, onMounted, ref, watch } from "vue";
 const user = usePage().props.auth.user;
 const props = defineProps({
-  items: {
-    type: Object,
-    default: {},
-  },
   userInfo: {
     type: Object,
     default: () => ({})
@@ -19,11 +15,7 @@ const props = defineProps({
     default: () => ({}),
   },
 });
-let itemsContainer = ref([]);
 let getUserInfo = ref([])
-onMounted(() => {
-  itemsContainer.value = props.items;
-});
 watch(
   () => props.userInfo,
   (newItem) => {
@@ -31,7 +23,6 @@ watch(
   },
   {immediate: true}
 )
-// console.log('user info => ', JSON.stringify(props.userInfo))
 
 </script>
 <template>
@@ -69,38 +60,7 @@ watch(
                 </div>
       </div>
 
-      <div class="container" v-if="itemsContainer">
-        <h3 class="text-muted fw-light mt-5 mb-3">My Items</h3>
-        <table class="table table-responsive">
-          <thead>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Status</th>
-            <th class="text-end pe-2">Action</th>
-          </thead>
-
-          <tbody>
-            <tr v-for="item in itemsContainer" :key="item.id">
-              <td class="bg-light">{{ item.title }}</td>
-              <td class="bg-light">{{ item.description }}</td>
-              <td class="bg-light"
-              :class="item.status == 'Lost' ? 'text-danger' : item.status == 'Found' ? 'text-dark' : 'text-success'"
-              >{{ item.status }}</td>
-              <td class="text-end bg-light">
-                <Link 
-                  :href="route('viewItem', { id: item.id })"
-                  class="btn btn-primary ms-0"
-                  >View</Link
-                >
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div v-else>
-        <h1 class="text-dark fw-lighter text-center">No item posted</h1>
-      </div>
+    
 
           <!-- Extra space at the bottom  -->
           <div class="container space mt-5"></div>

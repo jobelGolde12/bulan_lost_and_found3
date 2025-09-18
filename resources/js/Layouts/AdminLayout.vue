@@ -1,11 +1,18 @@
 <script setup>
 import { usePage } from "@inertiajs/vue3";
 import { Link } from "@inertiajs/vue3";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, defineProps, watch } from "vue";
+import { usePendingRequestStore } from "@/piniaStore/pendingRequestStore";
+import { storeToRefs } from "pinia"
+import { computed } from "vue";
 
 const currentRoute = usePage().url;
 const user = usePage().props.auth?.user;
 const isSidebarOpen = ref(localStorage.getItem('isSidebarOpen') === 'true');
+
+const { count } = storeToRefs(usePendingRequestStore());
+const hasPendingRequest = computed(() => count.value || 0);
+
 
 const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value;
@@ -62,6 +69,22 @@ onMounted(() => {
           <span v-if="isSidebarOpen">Report</span>
         </Link>
 
+        <Link
+          :href="route('viewPendingRequest')"
+          :class="{ active: currentRoute === '/view-pending-request' }"
+          class="nav-link"
+        >
+          <div :class="{ 'icon-container': !isSidebarOpen }" class="icon-wrapper">
+            <i class="bi bi-envelope-paper link"></i>
+
+            <span v-if="hasPendingRequest > 0" class="pending-badge">
+              {{ hasPendingRequest }}
+            </span>
+          </div>
+          <span v-if="isSidebarOpen">Requests</span>
+        </Link>
+
+
         <hr />
 
         <Link :href="route('profile')" :class="{ active: currentRoute === '/my-profile' }">
@@ -71,7 +94,7 @@ onMounted(() => {
           <span v-if="isSidebarOpen">Profile</span>
         </Link>
 
-        <Link :href="route('trash.trashItemRoute')" :class="{ active: currentRoute === '/trash-trash-item' }">
+        <Link :href="route('trash.index')" :class="{ active: currentRoute === '/trash-trash-item' }">
           <div :class="{ 'icon-container': !isSidebarOpen }">
             <i class="bi bi-gear link"></i>
           </div>
@@ -197,6 +220,28 @@ onMounted(() => {
 .sidebar.closed ~ .right {
   width: calc(100% - 5%);
 }
+
+.icon-wrapper {
+  position: relative; /* so badge is positioned relative to this */
+  display: inline-block;
+}
+
+.pending-badge {
+  position: absolute;
+  top: -4px;
+  right: -100px;
+  background-color: #198754; /* Bootstrap bg-success */
+  color: #fff;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
 
 /* Mobile View */
 @media screen and (max-width: 800px) {

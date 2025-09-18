@@ -7,10 +7,6 @@ import { defineProps, onMounted, ref } from "vue";
 const user = usePage().props.auth.user;
 
 const props = defineProps({
-  items: {
-    type: Array,
-    default: () => [],
-  },
   userInfo: {
     type: Object,
     default: () => ({}),
@@ -21,11 +17,9 @@ const props = defineProps({
   },
 });
 
-let itemsContainer = ref([]);
 const getUserInfo = ref({});
 
 onMounted(() => {
-  itemsContainer.value = props.items;
   getUserInfo.value = props.userInfo;
 });
 </script>
@@ -75,38 +69,7 @@ onMounted(() => {
         </div>
       </div>
 
-      <div class="container" v-if="itemsContainer.length">
-        <h3 class="text-muted fw-light mt-5">My Items</h3>
-        <table class="table table-responsive">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Description</th>
-              <th>Status</th>
-              <th class="text-end pe-2">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="item in itemsContainer" :key="item.id">
-              <td class="bg-light">{{ item.title }}</td>
-              <td class="bg-light">{{ item.description }}</td>
-              <td class="bg-light">{{ item.status }}</td>
-              <td class="text-end bg-light">
-                <Link
-                  :href="route('viewItem', { id: item.id })"
-                  class="btn btn-primary ms-0"
-                >
-                  View
-                </Link>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div v-else>
-        <h1 class="text-dark fw-lighter text-center">No item posted</h1>
-      </div>
+     
     </div>
   </AuthenticatedLayout>
 </template>

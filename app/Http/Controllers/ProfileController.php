@@ -23,18 +23,15 @@ class ProfileController extends Controller
      * Display the user's profile form.
      */
     public function index(){
-        $items = ItemModel::where('user_id', Auth::id())->get();
         $userInfo = UserInfo::where('user_id', Auth::id())->first();
         $permission = MyPermissionModel::where('user_id', Auth::id())->first();
         if(Auth::check() && Auth::user()->role === 'admin'){
             return Inertia::render('admin/Profile', [
-                'items' => $items, 
                 'userInfo' => $userInfo, 
                 'permission' => $permission,
             ]);
         }else{
             return Inertia::render('user/Profile', [
-                'items' => $items,  
                 'userInfo' => $userInfo,
                 'permission' => $permission,
             ]);
