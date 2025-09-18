@@ -50,9 +50,9 @@ onMounted(() => {
 
         <Link :href="route('items')" :class="{ active: currentRoute === '/items' }">
           <div :class="{ 'icon-container': !isSidebarOpen }">
-            <i class="bi bi-box link"></i>
+            <i class="bi bi-journal-text link"></i>
           </div>
-          <span v-if="isSidebarOpen">Items</span>
+          <span v-if="isSidebarOpen">Records</span>
         </Link>
 
         <Link :href="route('reportItem')" :class="{ active: currentRoute === '/report-item' }">
