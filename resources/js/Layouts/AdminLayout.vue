@@ -59,14 +59,14 @@ onMounted(() => {
           <div :class="{ 'icon-container': !isSidebarOpen }">
             <i class="bi bi-journal-text link"></i>
           </div>
-          <span v-if="isSidebarOpen">Records</span>
+          <span v-if="isSidebarOpen">Reports</span>
         </Link>
 
         <Link :href="route('reportItem')" :class="{ active: currentRoute === '/report-item' }">
           <div :class="{ 'icon-container': !isSidebarOpen }">
-            <i class="bi bi-question-circle link"></i>
+            <i class="bi bi-pencil-square link"></i>
           </div>
-          <span v-if="isSidebarOpen">Report</span>
+          <span v-if="isSidebarOpen">Post</span>
         </Link>
 
         <Link

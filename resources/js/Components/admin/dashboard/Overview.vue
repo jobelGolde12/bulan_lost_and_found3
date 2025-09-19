@@ -2,9 +2,8 @@
   <div class="overview-wrapper">
     <div class="card border-0 overview-card">
       <div class="card-body">
-        <h5 class="card-title mb-4">Overview</h5>
-
-        <!-- Chart Section -->
+        <h5 class="card-title">Overview</h5>
+        <p class="text-muted">Current Lost and Found Cases Reported on this System.</p>
         <div class="chart-container">
           <ECharts
             :option="overviewChartOptions"
@@ -13,22 +12,7 @@
           />
         </div>
 
-        <!-- Bottom labels in a row -->
-        <!-- <div class="d-flex flex-row justify-content-start flex-wrap gap-4 mt-3">
-          <div class="d-flex align-items-center legend">
-            <span class="rounded-circle me-2" style="background-color: #FFC043;"></span>
-            Lost items
-          </div>
-          <div class="d-flex align-items-center legend">
-            <span class="rounded-circle me-2" style="background-color: #6B8BFF;"></span>
-            Found items
-          </div>
-          <div class="d-flex align-items-center legend">
-            <span class="rounded-circle me-2" style="background-color: #7ED957;"></span>
-            Resolved cases
-          </div>
-        </div> -->
-      </div>
+        </div>
     </div>
   </div>
 </template>
@@ -66,8 +50,8 @@ const countResolvedCases = computed(() => Number(getData.value.resolve) || 0);
 const overviewChartOptions = ref({});
 
 watch(
-  () => [countLostItems.value, countFoundItems.value, countResolvedCases.value],
-  ([lost, found, resolved]) => {
+  () => [countLostItems.value, countFoundItems.value],
+  ([lost, found]) => {
     overviewChartOptions.value = {
       tooltip: { trigger: "axis" },
       grid: {
@@ -80,7 +64,7 @@ watch(
       xAxis: {
         type: "category",
         boundaryGap: false,
-        data: ["Lost", "Found", "Resolved"],
+        data: ["Lost", "Found"],
         axisLine: { lineStyle: { color: "#333", width: 2 } },
         axisTick: { show: true },
         axisLabel: { color: "#333", fontSize: 12 },
@@ -96,7 +80,7 @@ watch(
           name: "Cases",
           type: "line",
           smooth: true,
-          data: [lost, found, resolved],
+          data: [lost, found],
           symbol: "circle",
           symbolSize: 9,
           lineStyle: { width: 4 },
@@ -118,8 +102,8 @@ watch(
 }
 
 .overview-card {
-  width: 600px;        /* default width */
-  max-width: 100%;     /* shrink on small screens */
+  width: 600px; /* default width */
+  max-width: 100%; /* shrink on small screens */
   background: #fff;
   border-radius: 12px;
 }

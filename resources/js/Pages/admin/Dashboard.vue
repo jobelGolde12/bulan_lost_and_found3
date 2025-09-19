@@ -117,7 +117,7 @@ overViewData.value = {
   <Head title="Dashboard" />
   <AdminLayout>
     <div class="dashboard-container">
-        <div class="container-top container-fluid pe-0 d-flex justify-content-between" style="min-height: 300px;  max-height: 200px;" >
+        <div class="container-top container-fluid pe-0 d-flex justify-content-between " style="min-height: 300px;  max-height: 200px;" >
             <div class=" header">
               <h1 class="fw-bold mb-2">Lost & Found Admin Dashboard</h1>
               <p class="text-muted">Manage reports, users, and system settings effectively.</p>
@@ -177,6 +177,9 @@ overViewData.value = {
   overflow-x: hidden;
   overflow-y: scroll;
 }
+.header h1{
+  font-size: 3rem;
+}
 .progress-circle {
   width: 100px;
   height: 100px;
@@ -209,6 +212,17 @@ overViewData.value = {
 }
 .card-bottom{
   flex-direction: row;
+}
+
+@media screen and (max-width: 1082px){ 
+  .header h1{
+    font-size: 2.7rem;
+  }
+}
+@media screen and (max-width: 1008px){ 
+  .header h1{
+    font-size: 2.3rem;
+  }
 }
 @media screen and (max-width: 893px){ 
   .container-top{

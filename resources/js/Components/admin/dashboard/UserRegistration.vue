@@ -35,7 +35,10 @@ watch(
           <i class="bi bi-people-fill icon"></i>
         </div>
         <h1 class="display-3 fw-bold text-primary">{{ getValue || "0" }}</h1>
-        <h5 class="card-title fw-bold text-uppercase mb-2">User Registrations</h5>
+        <h5 class="card-title fw-bold text-uppercase mb-2">
+          <span v-if="getValue > 1">User's</span>
+          <span v-else> User</span>
+        </h5>
         <p class="card-text">Number of registered users.</p>
       </div>
     </Link>

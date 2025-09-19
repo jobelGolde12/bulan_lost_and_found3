@@ -1,8 +1,8 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import OffcanvasForUserProfile from "@/Components/user/OffcanvasForUserProfile.vue";
 import { Head, usePage, Link } from "@inertiajs/vue3";
 import { defineProps, onMounted, ref } from "vue";
+import MyPermission from "@/Components/MyPermission.vue";
 
 const user = usePage().props.auth.user;
 
@@ -25,11 +25,10 @@ onMounted(() => {
 </script>
 
 <template>
-  <Head title="My profile" />
+  <Head title="My Profile" />
   <AuthenticatedLayout>
-    <OffcanvasForUserProfile :permission="props.permission" />
-
     <div class="main-container1 pb-5">
+      <!-- Profile Header -->
       <div
         class="container-fluid d-flex flex-column justify-content-center align-items-center pt-5 gap-2"
       >
@@ -57,7 +56,8 @@ onMounted(() => {
         </div>
       </div>
 
-      <div class="container">
+      <!-- Contact Info -->
+      <div class="container mt-3">
         <div class="name text-start text-dark fw-light">
           <span class="fw-semibold me-2"><i class="bi bi-envelope"></i></span>
           {{ user.email ?? 'N/A' }}
@@ -69,7 +69,38 @@ onMounted(() => {
         </div>
       </div>
 
-     
+      <!-- Settings Actions -->
+      <div class="container mt-4">
+        <h5 class="fw-semibold mb-3">Profile Settings</h5>
+        <div class="settings-links">
+          <Link
+            :href="route('profile.edit')"
+            class="settings-btn edit text-dark"
+          >
+            <i class="bi bi-pencil-square"></i>
+            <span>Edit Profile</span>
+          </Link>
+
+          <Link
+            :href="route('logout')"
+            method="POST"
+            class="settings-btn logout text-dark"
+          >
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Logout</span>
+          </Link>
+
+          <Link
+            :href="route('viewLater.view')"
+            class="settings-btn saved text-dark"
+          >
+            <i class="bi bi-bookmark"></i>
+            <span>Saved Reports</span>
+          </Link>
+
+          <MyPermission :permission="props.permission" />
+        </div>
+      </div>
     </div>
   </AuthenticatedLayout>
 </template>
@@ -89,7 +120,6 @@ onMounted(() => {
   width: 180px;
   height: 180px;
   border-radius: 50%;
-  left: 0%;
   overflow: hidden;
 }
 .profile-pic img {
@@ -98,9 +128,40 @@ onMounted(() => {
   height: 100%;
   border-radius: inherit;
   transition: 0.5s;
+  object-fit: cover;
 }
 .profile-pic img:hover {
   transform: scale(1.1);
   filter: brightness(0.8);
+}
+
+/* Modern Action Buttons */
+.settings-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.settings-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1.2rem;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+
+
+.settings-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.settings-btn i {
+  font-size: 1.2rem;
 }
 </style>
