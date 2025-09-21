@@ -16,6 +16,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -43,8 +44,18 @@ class ItemController extends Controller
         if (!$category) {
             return redirect()->back()->withErrors(['category' => 'Invalid category selected.'])->withInput();
         }
+
+        // Check if the item has a profanity words
+        $wordsToCheck = $request->name . ' ' . $request->description;
+        $profanityWords = $this->checkProfanity($wordsToCheck);
+        if (!empty($profanityWords)) {
+    Log::info("Profanity detected: " . implode(', ', $profanityWords));
     
-         // Check if user is admin
+    return back()->withErrors([
+        'description' => 'The information you provide contains profanity, please avoid using such words.',
+    ])->withInput();
+}
+
         if(Auth::check() && Auth::user()->role == 'admin'){
             ItemModel::create([
                 'title' => $request->name,
@@ -74,6 +85,76 @@ class ItemController extends Controller
         return redirect()->back()->with(['message' => 'Item created.']);
     }
 
+       public function checkProfanity($words)
+{
+    $urls = [
+        "https://filipinoprofanitywordapi.netlify.app/data/pureFilipino.json",
+        "https://filipinoprofanitywordapi.netlify.app/data/regional.json",
+    ];
+
+    $allProfanityWords = [];
+
+    foreach ($urls as $url) {
+        try {
+            $response = Http::timeout(10) // Increased timeout
+                         ->retry(3, 100) // Retry 3 times with 100ms delay
+                         ->withOptions([
+                             'verify' => true, // Ensure SSL verification
+                         ])
+                         ->get($url);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                foreach ($data as $item) {
+                    if (isset($item['word'])) {
+                        $allProfanityWords[] = $item['word'];
+                    }
+                }
+            } else {
+                Log::warning("Failed to fetch from {$url}, status: " . $response->status());
+            }
+        } catch (\Exception $e) {
+            Log::error("Error fetching from {$url}: " . $e->getMessage());
+            continue; // Continue with next URL instead of stopping
+        }
+    }
+
+    // Fallback to local cache if API fails
+    if (empty($allProfanityWords)) {
+        $allProfanityWords = $this->getCachedProfanityWords();
+    }
+
+    $found = [];
+    foreach ($allProfanityWords as $badWord) {
+        if (stripos($words, $badWord) !== false) {
+            $found[] = $badWord;
+        }
+    }
+
+    Log::info([
+        'Checking profanity in input:' => $words,
+        'Found:' => $found,
+    ]);
+
+    return $found;
+}
+
+// Add this method for fallback
+private function getCachedProfanityWords()
+{
+    // You can cache the words locally to avoid API dependency
+    $cachedWords = cache('profanity_words');
+    
+    if ($cachedWords) {
+        return $cachedWords;
+    }
+    
+    // Default fallback words if cache is empty
+    return [
+        'putang', 'gago', 'bobo', 'tanga', 'ulol',
+        'lintik', 'punyeta', 'leche', 'buwisit', 'sira'
+    ];
+}
         public function reportItem()
     {
         $locations = LocationModel::all();

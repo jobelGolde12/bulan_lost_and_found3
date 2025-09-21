@@ -70,12 +70,18 @@ function toggle(index) {
           <li>Contact information should be provided for easier communication between the finder and the owner.</li>
         </ul>
 
+        <p>
+          <span class="text-danger fw-bold">Important Notice: </span>
+          Don't use bad words or profanity when reporting lost or found items. Any reports containing inappropriate language will be rejected. This platform use API to detect profanity.
+        </p>
+        
         <h3 class="section-title">4. Privacy and Data Protection</h3>
         <ul>
           <li>Personal data such as contact information will be handled securely and used only for communication purposes related to lost and found items.</li>
           <li>The platform does not sell or share personal information with third parties.</li>
         </ul>
 
+        
         <h3 class="section-title">5. Disclaimer</h3>
         <ul>
           <li>The Bulan Lost and Found web app serves as a facilitator for reconnecting owners with their lost belongings.</li>

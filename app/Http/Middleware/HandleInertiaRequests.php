@@ -34,6 +34,11 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'flash' => [
+                'hasProfanity' => fn () => $request->session()->get('hasProfanity'),
+                'profanityError' => fn () => $request->session()->get('profanityError'),
+            ],
         ];
     }
+
 }
