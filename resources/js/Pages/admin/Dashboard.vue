@@ -19,6 +19,7 @@ import {
 import { CanvasRenderer } from 'echarts/renderers';
 import TotalLostAndFound from '@/Components/admin/dashboard/TotalLostAndFound.vue';
 import { usePendingRequestStore } from "@/piniaStore/pendingRequestStore";
+import OverAllResolved from '@/Components/admin/dashboard/OverAllResolved.vue';
 
 echarts.use([PieChart, TitleComponent, TooltipComponent, LegendComponent, CanvasRenderer]);
 
@@ -52,6 +53,10 @@ const props = defineProps({
   recentLostAndFound: {
     type: Array,
     default: () => []
+  },
+  overall_resolved: {
+    type: Number,
+    default: 0
   }
 });
 
@@ -80,6 +85,7 @@ const filterSelectedForResolveCases = (data) => {
 let getUserCount = ref();
 let getReports = ref([]);
 let getResolve = ref([]);
+let overall_resolved = ref(0);
 const getRecentLostAndFoundItem = ref([]);
 watch(() => props.items, (newItem) => {
   getReports.value = newItem;
@@ -91,7 +97,9 @@ watch(() => props.user_count, (newItem) => {
 watch(() => props.recentLostAndFound, (data) => {
   getRecentLostAndFoundItem.value = data;
 }, { immediate: true });
-
+watch(() => props.overall_resolved, (data) => {
+  overall_resolved.value = data;
+}, { immediate: true });
 // kuhaon ang resolve na item tas eh process
 // sa ResolveCasesChart
 getResolve.value = props.items.filter(item => item.status === 'Claimed');
@@ -138,10 +146,11 @@ overViewData.value = {
             <ResolveCasesChartYearly :resolve="counts.claimed" v-if="filterValue === 'year'"/>
           </div>
 
+      <OverAllResolved 
+      :overallResolved="overall_resolved"
+      />
       <!-- Cards Section -->
       <div class="card-bottom d-flex justify-content-between align-items-center rounded">
-      
-
         <Overview :data="overViewData"/>
 
         <div class="">

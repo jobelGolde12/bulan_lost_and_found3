@@ -76,6 +76,14 @@
 .action-container:hover{
   background: #dfdada;
 }
+.modal .modal-dialog{
+  max-width: 800px !important; 
+}
+.modal .modal-body{
+  height: auto;
+  min-height: 700px !important;
+
+}
 @media screen and (max-width: 768px){
   .image-item{
     max-width: 350px;

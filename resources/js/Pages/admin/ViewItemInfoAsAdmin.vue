@@ -3,6 +3,7 @@ import { ref, watch } from "vue";
 import { Link, useForm, Head, router, usePage } from "@inertiajs/vue3";
 import CustomModal from "@/Components/CustomModal.vue";
 import ViewItemInfoForAdminHeader from "@/Components/admin/ViewItemInfoForAdminHeader.vue";
+import downloadAsPDF from "@/Components/admin/item/downloadAsPDF.vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import { Inertia } from "@inertiajs/inertia";
 const props = defineProps({
@@ -208,6 +209,25 @@ const deleteComment = (getId) => {
       <div v-else>
         <p>Loading item details...</p>
       </div>
+
+
+       <div class="modal fade" id="downloadAsPDF" tabindex="-1" aria-labelledby="addNewMemberLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-body">
+            <downloadAsPDF
+            :item="data"
+            />
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary">Download now</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
     </div>
   </div>
       </div>
@@ -221,4 +241,5 @@ const deleteComment = (getId) => {
   min-width: 45px;
   height: 45px;
 }
+
 </style>

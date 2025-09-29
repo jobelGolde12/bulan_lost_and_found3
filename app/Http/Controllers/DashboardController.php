@@ -46,6 +46,7 @@ class DashboardController extends Controller
             $recentLostAndFound = ItemModel::whereMonth('created_at', Carbon::now()->month)
             ->whereYear('created_at', Carbon::now()->year)
             ->orderBy('created_at', 'desc')->get();
+            $overAllResolved = ItemModel::where('status', 'Claimed')->count();
 
             // move to storage cleaner if more than 1000 items 
             if($getItemAsAdmin->count() > 1000){
@@ -59,6 +60,7 @@ class DashboardController extends Controller
                 'pending_request_count' => $pendingRequestCount,
                 'user_count' => $userCount,
                 'recentLostAndFound' => $recentLostAndFound,
+                'overall_resolved' => $overAllResolved,
         ]); 
             }
            

@@ -84,6 +84,7 @@ const forceDelete = () => {
           >
             <button class="button mb-2" @click="markAsResolveFunc">Mark as Resolve</button>
             <button class="button" @click="forceDelete" title="Note! only if the user didn't follow the privacy and policy.">Force Delete</button>
+            <button class="button" data-bs-toggle="modal" data-bs-target="#downloadAsPDF">Download as PDF</button>
           </div>
         </div>
       </div>
