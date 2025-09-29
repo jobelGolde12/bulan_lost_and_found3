@@ -1,5 +1,5 @@
 <template>
-  <div class="overview-wrapper">
+  <div class="overview-wrapper p-3">
     <div class="card border-0 overview-card">
       <div class="card-body">
         <h5 class="card-title">Overview</h5>
@@ -11,8 +11,7 @@
             class="echart"
           />
         </div>
-
-        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -96,15 +95,15 @@ watch(
 
 <style scoped>
 .overview-wrapper {
-  width: 100%;
+  width: 100%; 
   display: flex;
-  justify-content: flex-start; /* align left */
+  justify-content: center;
+  background: transparent;
 }
 
 .overview-card {
-  width: 600px; /* default width */
-  max-width: 100%; /* shrink on small screens */
-  background: #fff;
+  width: 100vw; 
+  background: transparent;
   border-radius: 12px;
 }
 

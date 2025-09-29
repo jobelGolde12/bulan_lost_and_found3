@@ -150,15 +150,17 @@ overViewData.value = {
       :overallResolved="overall_resolved"
       />
       <!-- Cards Section -->
-      <div class="card-bottom d-flex justify-content-between align-items-center rounded">
+      <div class="card-bottom">
         <Overview :data="overViewData"/>
-
-        <div class="">
-          <UserRegistration :getUserCountValue="getUserCount" class="registered-user"/>
-        </div>
 
       </div>
 
+      <!-- <div class="container">
+        
+        <div class="">
+          <UserRegistration :getUserCountValue="getUserCount" class="registered-user"/>
+        </div>
+      </div> -->
 
 
         <!-- Recent Files Section -->

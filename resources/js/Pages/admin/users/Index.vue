@@ -52,6 +52,7 @@ function viewUser(userId) {
                 <div class="header-container container-fluid py-3 d-flex justify-content-between mb-3">
                     <div class="w-50">
                         <h2 class="fw-bold all-users-text">All users</h2>
+                        <p>Total Users: <span class="text-success">{{ filteredUsers.length }}</span></p>
                     </div>
                     <!-- Search -->
                     <div class="input-group d-flex justify-content-end search-container">
