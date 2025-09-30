@@ -82,7 +82,7 @@ class ItemController extends Controller
             ]);
         }
     
-        return redirect()->back()->with(['message' => 'Item created.']);
+        return redirect()->back()->with(['message' => 'Item created.']);    
     }
 
        public function checkProfanity($words)
