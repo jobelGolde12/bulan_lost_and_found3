@@ -16,8 +16,7 @@ import dataReport from "../../images/aboutUs/data-reports.svg";
       </div>
       <div class="links d-none d-lg-flex flex-row gap-4 align-items-center">
         <Link href="/" class="text-dark text-decoration-none">Home</Link>
-        <Link :href="route('login')" class="text-dark text-decoration-none">Login</Link>
-        <Link :href="route('register')" class="text-decoration-none btn btn-dark px-2 py-1">Signup</Link>
+        <Link :href="route('login')" class="btn btn-dark text-decoration-none">Login</Link>
       </div>
       <div
         class="bi bi-list fs-1 fw-bolder d-block d-lg-none pointer"
@@ -34,8 +33,7 @@ import dataReport from "../../images/aboutUs/data-reports.svg";
       </div>
       <div class="offcanvas-body">
         <Link href="/" class="d-block mb-2 text-dark text-decoration-none">Home</Link>
-        <Link :href="route('login')" class="d-block mb-2 text-dark text-decoration-none">Login</Link>
-        <Link :href="route('register')" class="d-block mb-2 text-decoration-none btn btn-dark px-2 py-1 rounded">Signup</Link>
+        <Link :href="route('login')" class="d-block mb-2 btn btn-dark text-decoration-none">Login</Link>
       </div>
     </div>
 

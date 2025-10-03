@@ -16,14 +16,14 @@ use Inertia\Inertia;
 class DashboardController extends Controller
 {
     public function index(){
-        if (!Auth::check()) {
-            return redirect()->route('login');
-        }
+        // if (Auth::user()->role == 'admin' && !Auth::check()) {
+        //     return redirect()->route('login');
+        // }
         
         $categories = ItemCategories::all();
         $pendingRequestCount = PendingRequest::where('pending_status', 'pending')->count(); //Para sa admin (dashboard)
 
-        if (Auth::check() && Auth::user()->role === 'user') { 
+        if (Auth::user()->role !== 'admin') { 
             
         //get only the specific viewLater data base sa id ni user
         $userId = Auth::id();

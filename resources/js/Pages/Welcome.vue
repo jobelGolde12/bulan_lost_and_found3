@@ -31,13 +31,8 @@ import HeroSection from "@/Components/welcome_page/HeroSection.vue";
                 >
                 <Link
                     :href="route('login')"
-                    class="text-dark text-decoration-none"
+                    class="text-decoration-none btn btn-dark"
                     >Login</Link
-                >
-                <Link
-                    :href="route('register')"
-                    class="text-decoration-none bg-dark text-light px-2 py-1 signup-link"
-                    >Signup</Link
                 >
             </div>
 
@@ -77,11 +72,7 @@ import HeroSection from "@/Components/welcome_page/HeroSection.vue";
                     class="d-block mb-2 text-dark text-decoration-none"
                     >Login</Link
                 >
-                <Link
-                    :href="route('register')"
-                    class="d-block mb-2 text-decoration-none bg-dark text-light px-2 py-1 signup-link"
-                    >Signup</Link
-                >
+                
             </div>
         </div>
         
