@@ -21,7 +21,7 @@ import { Link } from '@inertiajs/vue3';
         class=" action-button container d-flex flex-row align-items-center justify-content-center gap-5 pt-3 px-0 mx-0"
       >
         <Link
-          :href="route('dashboard')"
+          :href="route('guest.dashboard')"
           class="text-decoration-none text-light bg-dark px-3 py-2 report-found-item-link"
         >
           Get started <i class="bi bi-arrow-right"></i>
