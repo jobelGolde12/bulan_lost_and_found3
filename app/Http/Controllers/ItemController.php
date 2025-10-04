@@ -49,7 +49,6 @@ class ItemController extends Controller
         $wordsToCheck = $request->name . ' ' . $request->description;
         $profanityWords = $this->checkProfanity($wordsToCheck);
         if (!empty($profanityWords)) {
-    Log::info("Profanity detected: " . implode(', ', $profanityWords));
     
     return back()->withErrors([
         'description' => 'The information you provide contains profanity, please avoid using such words.',
@@ -63,7 +62,7 @@ class ItemController extends Controller
                 'status' => $request->status,
                 'location' => $request->location,
                 'image_url' => $imagePath ? asset('storage/' . $imagePath) : asset('images/noImage.jpg'),
-                'category' => $request->category,
+                'category' => $category->name ?: "Uncategorized",
                 'user_id' => $request->user_id,
                 'owner_phone_number' => $request->owner_phone_number,
                 'pending_status' => 'pending'
@@ -75,7 +74,7 @@ class ItemController extends Controller
                 'status' => $request->status,
                 'location' => $request->location,
                 'image_url' => $imagePath ? asset('storage/' . $imagePath) : asset('images/noImage.jpg'),
-                'category' => $request->category,
+                'category' => $category->name ?: "Uncategorized",
                 'user_id' => $request->user_id,
                 'owner_phone_number' => $request->owner_phone_number,
                 'pending_status' => 'pending'

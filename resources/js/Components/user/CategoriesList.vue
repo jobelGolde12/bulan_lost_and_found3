@@ -66,8 +66,9 @@ function chooseCategoryFunc(name, id) {
 
 <style scoped>
 .list {
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(107, 102, 102, 0.1);
   cursor: pointer;
+  font-weight: 400;
 }
 .list:hover {
   background: rgba(0, 0, 0, 0.2);
