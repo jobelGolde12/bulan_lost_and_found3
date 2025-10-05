@@ -45,7 +45,7 @@ const truncateText = (text, maxLength = 20) => {
       v-for="data in itemContainer"
       :key="data.id"
     >
-      <Link :href="route('viewItemInfo', { item: data.id })" class="text-decoration-none">
+      <Link :href="route('viewItemInfoAsGuest', { item: data.id })" class="text-decoration-none">
         <div class="image-container">
           <img
             :src="data.image_url"
