@@ -45,6 +45,7 @@ const description = props.description || '';
 <style scoped>
 .profile-pic{
   min-width: 35px;
-  height: 35px;
+  max-width: 40px;
+  height: 40px;
 }
 </style>
