@@ -124,7 +124,9 @@ const openLoginModal = () => {
         </Link>
       </div>
 
-      <LoginButton />
+      <div v-if="isSidebarOpen">
+        <LoginButton />
+      </div>
     </div>
 
     <!-- Page Content -->

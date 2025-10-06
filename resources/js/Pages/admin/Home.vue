@@ -81,9 +81,9 @@ const handleSearch = () => {
   <AdminLayout>
     <div class="main-container bg-light">
       <div class="container-fluid mt-4 d-flex flex-row justify-content-between align-items-center">
-        <div class="logo d-none d-sm-block d-lg-block">Lost And Found</div>
+        <div class="logo d-none d-sm-block d-lg-block fs-5 fw-bold">Lost And Found</div>
 
-        <div class="search-bar input-group mb-3">
+        <div class="search-bar input-group mb-3 d-flex justify-content-end">
           <input
             type="text"
             class="bg-light"
@@ -134,14 +134,17 @@ const handleSearch = () => {
 }
 .search-bar {
   position: relative;
-  width: 30%;
+  width: 50%;
 }
 .search-bar input {
   position: relative;
   width: 80%;
   padding: 0.5rem 1rem;
   border: 0.5px solid rgba(0, 0, 0, 0.2);
-  border-radius: 5px 0 0 5px;
+  border-radius: 30px 0 0 30px;
+}
+.search-bar button{
+  border-radius: 0 30px 30px 0;
 }
 .search-bar input:focus,
 .search-bar input:hover {
