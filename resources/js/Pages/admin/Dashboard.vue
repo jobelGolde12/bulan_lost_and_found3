@@ -142,8 +142,8 @@ overViewData.value = {
       </div>
 
       <div class="contaner-fluid mt-5 pt-5">
-            <ResolveCasesChart :resolve="getResolve" v-if="filterValue === 'month'"/>
-            <ResolveCasesChartYearly :resolve="counts.claimed" v-if="filterValue === 'year'"/>
+            <ResolveCasesChart :resolve="getResolve"/>
+            <ResolveCasesChartYearly :resolve="counts.claimed"/>
           </div>
 
       <OverAllResolved 

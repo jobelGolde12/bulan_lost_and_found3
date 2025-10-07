@@ -2,19 +2,20 @@
 import { ref, defineProps, watch } from 'vue';
 import { use } from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
-import { BarChart } from 'echarts/charts';
+import { LineChart } from 'echarts/charts';
 import { GridComponent, TooltipComponent, LegendComponent } from 'echarts/components';
 import VChart from 'vue-echarts';
 import FilterResolveCases from './FilterResolveCases.vue';
 
-use([CanvasRenderer, BarChart, GridComponent, TooltipComponent, LegendComponent]);
+use([CanvasRenderer, LineChart, GridComponent, TooltipComponent, LegendComponent]);
 
 const props = defineProps({
   resolve: {
     type: Array,
     default: () => []
   }
-})
+});
+
 let getResolve = ref([]);
 
 watch(
@@ -23,18 +24,18 @@ watch(
     getResolve.value = i;
   },
   { immediate: true }
-)
+);
 
 const getMonthlyResolvedCases = (data) => {
-  const monthlyCounts = Array(12).fill(0); 
+  const monthlyCounts = Array(12).fill(0);
 
   data.forEach((caseData) => {
     const reportedMonth = new Date(caseData.reported_at).getMonth();
-    monthlyCounts[reportedMonth] += 1; 
+    monthlyCounts[reportedMonth] += 1;
   });
 
   return monthlyCounts;
-}
+};
 
 const resolvedCasesByMonth = getMonthlyResolvedCases(getResolve.value);
 
@@ -44,7 +45,7 @@ const chartOptions = ref({
   tooltip: {
     trigger: 'axis',
     axisPointer: {
-      type: 'shadow'
+      type: 'line'
     }
   },
   xAxis: {
@@ -57,23 +58,19 @@ const chartOptions = ref({
   series: [
     {
       name: 'Resolved Cases',
-      type: 'bar',
-      data: resolvedCasesByMonth, 
-      itemStyle: {
-        color: {
-          type: 'linear',
-          x: 0,
-          y: 0,
-          x2: 0,
-          y2: 1,
-          colorStops: [
-            { offset: 0, color: '#4C9AFF' },
-            { offset: 1, color: '#007BFF' }
-          ]
-        },
-        barBorderRadius: [5, 5, 0, 0]
+      type: 'line',
+      data: resolvedCasesByMonth,
+      smooth: true,
+      lineStyle: {
+        color: '#007BFF',
+        width: 3
       },
-      barWidth: '50%'
+      itemStyle: {
+        color: '#4C9AFF'
+      },
+      areaStyle: {
+        color: 'rgba(76, 154, 255, 0.2)'
+      }
     }
   ]
 });
@@ -86,13 +83,12 @@ const chartOptions = ref({
         <h5 class="text-dark fw-lighter mb-0">Resolved Cases</h5>
         <p class="text-muted">Monthly statistics of resolved lost and found cases.</p>
       </div>
-
-      <div>
-        <FilterResolveCases class="filter"/>
-      </div>
     </div>
     <v-chart v-if="hasResolvedCases" class="chart" :option="chartOptions" />
-    <p v-else class="rounded text-center my-5 text-muted">No resolved cases this month.</p>
+    <div v-else class="rounded text-center my-5 text-muted">
+      <img src="../../../../images/noImage.jpg" alt="No Resolve Cases svg" class="img-icon mb-2 mx-auto">
+      <p class="text-muted text-center">No resolved cases this month.</p>
+    </div>
   </div>
 </template>
 
@@ -101,14 +97,18 @@ const chartOptions = ref({
   width: 100%;
   height: 400px;
 }
-@media screen and (max-width: 768px){
-  .resolve-header h5{
+.img-icon {
+  width: 150px;
+  height: 150px;
+}
+@media screen and (max-width: 768px) {
+  .resolve-header h5 {
     font-size: 1.2rem;
   }
-  .resolve-header p{
-    font-size: .7rem;
+  .resolve-header p {
+    font-size: 0.7rem;
   }
-  .filter{
+  .filter {
     transform: translateY(-50%);
   }
 }

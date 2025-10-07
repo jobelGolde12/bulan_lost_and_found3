@@ -1,5 +1,31 @@
+<template>
+  <div class="resolved-card">
+    <div class="content-wrapper d-flex flex-row align-items-center justify-content-between">
+      <!-- Left side text -->
+      <div class="info">
+        <h5 class="fw-semibold mb-2 fs-1 fw-bold">Overall Resolved Cases</h5>
+        <p class="text-muted  mb-0 ">
+          Number of resolved cases recorded in this system.
+        </p>
+      </div>
+
+      <!-- Right side chart -->
+      <div class="chart-container">
+        <v-chart class="chart" :option="chartOptions" autoresize />
+      </div>
+    </div>
+  </div>
+</template>
+
 <script setup>
-import { defineProps } from 'vue';
+import { ref, defineProps, watch, onMounted } from 'vue';
+import { use } from 'echarts/core';
+import { CanvasRenderer } from 'echarts/renderers';
+import { GaugeChart } from 'echarts/charts';
+import { TitleComponent } from 'echarts/components';
+import VChart from 'vue-echarts';
+
+use([CanvasRenderer, GaugeChart, TitleComponent]);
 
 const props = defineProps({
   overallResolved: {
@@ -7,96 +33,92 @@ const props = defineProps({
     default: 0
   }
 });
+
+const chartOptions = ref({
+  series: [
+    {
+      type: 'gauge',
+      startAngle: 210,
+      endAngle: -30,
+      min: 0,
+      max: 100,
+      radius: '100%',
+      progress: {
+        show: true,
+        width: 16,
+        itemStyle: { color: '#007BFF' }
+      },
+      axisLine: {
+        lineStyle: { width: 16, color: [[1, '#E9ECEF']] }
+      },
+      pointer: {
+        show: true,
+        length: '70%',
+        width: 6
+      },
+      splitLine: { show: false },
+      axisTick: { show: false },
+      axisLabel: { show: false },
+      detail: {
+        valueAnimation: true,
+        fontSize: 28,
+        color: '#007BFF',
+        offsetCenter: [0, '60%'],
+        formatter: '{value}'
+      },
+      data: [{ value: props.overallResolved }]
+    }
+  ]
+});
+
+watch(
+  () => props.overallResolved,
+  (val) => {
+    chartOptions.value.series[0].data[0].value = val;
+  },
+  { immediate: true }
+);
+
+onMounted(() => {
+  setTimeout(() => {
+    chartOptions.value = { ...chartOptions.value };
+  }, 150);
+});
 </script>
 
-
-<template>
-
-  <div>
-
-    <div class="grid-container d-flex justify-center align-center mb-3">
-      <div class="card shadow-sm" style="width: 80%;">
-        <h1 class="title text-muted">Overall Resolved Cases</h1>
-        <div class="content text-center">
-            <h1 class="count me-5">{{ props.overallResolved }}</h1>
-        <div class="">Number of Resolved Cases Recorded in this System </div>
-        </div>
-  </div>
-</div>
-  </div>
-</template>
 <style scoped>
-
-body {
-  background: #d0dbe1;
-  padding: 2rem;
+.resolved-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 30px;
 }
 
-.grid-container {
-  width: min(75rem, 100%);
-  margin-inline: auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(20rem, 100%), 1fr));
-  gap: 2rem;
+.content-wrapper {
+  width: 100%;
+  border-radius: 16px;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 2px solid rgba(76, 154, 255, 0.2);
+  border-bottom: 2px solid rgba(76, 154, 255, 0.2);
+  padding-top: 2rem;
+  padding-bottom: 2rem;
 }
 
-.card {
-  --grad: red, blue;
-  padding: 2.5rem;
-  background-image: linear-gradient(to bottom left, #e0e4e5, #f2f6f9);
-  border-radius: 2rem;
-  gap: 1.5rem;
-  display: grid;
-  grid-template: 'title icon' 'content content' 'bar bar' / 1fr auto;
-  font-family: system-ui, sans-serif;
-  color: #444447;
+.info {
+  flex: 1;
+  padding-right: 20px;
 }
 
-/* Title */
-.card .title {
-  font-size: 1.5rem;
-  grid-area: title;
-  align-self: end;
-  text-transform: uppercase;
-  font-weight: 500;
-  word-break: break-all;
+.chart-container {
+  width: 250px;
+  height: 200px;
 }
 
-/* Icon */
-.card .icon {
-  grid-area: icon;
-  font-size: 3rem;
-}
-
-.card .icon > i {
-  color: transparent;
-  background: linear-gradient(to right, var(--grad));
-  -webkit-background-clip: text;
-  background-clip: text;
-}
-
-/* Content */
-.card .content {
-  grid-area: content;
-}
-
-.card .content > *:first-child {
-  margin-top: 0rem;
-}
-
-.card .content > *:last-child {
-  margin-bottom: 0rem;
-}
-
-/* Gradient bar */
-.card::after {
-  content: "";
-  grid-area: bar;
-  height: 2px;
-  background-image: linear-gradient(90deg, var(--grad));
-}
-.count{
-  font-size: 4rem;
-  font-weight: 800;
+.chart {
+  width: 100%;
+  height: 100%;
 }
 </style>

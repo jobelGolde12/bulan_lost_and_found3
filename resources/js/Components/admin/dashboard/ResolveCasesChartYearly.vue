@@ -100,12 +100,12 @@ const chartOptions = ref({
         <h5 class="text-dark fw-lighter mb-0">Resolved Cases</h5>
         <p class="text-muted">Yearly statistics of resolved lost and found cases.</p>
       </div>
-      <div>
-        <FilterResolveCases class="filter"/>
-      </div>
     </div>
     <v-chart v-if="hasResolvedCases" class="chart" :option="chartOptions" />
-    <p v-else class="rounded text-center my-5 text-muted">No resolved cases yearly.</p>
+    <div v-else class="rounded text-center my-5 text-muted">
+      <img src="../../../../images/no-data.svg" alt="No Resolve Cases svg" class="img-icon mx-auto mb-1">
+      <p class="text-muted text-center">No resolved cases yearly.</p>
+    </div>
   </div>
 </template>
 
@@ -113,6 +113,10 @@ const chartOptions = ref({
 .chart {
   width: 100%;
   height: 400px;
+}
+.img-icon{
+  width: 150px;
+  height: 150px;
 }
 @media screen and (max-width: 768px){
   .resolve-header h5{
