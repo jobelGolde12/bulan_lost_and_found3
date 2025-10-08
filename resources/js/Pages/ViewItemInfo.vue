@@ -34,7 +34,7 @@ const data = ref({});
 const getProfile = ref('')
 const getComment = ref([]);
 const getCreatedBy = ref();
-
+let isHovered = ref(false);
 watch(
   () => props.created_by?.id,
   (newItem) => {
@@ -133,12 +133,23 @@ const deleteComment = (getId) => {
           :title="data.title"
           :description="data.description"
         />
-        <div class="mb-6">
+       <div
+          class="relative mb-6"
+          @mouseenter="isHovered = true"
+          @mouseleave="isHovered = false"
+        >
           <img
             :src="data.image_url"
             alt="Item Image"
-            class=" rounded object-cover image-item"
+            class="rounded object-cover image-item"
           />
+          <button
+            v-if="isHovered"
+            class="absolute inset-0 bg-black bg-opacity-50 text-white font-semibold transition-opacity duration-300 flex items-center justify-center rounded"
+            data-bs-toggle="modal" data-bs-target="#fullView"
+          >
+            Full View
+          </button>
         </div>
         <div class="text-end date">
           {{ formatDate(data.reported_at) }}
@@ -212,6 +223,25 @@ const deleteComment = (getId) => {
     </div>
   </div>
       </div>
+
+       <!-- Full view of image Modal -->
+          <div class="modal fade" id="fullView" tabindex="-1" aria-labelledby="fullViewLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="fullView">Full image</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <img :src="data.image_url" 
+                  alt="Image"
+                  class="mx-auto"
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
 </AuthenticatedLayout>  
 </template>
 <style scoped>

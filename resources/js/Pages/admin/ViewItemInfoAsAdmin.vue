@@ -34,7 +34,7 @@ const data = ref({});
 const getProfile = ref("");
 const getComment = ref([]);
 const getCreatedBy = ref();
-
+let isHovered = ref(false);
 watch(
   () => props.created_by?.id,
   (newItem) => {
@@ -113,11 +113,11 @@ const deleteComment = (getId) => {
   getComment.value = getComment?.value.filter((comment) => comment.id != getId);
 };
 
-// 🔽 Loading overlay state
+//  Loading overlay state
 const isLoading = ref(false);
 const loadingMessage = ref("Generating PDF, please wait...");
 
-// 🔽 Ref to child
+//  Ref to child
 const pdfRef = ref(null);
 
 const handleDownload = async () => {
@@ -149,13 +149,24 @@ const handleDownload = async () => {
               :profile="getProfile"
             />
 
-            <div class="mb-6">
-              <img
-                :src="data.image_url"
-                alt="Item Image"
-                class="rounded object-cover image-item"
-              />
-            </div>
+      <div
+          class="relative mb-6"
+          @mouseenter="isHovered = true"
+          @mouseleave="isHovered = false"
+        >
+          <img
+            :src="data.image_url"
+            alt="Item Image"
+            class="rounded object-cover image-item"
+          />
+          <button
+            v-if="isHovered"
+            class="absolute inset-0 bg-black bg-opacity-50 text-white font-semibold transition-opacity duration-300 flex items-center justify-center rounded"
+            data-bs-toggle="modal" data-bs-target="#fullView"
+          >
+            Full View
+          </button>
+        </div>
             <div class="text-end date">
               {{ formatDate(data.reported_at) }}
             </div>
@@ -324,51 +335,33 @@ const handleDownload = async () => {
         <p>{{ loadingMessage }}</p>
       </div>
     </div>
+
+
+
+          <!-- Full view of image Modal -->
+          <div class="modal fade" id="fullView" tabindex="-1" aria-labelledby="fullViewLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="fullView">Full image</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <img :src="data.image_url" 
+                  alt="Image"
+                  class="mx-auto"
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+
   </AdminLayout>
 </template>
 
 <style scoped>
 @import "../../../css/viewItemInfo.css";
+@import "../../../css/admin/viewInfo.css";
 
-.profile-in-comment2 {
-  position: relative;
-  width: 45px;
-  min-width: 45px;
-  height: 45px;
-}
-
-/* Loading overlay */
-.loading-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-}
-.loading-box {
-  background: #fff;
-  padding: 20px 30px;
-  border-radius: 12px;
-  text-align: center;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-.spinner {
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #007bff;
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  margin: 0 auto 12px;
-  animation: spin 1s linear infinite;
-}
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
 </style>
