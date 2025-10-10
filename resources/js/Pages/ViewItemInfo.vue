@@ -155,12 +155,29 @@ const deleteComment = (getId) => {
           {{ formatDate(data.reported_at) }}
         </div>
         
-        <div class="text-sm text-gray-700 space-y-1 d-none d-lg-block ">
-          <p class="mb-0"><strong>Location:</strong> {{ data.location }}</p>
-          <p><strong>Phone number:</strong> {{ data.owner_phone_number || 'NA' }}</p>
-          <p v-if="data.category"><strong>Category:</strong> {{ data.category  || "NA"}}</p>
-          <p><strong>Status:</strong> <span :class="data.status === 'Lost' ? 'text-red-600 font-semibold' : 'text-green-600'">{{ data.status }}</span></p>
+              <div class="text-sm text-gray-700 space-y-1 d-none d-lg-block">
+          <p class="mb-0">
+            <i class="bi bi-geo-alt-fill me-2 text-dark"></i>{{ data.location }}
+          </p>
+          <p>
+            <i class="bi bi-telephone-fill me-2 text-dark"></i>{{ data.owner_phone_number || "NA" }}
+          </p>
+          <p v-if="data.category">
+            <i class="bi bi-tags-fill me-2 text-dark"></i>{{ data.category || "NA" }}
+          </p>
+          <p>
+            <i
+              class="bi me-2"
+              :class="data.status === 'Lost' ? 'bi-x-circle-fill text-danger' : 'bi-check-circle-fill text-success'"
+            ></i>
+            <span
+              :class="data.status === 'Lost' ? 'text-red-600 font-semibold' : 'text-green-600'"
+            >
+              {{ data.status }}
+            </span>
+          </p>
         </div>
+
 
         <div class="text-sm text-gray-700 space-y-1 d-block d-lg-none">
           <p class="mb-0"><i class="bi bi-geo-alt-fill me-2"></i>{{ data.location }}</p>

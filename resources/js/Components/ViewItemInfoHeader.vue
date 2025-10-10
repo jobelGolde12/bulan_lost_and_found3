@@ -1,7 +1,7 @@
 
 <script setup>
 import {defineProps} from 'vue';
-
+import { Link } from '@inertiajs/vue3';
 const props = defineProps({
   created_by: Object,
   getProfile: String,
@@ -18,16 +18,21 @@ const description = props.description || '';
 <template>
   <div>
         <div class="container-fluid d-column flex-row align-items-center px-0">
-           <div class="mb-2">
-            <Link :href="route('view.userAsUser', {id: created_by.id})" class="text-decoration-none d-flex align-items-center gap-2">
-            <img
-              :src="getProfile == 'NA' ? '../../images/profile.jpeg' : `/storage/${getProfile}`"
-              alt="User"
-              class="profile-pic rounded-full"
-            />
+           <div class="mb-2 container-fluid px-0 d-flex flex-row justify-content-between align-items-center">
+            <div>
+                <Link :href="route('view.userAsUser', {id: created_by.id})" class="text-decoration-none d-flex align-items-center gap-2 image-container">
+                  <img
+                    :src="getProfile == 'NA' ? '../../images/profile.jpeg' : `/storage/${getProfile}`"
+                    alt="User"
+                    class="profile-pic rounded-full"
+                  />
+                <span class="text-sm font-medium text-gray-700">{{ created_by.name }}</span>
+              </Link>
+            </div>
 
-            <span class="text-sm font-medium text-gray-700">{{ created_by.name }}</span>
-          </Link>
+            <div>
+              <Link :href="route('message.admin')" class="btn btn-light">Contact Admin</Link>
+            </div>
            </div>
 
         <div class="flex justify-between items-center mb-4 header">
@@ -43,8 +48,16 @@ const description = props.description || '';
 </template>
 
 <style scoped>
+.image-container{
+  width: 37px;
+  height: 37px;
+  min-height: 35px;
+  border-radius: 50%;
+}
 .profile-pic{
-  min-width: 35px;
-  height: 35px;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
 }
 </style>

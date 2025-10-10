@@ -1,13 +1,17 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\BlockedMessages;
 use App\Models\ItemModel;
 use App\Models\CategoryModel;
 use App\Models\Comment;
 use App\Models\ItemCategories;
 use App\Models\LocationModel;
+use App\Models\MessageModel;
 use App\Models\NotificationModel;
 use App\Models\PendingRequest;
+use App\Models\PinnedChatsModel;
+use App\Models\RemovePinnedMessages;
 use App\Models\User;
 use App\Models\UserInfo;
 use App\Services\SemaphoreService;
@@ -333,4 +337,106 @@ public function markAsResolve($id, $userId)
         $item->forceDelete();
         return redirect()->route('items')->with(['success' => 'item deleted successfully...']);
     }
+
+    // Sa message admin san view item info
+           public function viewChat()
+{
+    $pinnedMessages = PinnedChatsModel::all();
+    $pinnedUser = null;
+
+    $currentUserId = Auth::id();
+    $removedUser = RemovePinnedMessages::where('user_id', $currentUserId)->get(['id', 'removed_user']);
+    $blockedUser = BlockedMessages::where('user_id', $currentUserId)->get(['id', 'blocked_user']);
+    $excludedIds = $removedUser->pluck('removed_user')->toArray();
+    $excludedBlockedIds = $blockedUser->pluck('blocked_user')->toArray();
+
+    // Only get users who are not removed or blocked
+    if (empty($excludedIds)) {
+        $users = User::select(['id', 'name', 'role'])->get();
+    } else {
+        $users = User::whereNotIn('id', $excludedIds)
+            ->select(['id', 'name', 'role'])
+            ->get();
+    }
+
+    // Retrieve pinned messages and their associated user information
+    if ($pinnedMessages->isNotEmpty()) {
+        $userIds = $pinnedMessages->pluck('user_id')->unique();
+
+        if (empty($excludedIds)) {
+            $pinnedUser = User::with('userInfo')
+                ->whereIn('id', $userIds)
+                ->get()
+                ->map(function ($user) {
+                    return [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'profile_pic' => $user->userInfo->profile_pic ?? null,
+                    ];
+                });
+        } else {
+            $pinnedUser = User::whereNotIn('id', $excludedIds)
+                ->whereNotIn('id', $excludedBlockedIds)
+                ->with('userInfo')
+                ->whereIn('id', $userIds)
+                ->get()
+                ->map(function ($user) {
+                    return [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'profile_pic' => $user->userInfo->profile_pic ?? null,
+                    ];
+                });
+        }
+
+        if (!empty($excludedBlockedIds)) {
+            $pinnedUser = User::whereNotIn('id', $excludedIds)
+                ->whereNotIn('id', $excludedBlockedIds)
+                ->with('userInfo')
+                ->whereIn('id', $userIds)
+                ->get()
+                ->map(function ($user) {
+                    return [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'profile_pic' => $user->userInfo->profile_pic ?? null,
+                    ];
+                });
+        }
+    }
+
+    // ✅ Get only one admin user (first one found)
+    $adminUser = User::with('userInfo')
+        ->where('role', 'admin')
+        ->first();
+
+    // If no admin found
+    if (!$adminUser) {
+        return redirect()->back()->with('error', 'No admin user found.');
+    }
+
+    // Retrieve conversation between current user and admin
+    $data2 = MessageModel::where(function ($query) use ($adminUser, $currentUserId) {
+        $query->where('sender_id', $currentUserId)
+              ->where('receiver_id', $adminUser->id);
+    })->orWhere(function ($query) use ($adminUser, $currentUserId) {
+        $query->where('sender_id', $adminUser->id)
+              ->where('receiver_id', $currentUserId);
+    })->orderBy('created_at', 'asc')
+      ->get();
+
+    $message = [
+        'data1' => $adminUser, // Admin user's info
+        'data2' => $data2,     // Conversation messages
+    ];
+
+    return Inertia::render('Message', [
+        'pinned' => $pinnedUser,
+        'message' => $message ?: null,
+        'users' => $users,
+        'currentUserId' => $currentUserId,
+    ]);
+}
+
+
 }
