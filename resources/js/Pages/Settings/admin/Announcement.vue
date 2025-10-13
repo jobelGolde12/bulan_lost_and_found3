@@ -1,8 +1,9 @@
 <script setup>
 import { defineProps, ref, watch } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
-import AdminSettingsLayout from '@/Layouts/settings/AdminSettingsLayout.vue';
+import AdminLayout from '@/Layouts/AdminLayout.vue';
 import AnnouncementCard from '@/Components/settings/AnnouncementCard.vue';
+
 const props = defineProps({
   ann: {
     type: Array,
@@ -12,18 +13,59 @@ const props = defineProps({
 
 let announcements = ref([]);
 let toastMessage = ref('');
+let selectedAnnouncementId = ref(null);
+
+// Add sorting and filtering variables
+const sortOrder = ref("latest"); // latest | oldest
+const filterStatus = ref("all"); // all | viewed | unviewed
+
+// Apply both filtering and sorting
+const applyFiltersAndSorting = () => {
+  let data = [...props.ann];
+
+  // Apply status filter
+  if (filterStatus.value === "viewed") {
+    data = data.filter(ann => ann.read_status === 1);
+  } else if (filterStatus.value === "unviewed") {
+    data = data.filter(ann => ann.read_status === 0);
+  }
+
+  // Apply date sorting
+  data.sort((a, b) => {
+    const dateA = new Date(a.created_at);
+    const dateB = new Date(b.created_at);
+    return sortOrder.value === "latest" ? dateB - dateA : dateA - dateB;
+  });
+
+  announcements.value = data;
+};
+
+// Toggle sort order between latest and oldest
+const toggleSortOrder = () => {
+  sortOrder.value = sortOrder.value === "latest" ? "oldest" : "latest";
+  applyFiltersAndSorting();
+};
+
+// Cycle through filter status: all → unviewed → viewed → all
+const toggleFilter = () => {
+  if (filterStatus.value === "all") {
+    filterStatus.value = "unviewed";
+  } else if (filterStatus.value === "unviewed") {
+    filterStatus.value = "viewed";
+  } else {
+    filterStatus.value = "all";
+  }
+  applyFiltersAndSorting();
+};
 
 watch(
   () => props.ann,
   (newVal) => {
-    // Sort announcements by date (newer first)
-    announcements.value = [...newVal].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    // Store original data and apply current filters/sorting
+    applyFiltersAndSorting();
   },
   { immediate: true }
 );
-
-const selectedAnnouncementId = ref(null);
-
 
 const deleteAnnouncement = () => {
   if (selectedAnnouncementId.value) {
@@ -32,7 +74,7 @@ const deleteAnnouncement = () => {
         announcements.value = announcements.value.filter(ann => ann.id != selectedAnnouncementId.value);
         setTimeout(() => {
           alert("Deleted successfully...");
-        },1000)
+        }, 1000);
       },
     });
   }
@@ -42,15 +84,33 @@ const deleteAnnouncement = () => {
 <template>
   <Head title="Announcements" />
 
-  <AdminSettingsLayout>
+  <AdminLayout>
     <div class="main-container">
       <!-- Header -->
-      <div class="container-fluid d-flex flex-row justify-content-between align-items-center mb-4">
+      <div class="container-fluid d-flex flex-row justify-content-between align-items-center mb-4 mt-3">
         <div>
           <h1 class="text-dark fw-light">Announcements</h1>
         </div>
-        <div>
-          <Link :href="route('settings.addAnnouncementPage')" class="btn btn-success">
+        <div class="d-flex align-items-center gap-3">
+          <!-- Filter and Sort Controls -->
+          <div class="d-flex align-items-center gap-3 me-3">
+            <!-- Filter Button -->
+
+            <!-- Sort Button -->
+            <div
+              class="text-dark fs-5 pointer d-flex align-items-center"
+              @click="toggleSortOrder"
+              title="Sort announcements"
+            >
+              <i class="bi bi-sort-down me-1"></i>
+              <span style="font-size: 0.9rem;">
+                {{ sortOrder === "latest" ? "Latest → Oldest" : "Oldest → Latest" }}
+              </span>
+            </div>
+          </div>
+
+          <!-- New Announcement Button -->
+          <Link :href="route('settings.addAnnouncementPage')" class="btn btn-success me-4">
             <i class="bi bi-plus-lg me-2"></i>
             New
           </Link>
@@ -64,11 +124,11 @@ const deleteAnnouncement = () => {
           :key="announcement.id"
           class="col-md-6 col-lg-4 mb-4"
         >
-         <AnnouncementCard 
-         :announcement="announcement"
-         :key="announcement.id"
-         v-model:selected="selectedAnnouncementId"
-         />
+          <AnnouncementCard 
+            :announcement="announcement"
+            :key="announcement.id"
+            v-model:selected="selectedAnnouncementId"
+          />
         </div>
         <!-- Extra space at the bottom -->
         <div class="bottom-container container"></div>
@@ -77,10 +137,14 @@ const deleteAnnouncement = () => {
       <!-- No Announcements Message -->
       <div v-else class="text-center py-5">
         <h4>No announcements found.</h4>
+        <p class="text-muted" v-if="filterStatus !== 'all'">
+          Try changing your filter settings.
+        </p>
       </div>
     </div>
-  </AdminSettingsLayout>
+  </AdminLayout>
 
+  <!-- Delete Confirmation Modal -->
   <div
     class="modal fade"
     id="exampleModal"
@@ -118,24 +182,22 @@ const deleteAnnouncement = () => {
       </div>
     </div>
 
-    <!-- pasa sa message kung deleted na ang announcement  -->
-        <div class="toast-container position-fixed bottom-0 end-0 p-3">
-  <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-    <div class="toast-header">
-      <strong class="me-auto">Notification</strong>
-      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    <!-- Toast for delete message -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+      <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+          <strong class="me-auto">Notification</strong>
+          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+          {{ toastMessage }}
+        </div>
+      </div>
     </div>
-    <div class="toast-body">
-      {{ toastMessage }}
-    </div>
-  </div>
-</div>
-
-
   </div>
 </template>
 
-<style>
+<style scoped>
 body {
   background-color: #f8f9fa;
 }
@@ -143,7 +205,6 @@ body {
 .card {
   transition: transform 0.2s, box-shadow 0.2s;
 }
-
 
 .profile-container {
   width: 45px;
@@ -181,5 +242,14 @@ body {
 .bottom-container {
   width: 100%;
   height: 20%;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+/* Style for active filter/sort buttons */
+.text-dark:hover {
+  color: #007bff !important;
 }
 </style>

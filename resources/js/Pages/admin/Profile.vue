@@ -1,5 +1,5 @@
 <script setup>
-import AdminLayout from "@/Layouts/AdminLayout.vue";
+import AdminSettingsLayout from "@/Layouts/settings/AdminSettingsLayout.vue";
 import { Head, usePage, Link } from "@inertiajs/vue3";
 import { defineProps, ref, watch } from "vue";
 import MyPermission from "@/Components/MyPermission.vue";
@@ -28,7 +28,7 @@ watch(
 
 <template>
   <Head title="My Profile" />
-  <AdminLayout>
+  <AdminSettingsLayout>
     <div class="main-container1">
       <!-- Profile Header -->
       <div
@@ -78,14 +78,6 @@ watch(
             <span>Edit Profile</span>
           </Link>
 
-          <Link
-            :href="route('logout')"
-            method="POST"
-            class="settings-btn logout"
-          >
-            <i class="bi bi-box-arrow-right"></i>
-            <span>Logout</span>
-          </Link>
 
           <Link
             :href="route('viewLater.view')"
@@ -96,14 +88,23 @@ watch(
           </Link>
 
           <!-- Permissions -->
-          <MyPermission :permission="props.permission" />
+          <MyPermission :permission="props.permission" class="settings-btn"/>
+
+           <Link
+            :href="route('logout')"
+            method="POST"
+            class="settings-btn logout text-danger"
+          >
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Logout</span>
+          </Link>
         </div>
       </div>
 
       <!-- Extra space at the bottom -->
       <div class="container space mt-5"></div>
     </div>
-  </AdminLayout>
+  </AdminSettingsLayout>
 </template>
 
 <style lang="css" scoped>

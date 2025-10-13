@@ -87,13 +87,6 @@ onMounted(() => {
 
         <hr />
 
-        <Link :href="route('profile')" :class="{ active: currentRoute === '/my-profile' }">
-          <div :class="{ 'icon-container': !isSidebarOpen }">
-            <i class="bi bi-person link"></i>
-          </div>
-          <span v-if="isSidebarOpen">Profile</span>
-        </Link>
-
         <Link :href="route('trash.index')" :class="{ active: currentRoute === '/trash-trash-item' }">
           <div :class="{ 'icon-container': !isSidebarOpen }">
             <i class="bi bi-gear link"></i>
@@ -114,6 +107,17 @@ onMounted(() => {
           </div>
           <span v-if="isSidebarOpen">Users</span>
         </Link>
+
+        
+        <Link
+          :href="route('settings.announcements')"
+          class="nav-link d-flex align-items-center p-2 rounded text-decoration-none text-dark"
+          :class="{ 'active': currentRoute === '/settings/announcements' }"
+        >
+          <i class="bi bi-megaphone me-2"></i>
+          <span v-if="isSidebarOpen">Announcement</span>
+        </Link>
+
       </div>
     </div>
 

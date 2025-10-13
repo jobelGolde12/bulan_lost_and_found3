@@ -1,10 +1,16 @@
 <script setup>
-import { ref, onMounted } from "vue";
-import { usePage } from "@inertiajs/vue3";
-import { Link } from "@inertiajs/vue3";
+import { ref, onMounted, computed } from "vue";
+import { usePage, Link } from "@inertiajs/vue3";
 
-const currentRoute = usePage().url; // Get the current route for active link styling
+const page = usePage();
+const currentRoute = computed(() => page.url); // reactive route tracking
 const isSidebarOpen = ref(localStorage.getItem("isSidebarOpen") === "true");
+
+// Helper function to check if current route matches
+const isActiveRoute = (routeName) => {
+  const routePath = route(routeName);
+  return currentRoute.value === routePath || currentRoute.value.startsWith(routePath + '/');
+};
 
 const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value;
@@ -25,7 +31,7 @@ onMounted(() => {
     >
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 v-if="isSidebarOpen" class="mb-0 text-dark">Settings</h5>
-        <button class=" p-1" @click="toggleSidebar">
+        <button class="p-1" @click="toggleSidebar">
           <i class="bi bi-list fs-3"></i>
         </button>
       </div>
@@ -35,7 +41,7 @@ onMounted(() => {
         <Link
           :href="route('dashboard')"
           class="nav-link d-flex align-items-center p-2 rounded text-decoration-none text-dark"
-          :class="{ 'bg-primary text-white': currentRoute === route('dashboard') }"
+          :class="{ 'bg-primary text-white': isActiveRoute('dashboard') }"
         >
           <i class="bi bi-house me-2"></i>
           <span v-if="isSidebarOpen">Home</span>
@@ -44,7 +50,7 @@ onMounted(() => {
         <Link
           :href="route('settings.index')"
           class="nav-link d-flex align-items-center p-2 rounded text-decoration-none text-dark"
-          :class="{ 'bg-primary text-white': currentRoute === route('settings.index') }"
+          :class="{ 'bg-primary text-white': isActiveRoute('settings.index') }"
         >
           <i class="bi bi-trash me-2"></i>
           <span v-if="isSidebarOpen">Trash</span>
@@ -53,34 +59,27 @@ onMounted(() => {
         <Link
           :href="route('settings.notifications')"
           class="nav-link d-flex align-items-center p-2 rounded text-decoration-none text-dark"
-          :class="{ 'bg-primary text-white': currentRoute === route('settings.notifications') }"
+          :class="{ 'bg-primary text-white': isActiveRoute('settings.notifications') }"
         >
           <i class="bi bi-bell me-2"></i>
           <span v-if="isSidebarOpen">Notifications</span>
         </Link>
 
-         <Link
-          :href="route('settings.announcements')"
-          class="nav-link d-flex align-items-center p-2 rounded text-decoration-none text-dark"
-          :class="{ 'bg-primary text-white': currentRoute === route('settings.announcements') }"
-        >
-          <i class="bi bi-megaphone me-2"></i>
-          <span v-if="isSidebarOpen">Announcement</span>
-        </Link>
-
         <Link
-          :href="route('viewLater.view')"
+          :href="route('profile')"
           class="nav-link d-flex align-items-center p-2 rounded text-decoration-none text-dark"
-          :class="{ 'bg-primary text-white': currentRoute === '/view-my-saved-items' }"
+          :class="{ 'bg-success text-white': isActiveRoute('profile') }"
         >
-          <i class="bi bi-bookmark me-2"></i>
-          <span v-if="isSidebarOpen">Saved</span>
+          <div :class="{ 'icon-container': !isSidebarOpen }">
+            <i class="bi bi-person link pe-2"></i>
+          </div>
+          <span v-if="isSidebarOpen">Profile</span>
         </Link>
         
         <Link
           :href="route('settings.privacy')"
           class="nav-link d-flex align-items-center p-2 rounded text-decoration-none text-dark"
-          :class="{ 'bg-primary text-white': currentRoute === route('settings.privacy') }"
+          :class="{ 'bg-primary text-white': isActiveRoute('settings.privacy') }"
         >
           <i class="bi bi-shield-check me-2"></i>
           <span v-if="isSidebarOpen">Privacy</span>
@@ -94,10 +93,11 @@ onMounted(() => {
     </main>
   </div>
 </template>
+
 <style scoped>
-.main-container{
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
+.main-container {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
 }
 </style>

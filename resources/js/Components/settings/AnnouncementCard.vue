@@ -11,6 +11,9 @@ const props = defineProps({
 const getAnnouncement = ref({});
 let selectedAnnouncementId = defineModel('selected')
 
+// Add reactive variables for content expansion
+const isContentExpanded = ref(false);
+const contentLimit = ref(150); // Character limit before truncation
 
 const page = usePage();
 const auth = page.props.auth;
@@ -22,6 +25,7 @@ watch(
         immediate: true
     }
 )
+
 const formatDate = (date, locale = 'en-US', options = {}) => {
   const defaultOptions = { year: 'numeric', month: 'long', day: 'numeric' };
   const finalOptions = { ...defaultOptions, ...options };
@@ -37,7 +41,37 @@ const formatDate = (date, locale = 'en-US', options = {}) => {
 const openDeleteModal = (id) => {
   selectedAnnouncementId.value = id;
 };
+
+// Toggle content expansion
+const toggleContent = () => {
+  isContentExpanded.value = !isContentExpanded.value;
+};
+
+// Check if content exceeds limit
+const shouldTruncate = () => {
+  return getAnnouncement.value.content && getAnnouncement.value.content.length > contentLimit.value;
+};
+
+// Get truncated content
+const getTruncatedContent = () => {
+  if (!getAnnouncement.value.content) return '';
+  
+  if (isContentExpanded.value || !shouldTruncate()) {
+    return getAnnouncement.value.content;
+  }
+  
+  // Find the last space within the limit to avoid cutting words
+  const truncated = getAnnouncement.value.content.substring(0, contentLimit.value);
+  const lastSpaceIndex = truncated.lastIndexOf(' ');
+  
+  if (lastSpaceIndex > 0) {
+    return truncated.substring(0, lastSpaceIndex) + '...';
+  }
+  
+  return truncated + '...';
+};
 </script>
+
 <template>
   <div class="announcement-card">
     <div class="card-wrapper">
@@ -56,7 +90,24 @@ const openDeleteModal = (id) => {
       </div>
 
       <p class="date">{{ formatDate(getAnnouncement.created_at) }}</p>
-      <p class="content">{{ getAnnouncement.content }}</p>
+      
+      <!-- Updated content section with truncation -->
+      <div class="content-container">
+        <p class="content" :class="{ 'expanded': isContentExpanded }">
+          {{ getTruncatedContent() }}
+        </p>
+        
+        <!-- See More/Less button -->
+        <button 
+          v-if="shouldTruncate()" 
+          @click="toggleContent" 
+          class="see-more-btn"
+          :aria-expanded="isContentExpanded"
+          :aria-label="isContentExpanded ? 'Show less content' : 'Show more content'"
+        >
+          {{ isContentExpanded ? 'See less' : 'See more' }}
+        </button>
+      </div>
 
       <div class="card-footer">
         <img
@@ -124,10 +175,32 @@ const openDeleteModal = (id) => {
   margin-top: 0.25rem;
 }
 
-.content {
+.content-container {
   margin: 1rem 0;
+}
+
+.content {
   color: #444;
   line-height: 1.6;
+  margin-bottom: 0.5rem;
+  white-space: pre-line;
+}
+
+.see-more-btn {
+  background: transparent;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.25rem 0;
+  transition: color 0.2s ease;
+  text-decoration: none;
+}
+
+.see-more-btn:hover {
+  color: #0056b3;
+  text-decoration: underline;
 }
 
 .card-footer {
