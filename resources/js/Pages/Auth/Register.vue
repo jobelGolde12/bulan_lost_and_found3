@@ -143,7 +143,7 @@ const agreeInTermsAndPolicy = ref(false);
       </div>
 
       <div class="mt-4 password-wrapper">
-        <InputLabel for="password" value="Password" />
+        <InputLabel for="password" value="Create Password" />
         <TextInput
           id="password"
           :type="showPassword ? 'text' : 'password'"

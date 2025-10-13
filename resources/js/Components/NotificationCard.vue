@@ -20,7 +20,6 @@ watch(
   },
   { immediate: true }
 );
-console.log("Notifications:", props.notification);
 const deleteNotification = (id) => {
   router.delete(
     route("settings.deleteNotification", { id }),
@@ -88,54 +87,44 @@ const formatDate = (dateString) => {
 
 <template>
   <div>
-    <!-- Bootstrap alert -->
     <div v-if="showAlert" class="alert alert-success text-center" role="alert">
       {{ alertMessage }}
     </div>
 
-    <!-- Scrollable flex container -->
     <div class="notification-container d-flex flex-wrap gap-3">
       <div
-        class="card p-3 rounded"
+        class="card p-3 rounded w-100 py-4"
         style="width: 500px"
         v-for="(data, index) in getData"
         :key="data.id"
       >
         <div class="flex-grow-1">
-          <div class="d-flex justify-content-between align-items-start mb-1">
-            <div class="d-flex flex-row gap-1">
-              <div>
-                <h6 class="mb-0">{{ data.title }}</h6>
-              </div>
-              <div>
-                <div class="not-read" v-if="data.read_status == 0"></div>
-              </div>
-            </div>
-            <button
-              type="button"
-              class="btn-close ms-2"
-              aria-label="Close"
-              @click="deleteNotification(data.id)"
-            ></button>
-          </div>
-          <p class="mb-2 text-muted" style="font-size: 0.95rem">
-            {{ data.message }}
-          </p>
-          <div>
-            <a
-              href="#"
-              class="me-3 text-decoration-none text-secondary"
-              @click.prevent="deleteNotification(data.id)"
-              >Delete</a
-            >
-            <a
-              href="#"
-              class="text-decoration-none fw-bold"
-              @click.prevent="viewItem(index, data.id, data.read_status, data.title, data.item_id)"
-              >View</a
-            >
-          </div>
-        </div>
+  <div class="d-flex justify-content-between align-items-start mb-1">
+    <div class="d-flex flex-row gap-1">
+      <div class="w-100">
+        <h6 class="mb-1 fw-bold text-dark fs-5">{{ data.title }}</h6>
+        <small class="text-muted">{{ formatDate(data.created_at) }}</small>
+      </div>
+
+      <div v-if="data.read_status == 0" class="not-read ms-2"></div>
+    </div>
+  </div>
+
+  <p class="mb-2 text-muted" style="font-size: 0.95rem">
+    {{ data.message }}
+  </p>
+
+  <div>
+    <a
+      href="#"
+      class="text-decoration-none fw-bold btn btn-primary"
+      @click.prevent="viewItem(index, data.id, data.read_status, data.title, data.item_id)"
+    >
+      View
+    </a>
+  </div>
+</div>
+
       </div>
     </div>
   </div>

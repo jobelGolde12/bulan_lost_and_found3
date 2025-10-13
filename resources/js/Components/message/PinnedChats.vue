@@ -73,7 +73,7 @@ const viewMessageFunc = (id) => {
 <style scoped>
 .list {
   overflow-y: scroll;
-  height: 500px;
+  height: auto;
   position: relative;
 }
 

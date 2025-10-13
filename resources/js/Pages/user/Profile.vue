@@ -1,5 +1,5 @@
 <script setup>
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import UserSettingsLayout from "@/Layouts/UserSettingsLayout.vue";
 import { Head, usePage, Link } from "@inertiajs/vue3";
 import { defineProps, onMounted, ref } from "vue";
 import MyPermission from "@/Components/MyPermission.vue";
@@ -26,7 +26,7 @@ onMounted(() => {
 
 <template>
   <Head title="My Profile" />
-  <AuthenticatedLayout>
+  <UserSettingsLayout>
     <div class="main-container1 pb-5">
       <!-- Profile Header -->
       <div
@@ -82,14 +82,15 @@ onMounted(() => {
           </Link>
 
           <Link
-            :href="route('logout')"
-            method="POST"
-            class="settings-btn logout text-dark"
-          >
-            <i class="bi bi-box-arrow-right"></i>
-            <span>Logout</span>
-          </Link>
+          :href="route('settings.index')"
+          class="nav-link d-flex align-items-center rounded text-decoration-none text-dark settings-btn" 
+          :class="{ 'bg-success text-white': currentRoute === '/settings/view-settings' }"
+        >
+          <i class="bi bi-bell me-2"></i>
+          <span>Notifications</span>
+        </Link>
 
+        
           <Link
             :href="route('viewLater.view')"
             class="settings-btn saved text-dark"
@@ -97,12 +98,23 @@ onMounted(() => {
             <i class="bi bi-bookmark"></i>
             <span>Saved Reports</span>
           </Link>
+          
 
-          <MyPermission :permission="props.permission" />
+          <MyPermission :permission="props.permission" class="settings-btn"/>
+
+            <Link
+            :href="route('logout')"
+            method="POST"
+            class="settings-btn logout text-danger"
+          >
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Logout</span>
+          </Link>
+
         </div>
       </div>
     </div>
-  </AuthenticatedLayout>
+  </UserSettingsLayout>
 </template>
 
 <style lang="css" scoped>

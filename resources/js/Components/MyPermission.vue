@@ -35,8 +35,8 @@ const toggleEmailPermission = () => {
 </script>
 
 <template>
-  <div class="ms-2 mb-3" style="cursor: pointer;" @click="toggleExpand">
-    <div class="d-flex align-items-center">
+  <div class=" mb-3 d-flex flex-column" style="cursor: pointer;" @click="toggleExpand">
+    <div class="d-flex justify-content-start w-100">
       <i class="bi bi-shield-lock me-2"></i>
       <span class="">My permission</span>
     </div>

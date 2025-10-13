@@ -3,6 +3,7 @@ import { defineProps, ref, watch } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import UserSettingsLayout from '@/Layouts/UserSettingsLayout.vue';
 import AnnouncementCard from '@/Components/settings/AnnouncementCard.vue';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 const props = defineProps({
   ann: {
     type: Array,
@@ -26,8 +27,8 @@ watch(
 <template>
   <Head title="Announcements" />
 
-  <UserSettingsLayout>
-    <div class="main-container">
+  <AuthenticatedLayout>
+    <div class="main-container mt-3">
       <h1 class="text-dark fw-light mb-4">Announcements</h1>
 
 
@@ -53,7 +54,7 @@ watch(
         <h4>No announcements found.</h4>
       </div>
     </div>
-  </UserSettingsLayout>
+  </AuthenticatedLayout>
 
   <!-- Bootstrap Modal -->
   <div

@@ -126,11 +126,20 @@ const pinnedChatAction = () => {
         >
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 v-if="isSidebarOpen" class="text-success mb-0"> Messages</h5>
-                <div
+
+                <div class="flex flex-row align-center gap-2"
+                :class="{'flex-column justify-content-center align-items-center': !isSidebarOpen}"
+                >
+                    <BackButton 
+                    :class="{ 'ms-2': !isSidebarOpen }"
+                    />
+                      <div
                     class="bi bi-list pointer text-dark fw-bolder fs-3"
                     @click="toggleSidebar"
-                    :class="{ 'mt-3': !isSidebarOpen }"
+                    :class="{ 'mt-1 d-flex': !isSidebarOpen }"
                 ></div>
+                </div>
+              
             </div>
 
             <div v-if="isSidebarOpen" class="input-group mb-3">
@@ -160,14 +169,13 @@ const pinnedChatAction = () => {
                 </form>
             </div>
 
-            <small v-if="isSidebarOpen" class="text-muted">PINNED CHATS</small>
+            <small v-if="isSidebarOpen" class="text-muted"> CHATS</small>
             <div v-if="pinnedChats.length === 0" class="mt-2 text-muted">
                 Start chatting by searching people.
             </div>
             
            
            <PinnedChats :pinned="pinnedChats" :active="getActiveMessage"/>
-           <BackButton v-if="isSidebarOpen"/>
         </div>
 
 

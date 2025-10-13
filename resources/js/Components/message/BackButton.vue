@@ -7,20 +7,21 @@ import {Link} from '@inertiajs/vue3';
     <div>
         <Link
             :href="route('dashboard')"
-            class="back ms-0 fs-5 text-decoration-none text-light bg-success p-3"
+            class="text-dark d-flex justify-content-center align-items-center"
+            title="Go back"
         >
-            <i class="bi bi-caret-left-fill me-2"></i>Back
+            <i class="bi bi-house me-2 back"></i>
         </Link>
     </div>
 </template>
 
 <style scoped>
 .back {
-    position: absolute;
-    bottom: 0;
+    position: relative;
+    display: inline-block;
+    transform: translateY(11%);
     cursor: pointer;
-    width: 90%;
-    border-radius: 10px 10px 0 0;
+    font-size: 1.4rem;
 }
 .back:hover{
   font-weight: bolder;

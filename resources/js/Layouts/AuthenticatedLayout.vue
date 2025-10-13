@@ -76,16 +76,7 @@ onMounted(() => {
 
         <hr>
         <!-- =========================== -->
-         
-        <Link
-          :href="route('profile')"
-          :class="{ active: currentRoute === '/my-profile' }"
-        >
-          <div :class="{'icon-container' : !isSidebarOpen}">
-            <i class="bi bi-person link"></i>
-          </div>
-          <span v-if="isSidebarOpen">Profile</span>
-        </Link>
+        
 
         <Link :href="route('settings.index')" :class="{ active: currentRoute === route('settings.index') }">
           <div :class="{ 'icon-container': !isSidebarOpen }">
@@ -109,6 +100,15 @@ onMounted(() => {
         >
           <span class="spinner-grow spinner-grow-sm me-2" role="status" aria-hidden="true"></span>
           <span v-if="isSidebarOpen">Pending Requests</span>
+        </Link>
+
+                <Link
+          :href="route('settings.announcements')"
+          class="nav-link d-flex align-items-center p-2 rounded text-decoration-none text-dark"
+          :class="{ 'bg-success text-white': currentRoute === '/settings/announcements' }"
+        >
+          <i class="bi bi-megaphone me-2"></i>
+          <span v-if="isSidebarOpen">Announcements</span>
         </Link>
         
       </div>

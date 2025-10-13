@@ -41,40 +41,15 @@ onMounted(() => {
           <span v-if="isSidebarOpen">Home</span>
         </Link>
 
-        <Link
-          :href="route('trash.index')"
+          <Link
+          :href="route('profile')"
           class="nav-link d-flex align-items-center p-2 rounded text-decoration-none text-dark"
-          :class="{ 'bg-success text-white': currentRoute === '/trash/view-trash' }"
+          :class="{ 'bg-success text-white': currentRoute.includes('profile') }"
         >
-          <i class="bi bi-trash me-2"></i>
-          <span v-if="isSidebarOpen">Trash</span>
-        </Link>
-        
-        <Link
-          :href="route('settings.index')"
-          class="nav-link d-flex align-items-center p-2 rounded text-decoration-none text-dark"
-          :class="{ 'bg-success text-white': currentRoute === '/settings/view-settings' }"
-        >
-          <i class="bi bi-bell me-2"></i>
-          <span v-if="isSidebarOpen">Notifications</span>
-        </Link>
-
-        <Link
-          :href="route('settings.announcements')"
-          class="nav-link d-flex align-items-center p-2 rounded text-decoration-none text-dark"
-          :class="{ 'bg-success text-white': currentRoute === '/settings/announcements' }"
-        >
-          <i class="bi bi-megaphone me-2"></i>
-          <span v-if="isSidebarOpen">Announcements</span>
-        </Link>
-
-        <Link
-          :href="route('viewLater.view')"
-          class="nav-link d-flex align-items-center p-2 rounded text-decoration-none text-dark"
-          :class="{ 'bg-primary text-white': currentRoute === '/view-my-saved-items' }"
-        >
-          <i class="bi bi-bookmark me-2"></i>
-          <span v-if="isSidebarOpen">Saved</span>
+          <div :class="{'icon-container' : !isSidebarOpen}">
+            <i class="bi bi-person link me-2"></i>
+          </div>
+          <span v-if="isSidebarOpen">Profile</span>
         </Link>
         
         <Link
