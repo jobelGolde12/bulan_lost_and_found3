@@ -73,7 +73,7 @@ const getTruncatedContent = () => {
 </script>
 
 <template>
-  <div class="announcement-card">
+  <div class="announcement-card" style="height: 430px;">
     <div class="card-wrapper">
       <div class="card-header">
         <h2 class="title">{{ getAnnouncement.title }}</h2>

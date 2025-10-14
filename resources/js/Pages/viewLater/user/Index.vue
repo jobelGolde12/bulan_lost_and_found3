@@ -1,5 +1,5 @@
 <script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import UserSettingsLayout from '@/Layouts/UserSettingsLayout.vue';
 import { defineProps, watch, ref } from 'vue';
 import { Head } from '@inertiajs/vue3';
 import ItemCard from '@/Components/ItemCard.vue';
@@ -21,13 +21,13 @@ watch(
 
 <template>
   <div>
-        <AuthenticatedLayout>
+        <UserSettingsLayout>
              <Head title="My saved items" />
              <div class="container mt-4">
                 <h5 class="text-muted">My Saved Items</h5>
                 <ItemCard :items="getItems" />
              </div>
-        </AuthenticatedLayout>
+        </UserSettingsLayout>
   </div>
 </template>
 

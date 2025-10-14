@@ -112,7 +112,6 @@ onMounted(() => {
         </Link>
         
       </div>
-           <LogoutButton :modifyWidth="isSidebarOpen"/>
     </div>
     <!-- Page Content -->
     <main 

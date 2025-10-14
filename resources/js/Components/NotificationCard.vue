@@ -94,7 +94,7 @@ const formatDate = (dateString) => {
     <div class="notification-container d-flex flex-wrap gap-3">
       <div
         class="card p-3 rounded w-100 py-4"
-        style="width: 500px"
+        style="max-width: 90%"
         v-for="(data, index) in getData"
         :key="data.id"
       >

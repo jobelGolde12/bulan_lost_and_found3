@@ -13,7 +13,7 @@ const changeRouteName = (text) => {
 </script>
 <template>
     <div class="main-container">
-        <h2 class="my-3 route-name">Settings > Trash > {{ selectedRoute.text }}</h2>
+        
 
         <div class="container-fluid d-flex flex-row align-items-center gap-2">
             <Link

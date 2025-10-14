@@ -78,6 +78,14 @@ watch(
             <span>Edit Profile</span>
           </Link>
 
+                  <Link
+          :href="route('settings.notifications')"
+          class=" text-dark settings-btn "
+        >
+          <i class="bi bi-bell me-2"></i>
+          <span>Notifications</span>
+        </Link>
+
 
           <Link
             :href="route('viewLater.view')"

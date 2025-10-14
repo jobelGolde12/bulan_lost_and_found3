@@ -25,9 +25,9 @@ onMounted(() => {
 <template>
   <div class="d-flex vh-100 bg-light main-container">
     <aside
-      class="bg-white shadow-sm transition-all d-flex flex-column"
+      class="bg-white shadow-sm transition-all d-flex flex-column sidebar"
       :class="isSidebarOpen ? 'p-4' : 'p-2'"
-      :style="{ width: isSidebarOpen ? '250px' : '70px' }"
+      :style="{ 'min-width': isSidebarOpen ? '250px' : '70px' }"
     >
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 v-if="isSidebarOpen" class="mb-0 text-dark">Settings</h5>
@@ -55,15 +55,7 @@ onMounted(() => {
           <i class="bi bi-trash me-2"></i>
           <span v-if="isSidebarOpen">Trash</span>
         </Link>
-        
-        <Link
-          :href="route('settings.notifications')"
-          class="nav-link d-flex align-items-center p-2 rounded text-decoration-none text-dark"
-          :class="{ 'bg-primary text-white': isActiveRoute('settings.notifications') }"
-        >
-          <i class="bi bi-bell me-2"></i>
-          <span v-if="isSidebarOpen">Notifications</span>
-        </Link>
+      
 
         <Link
           :href="route('profile')"
@@ -95,6 +87,9 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.sidebar{
+  min-width: 250px;
+}
 .main-container {
   width: 100vw;
   height: 100vh;

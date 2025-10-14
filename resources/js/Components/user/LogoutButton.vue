@@ -19,7 +19,7 @@ watch(
 <template>
     <div>
             <div class="container button-container">
-                <Link :href="route('logout')" class="btn btn-dark text-decoration-none w-100" method="post">
+                <Link :href="route('logout')" class="btn btn-danger  text-decoration-none w-100" method="post">
                     <span v-if="!getModifyWith">
                         <i class="bi bi-caret-left"></i>
                     </span>
@@ -33,6 +33,6 @@ watch(
 <style scoped>
 .button-container{
     position: relative;
-    bottom: -10rem;
+    bottom: -20rem;
 }
 </style>
