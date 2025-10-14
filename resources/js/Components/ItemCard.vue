@@ -67,7 +67,7 @@ const truncateText = (text, maxLength = 20) => {
           <div class="container-fluid d-flex flex-row justify-content-between align-items-center px-0">
             <div class="left">
                   <Link
-                :href="route('view.userAsUser', {id: data?.user.id})"
+                :href="data?.user ? route('view.userAsUser', { id: data.user.id }) : '#'"
                 class=" ps-0 d-flex flex-row gap-2 align-items-center text-dark text-decoration-none"
                 >
                   <div><img :src="data.user?.user_info?.profile_pic == null ? '../../images/profile.jpeg' : `/storage/${data.user?.user_info?.profile_pic}`" alt="profile" class="default-profile"></div>

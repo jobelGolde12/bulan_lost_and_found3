@@ -18,10 +18,10 @@ watch(
 </script>
 <template>
     <div>
-            <div class="container button-container">
+            <div class="container button-container pt-0">
                 <Link :href="route('logout')" class="btn btn-danger  text-decoration-none w-100" method="post">
-                    <span v-if="!getModifyWith">
-                        <i class="bi bi-caret-left"></i>
+                    <span v-if="!getModifyWith" class="me-3">
+                        <i class="bi bi-caret-left "></i>
                     </span>
                     <span v-else>Logout</span>
                 </Link>

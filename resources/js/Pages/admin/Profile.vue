@@ -82,7 +82,7 @@ watch(
           :href="route('settings.notifications')"
           class=" text-dark settings-btn "
         >
-          <i class="bi bi-bell me-2"></i>
+          <i class="bi bi-bell "></i>
           <span>Notifications</span>
         </Link>
 

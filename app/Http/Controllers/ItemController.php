@@ -260,26 +260,26 @@ public function markAsResolve($id, $userId)
 {
     $item = ItemModel::find($id);
 
-    if (!$item) {
-        return response()->json(['error' => 'Item not found'], 404);
-    }
-    if (!$userId) {
-        return response()->json(['error' => 'user_id not found'], 404);
-    }
+    // if (!$item) {
+    //     return response()->json(['error' => 'Item not found'], 404);
+    // }
+    // if (!$userId) {
+    //     return response()->json(['error' => 'user_id not found'], 404);
+    // }
 
-    $item->status = 'Claimed';
-    $item->resolved_at = now();
-    $item->save();
+    // $item->status = 'Claimed';
+    // $item->resolved_at = now();
+    // $item->save();
 
-    $notification = NotificationModel::create([
-        'title' => 'Item Marked as Resolved',
-        'user_id' => $userId,
-        'message' => 'The item you reported has been marked as resolved by the administrator. Thank you for using our service!',
-        'read_status' => 0,
-    ]);
+    // $notification = NotificationModel::create([
+    //     'title' => 'Item Marked as Resolved',
+    //     'user_id' => $userId,
+    //     'message' => 'The item you reported has been marked as resolved by the administrator. Thank you for using our service!',
+    //     'read_status' => 0,
+    // ]);
 
-    $notification->item_id = $item->id;
-    $notification->save();
+    // $notification->item_id = $item->id;
+    // $notification->save();
 
     $user = UserInfo::where('user_id', $userId)->first();
     

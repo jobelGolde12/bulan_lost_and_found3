@@ -141,14 +141,13 @@ const handleDownload = async () => {
         <div class="bg-white rounded-lg shadow-md w-full max-w-3xl p-6">
           <div v-if="Object.keys(data).length > 0">
             <ViewItemInfoForAdminHeader
-              :id="props?.created_by.id"
+              :id="props?.created_by?.id || null"
               :item_id="props?.item.id"
               :name="props?.created_by.name"
               :title="data?.title"
               :description="data?.description"
               :profile="getProfile"
             />
-
       <div
           class="relative mb-6"
           @mouseenter="isHovered = true"
@@ -232,6 +231,7 @@ const handleDownload = async () => {
                         ? '../../../images/profile.jpeg'
                         : `/storage/${getProfile}`
                     "
+
                     alt="User"
                     class="profile-pic1 rounded-full"
                   />

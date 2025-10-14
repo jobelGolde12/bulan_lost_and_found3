@@ -3,14 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\BlockedMessages;
+use App\Models\Comment;
 use App\Models\ItemModel;
+use App\Models\MessageModel;
 use App\Models\MyPermissionModel;
+use App\Models\NotificationModel;
+use App\Models\PendingRequest;
+use App\Models\PinnedChatsModel;
 use App\Models\User;
 use App\Models\UserInfo;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
@@ -173,7 +180,99 @@ class ProfileController extends Controller
 
     return redirect()->back()->with(['message: ' => "profile edited successfully..."]);
 }
+        public function deleteAccount(Request $request)
+        {
+            return Inertia::render('Profile/DeleteAccount');  
+        }
+        /**
+     * Delete the authenticated user's account.
+     */
+    public function destroyAccount(Request $request)
+{
+    // Validate password
+    $request->validate([
+        'password' => ['required', 'string'],
+    ]);
 
+    $user = $request->user();
+
+    // Check if password matches
+    if (!Hash::check($request->password, $user->password)) {
+        return back()->withErrors(['password' => 'The password is incorrect.']);
+    }
+
+    // 1. User Info (profile + photo)
+    $userInfo = UserInfo::where('user_id', $user->id)->first();
+    if ($userInfo) {
+        if (!empty($userInfo->profile_pic)) {
+            Storage::disk('public')->delete($userInfo->profile_pic);
+        }
+        $userInfo->delete();
+    }
+
+    // 2. Pinned Chats
+    if (PinnedChatsModel::where('user_id', $user->id)->exists()) {
+        PinnedChatsModel::where('user_id', $user->id)->delete();
+    }
+
+    // 3. Pending Requests
+    if (PendingRequest::where('user_id', $user->id)->exists()) {
+        PendingRequest::where('user_id', $user->id)->delete();
+    }
+
+    // 4. Items
+    if (ItemModel::where('user_id', $user->id)->exists()) {
+        ItemModel::where('user_id', $user->id)->where('status', '!=', 'Claimed')->delete();
+    }
+
+    // 5. Notifications
+    if (NotificationModel::where('user_id', $user->id)->exists()) {
+        NotificationModel::where('user_id', $user->id)->delete();
+    }
+
+    // 6. Permissions
+    if (MyPermissionModel::where('user_id', $user->id)->exists()) {
+        MyPermissionModel::where('user_id', $user->id)->delete();
+    }
+
+    // 7. Messages (sent or received)
+    if (
+        MessageModel::where('sender_id', $user->id)->exists() ||
+        MessageModel::where('receiver_id', $user->id)->exists()
+    ) {
+        MessageModel::where('sender_id', $user->id)
+            ->orWhere('receiver_id', $user->id)
+            ->delete();
+    }
+
+    // 8. Comments
+    if (Comment::where('user_id', $user->id)->exists()) {
+        Comment::where('user_id', $user->id)->delete();
+    }
+
+    // 9. Blocked Messages
+    if (
+        BlockedMessages::where('user_id', $user->id)->exists() ||
+        BlockedMessages::where('blocked_user_id', $user->id)->exists()
+    ) {
+        BlockedMessages::where('user_id', $user->id)
+            ->orWhere('blocked_user_id', $user->id)
+            ->delete();
+    }
+
+    // 10. Logout the user
+    Auth::logout();
+
+    // 11. Delete the user record
+    $user->delete();
+
+    // 12. Invalidate session
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    // 13. Redirect
+    return redirect('/')->with('message', 'Account successfully deleted.');
+}
 
 }
 

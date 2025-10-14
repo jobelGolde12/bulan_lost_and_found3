@@ -84,7 +84,6 @@ onMounted(() => {
           <Link
           :href="route('settings.index')"
           class="nav-link d-flex align-items-center rounded text-decoration-none text-dark settings-btn" 
-          :class="{ 'bg-success text-white': currentRoute === '/settings/view-settings' }"
         >
           <i class="bi bi-bell me-2"></i>
           <span>Notifications</span>
@@ -109,6 +108,14 @@ onMounted(() => {
           >
             <i class="bi bi-box-arrow-right"></i>
             <span>Logout</span>
+          </Link>
+
+           <Link
+            :href="route('deleteAccount')"
+            class="settings-btn logout text-danger"
+          >
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Delete Account</span>
           </Link>
 
         </div>

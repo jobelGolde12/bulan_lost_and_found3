@@ -61,7 +61,6 @@ onMounted(() => {
           <span v-if="isSidebarOpen">Privacy</span>
         </Link>
 
-           <LogoutButton :modifyWidth="isSidebarOpen"/>
       </nav>
     </aside>
     

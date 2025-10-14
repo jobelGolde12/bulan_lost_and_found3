@@ -92,15 +92,7 @@ onMounted(() => {
           <span v-if="isSidebarOpen">Message</span>
         </Link>
 
-        <Link 
-        :href="route('my.pending')" 
-        :class="{ active: currentRoute === route('my.pending') }"
-        class="btn btn-primary bg-primary text-light" type="button" 
-        v-if="props.isHavePending"
-        >
-          <span class="spinner-grow spinner-grow-sm me-2" role="status" aria-hidden="true"></span>
-          <span v-if="isSidebarOpen">Pending Requests</span>
-        </Link>
+       
 
                 <Link
           :href="route('settings.announcements')"
@@ -109,6 +101,16 @@ onMounted(() => {
         >
           <i class="bi bi-megaphone me-2"></i>
           <span v-if="isSidebarOpen">Announcements</span>
+        </Link>
+
+         <Link 
+        :href="route('my.pending')" 
+        :class="{ active: currentRoute === route('my.pending') }"
+        class="btn btn-primary bg-primary text-light" type="button" 
+        v-if="props.isHavePending"
+        >
+          <span class="spinner-grow spinner-grow-sm me-2" role="status" aria-hidden="true"></span>
+          <span v-if="isSidebarOpen">Pending Requests</span>
         </Link>
         
       </div>
