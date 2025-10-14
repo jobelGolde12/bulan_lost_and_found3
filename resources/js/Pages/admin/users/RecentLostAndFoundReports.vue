@@ -61,7 +61,7 @@ const navigateTo = (id) => {
             <table class="table">
               <thead>
                 <tr>
-                  <th>Item Name</th>
+                  <th> Name</th>
                   <th>Date</th>
                   <th>Category</th>
                   <th>Status</th>

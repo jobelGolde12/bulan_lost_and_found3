@@ -5,106 +5,160 @@ import { CanvasRenderer } from 'echarts/renderers';
 import { BarChart } from 'echarts/charts';
 import { GridComponent, TooltipComponent, LegendComponent } from 'echarts/components';
 import VChart from 'vue-echarts';
-import FilterResolveCases from './FilterResolveCases.vue';
 
 // Register necessary ECharts modules
 use([CanvasRenderer, BarChart, GridComponent, TooltipComponent, LegendComponent]);
 
+// --- Props ---
 const props = defineProps({
-  resolve: {
+  data: {
     type: Array,
     default: () => []
   }
-})
+});
 
-let getResolve = ref([]);
+// --- Refs ---
+const lostData = ref([]);
+const foundData = ref([]);
+const resolvedData = ref([]);
+const chartOptions = ref({});
+const hasData = ref(false);
 
+// --- Helpers ---
+const groupByYearAndStatus = (data) => {
+  const yearly = {};
 
-watch(
-  () => props.resolve,
-  (i) => {
-    getResolve.value = i;
-  },
-  { immediate: true }
-)
+  if (Array.isArray(data)) {
+    data.forEach((item) => {
+      if (item.reported_at && item.status) {
+        const year = new Date(item.reported_at).getFullYear();
+        const status = item.status;
 
+        if (!yearly[year]) {
+          yearly[year] = { Lost: 0, Found: 0, Resolved: 0 };
+        }
 
-const getYearlyResolvedCases = (data) => {
-  const yearlyCounts = {}; 
-
-
-  if (Array.isArray(data) && data.length > 0) {
-    data.forEach((caseData) => {
-      const reportedYear = new Date(caseData.reported_at).getFullYear();
-      yearlyCounts[reportedYear] = (yearlyCounts[reportedYear] || 0) + 1; 
+        if (status === 'Lost') yearly[year].Lost++;
+        else if (status === 'Found') yearly[year].Found++;
+        else if (status === 'Claimed' || status === 'Resolved') yearly[year].Resolved++;
+      }
     });
   }
 
-  return yearlyCounts;
-}
+  return yearly;
+};
 
+// --- Watch Props for Changes ---
+watch(
+  () => props.data,
+  (newData) => {
+    const yearlyStats = groupByYearAndStatus(newData);
+    const years = Object.keys(yearlyStats).sort();
 
-const yearlyResolvedCases = getYearlyResolvedCases(getResolve.value);
+    const lostCounts = years.map((year) => yearlyStats[year].Lost);
+    const foundCounts = years.map((year) => yearlyStats[year].Found);
+    const resolvedCounts = years.map((year) => yearlyStats[year].Resolved);
 
+    hasData.value = years.length > 0;
 
-const years = Object.keys(yearlyResolvedCases).sort();
-const resolvedCasesByYear = years.map((year) => yearlyResolvedCases[year]);
+    // Compute total per year for percentage display
+    const yearlyTotals = years.map(
+      (year) =>
+        yearlyStats[year].Lost +
+        yearlyStats[year].Found +
+        yearlyStats[year].Resolved
+    );
 
+    // --- Chart Options ---
+    chartOptions.value = {
+      tooltip: {
+        trigger: 'item',
+        formatter: (params) => {
+          const yearIndex = years.indexOf(params.name);
+          const total = yearlyTotals[yearIndex];
+          const percentage = total
+            ? ((params.value / total) * 100).toFixed(1)
+            : 0;
 
-const hasResolvedCases = resolvedCasesByYear.length > 0;
-
-
-const chartOptions = ref({
-  tooltip: {
-    trigger: 'axis',
-    axisPointer: {
-      type: 'shadow'
-    }
-  },
-  xAxis: {
-    type: 'category',
-    data: years, 
-  },
-  yAxis: {
-    type: 'value'
-  },
-  series: [
-    {
-      name: 'Resolved Cases',
-      type: 'bar',
-      data: resolvedCasesByYear,
-      itemStyle: {
-        color: {
-          type: 'linear',
-          x: 0,
-          y: 0,
-          x2: 0,
-          y2: 1,
-          colorStops: [
-            { offset: 0, color: '#4C9AFF' }, 
-            { offset: 1, color: '#007BFF' }  
-          ]
-        },
-        barBorderRadius: [5, 5, 0, 0]
+          return `
+            <div style="text-align:left;">
+              <strong>${params.seriesName}</strong><br/>
+              Year: ${params.name}<br/>
+              Count: ${params.value}<br/>
+              Percentage: ${percentage}% of total cases in ${params.name}
+            </div>
+          `;
+        }
       },
-      barWidth: '50%'
-    }
-  ]
-});
+      legend: { data: ['Lost Cases', 'Found Cases', 'Resolved Cases'] },
+      xAxis: {
+        type: 'category',
+        data: years,
+        axisTick: { alignWithLabel: true },
+        axisLabel: { color: '#555' }
+      },
+      yAxis: {
+        type: 'value',
+        axisLabel: { color: '#555' }
+      },
+      series: [
+        {
+          name: 'Lost Cases',
+          type: 'bar',
+          data: lostCounts,
+          itemStyle: {
+            color: '#FF4C4C',
+            barBorderRadius: [4, 4, 0, 0]
+          },
+          barWidth: '20%'
+        },
+        {
+          name: 'Found Cases',
+          type: 'bar',
+          data: foundCounts,
+          itemStyle: {
+            color: '#28A745',
+            barBorderRadius: [4, 4, 0, 0]
+          },
+          barWidth: '20%'
+        },
+        {
+          name: 'Resolved Cases',
+          type: 'bar',
+          data: resolvedCounts,
+          itemStyle: {
+            color: '#007BFF',
+            barBorderRadius: [4, 4, 0, 0]
+          },
+          barWidth: '20%'
+        }
+      ]
+    };
+  },
+  { immediate: true, deep: true }
+);
 </script>
 
 <template>
   <div>
     <div class="container-fluid d-flex flex-row justify-content-between align-items-center">
       <div>
-        <h5 class="text-dark fw-lighter mb-0">Resolved Cases</h5>
-        <p class="text-muted">Yearly statistics of resolved lost and found cases.</p>
+        <h5 class="text-dark fw-lighter mb-0">Yearly Case Statistics</h5>
+        <!-- <p class="text-muted">
+          Lost (red), Found (green), and Resolved (blue) cases per year.
+        </p> -->
       </div>
     </div>
-    <v-chart v-if="hasResolvedCases" class="chart" :option="chartOptions" />
+
+    <v-chart v-if="hasData" class="chart" :option="chartOptions" />
+
     <div v-else class="rounded text-center my-5 text-muted">
-      <img src="../../../../images/no-data.svg" alt="No Resolve Cases svg" class="img-icon mx-auto mb-1">
-      <p class="text-muted text-center">No resolved cases yearly.</p>
+      <img
+        src="../../../../images/no-data.svg"
+        alt="No Resolve Cases svg"
+        class="img-icon mx-auto mb-1"
+      />
+      <p class="text-muted text-center">No case data available yearly.</p>
     </div>
   </div>
 </template>
@@ -114,19 +168,16 @@ const chartOptions = ref({
   width: 100%;
   height: 400px;
 }
-.img-icon{
+.img-icon {
   width: 150px;
   height: 150px;
 }
-@media screen and (max-width: 768px){
-  .resolve-header h5{
+@media screen and (max-width: 768px) {
+  .resolve-header h5 {
     font-size: 1.2rem;
   }
-  .resolve-header p{
-    font-size: .7rem;
-  }
-  .filter{
-    transform: translateY(-50%);
+  .resolve-header p {
+    font-size: 0.7rem;
   }
 }
 </style>

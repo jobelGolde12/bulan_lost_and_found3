@@ -6,18 +6,22 @@ import { TooltipComponent, LegendComponent } from "echarts/components";
 import { CanvasRenderer } from "echarts/renderers";
 import VChart from "vue-echarts";
 
-// Register needed parts
+// Register echarts modules
 use([PieChart, TooltipComponent, LegendComponent, CanvasRenderer]);
 
 const props = defineProps({
-  data:{
+  data: {
     type: Object,
-    default: () => ({}),
-  }
+    default: () => ({
+      lostItems: 0,
+      fountItems: 0,
+      resolve: 0,
+    }),
+  },
 });
 
-
 const chartRef = ref(null);
+
 const chartOptions = ref({
   tooltip: { trigger: "item" },
   legend: {
@@ -36,41 +40,51 @@ const chartOptions = ref({
       },
       labelLine: { show: false },
       data: [
-        { value: props.data.lostItems, name: "Lost", itemStyle: { color: "#da7575" } },
-        { value: props.data.fountItems, name: "Found", itemStyle: { color: "#4C9AFF" } },
+        { value: props.data.lostItems, name: "Lost", itemStyle: { color: "#FF6B6B" } },
+        { value: props.data.fountItems, name: "Found", itemStyle: { color: "#4CAF50" } },
+        { value: props.data.resolve, name: "Resolved", itemStyle: { color: "#007BFF" } },
       ],
     },
   ],
 });
 
-function updateChart(lost, found) {
+function updateChart(lost, found, resolved) {
   const instance = chartRef.value?.getEchartsInstance?.();
   if (instance) {
     instance.setOption({
-      series: [{ data: [
-        { value: lost, name: "Lost", itemStyle: { color: "#E9ECEF" } },
-        { value: found, name: "Found", itemStyle: { color: "#4C9AFF" } },
-      ]}],
+      series: [
+        {
+          data: [
+            { value: lost, name: "Lost", itemStyle: { color: "#FF6B6B" } },
+            { value: found, name: "Found", itemStyle: { color: "#4CAF50" } },
+            { value: resolved, name: "Resolved", itemStyle: { color: "#007BFF" } },
+          ],
+        },
+      ],
     });
   }
 }
 
+// Watch for prop changes and update chart
 watch(
-  () => [props.lostCount, props.foundCount],
-  ([lost, found]) => {
-    updateChart(lost, found);
+  () => props.data,
+  (newData) => {
+    const lost = Number(newData.lostItems) || 0;
+    const found = Number(newData.fountItems) || 0;
+    const resolved = Number(newData.resolve) || 0;
+    updateChart(lost, found, resolved);
   },
-  { immediate: true }
+  { deep: true, immediate: true }
 );
 
 onMounted(async () => {
-  // Wait until DOM is ready and visible
   await nextTick();
   const container = chartRef.value?.$el;
   const waitUntilVisible = setInterval(() => {
     if (container?.clientWidth > 0 && container?.clientHeight > 0) {
       clearInterval(waitUntilVisible);
-      updateChart(props.lostCount, props.foundCount);
+      const { lostItems, fountItems, resolve } = props.data;
+      updateChart(lostItems, fountItems, resolve);
     }
   }, 100);
 });
@@ -79,8 +93,8 @@ onMounted(async () => {
 <template>
   <div class="overview my-5">
     <h5 class="fw-semibold fs-1">Overview</h5>
-    <p class="text-muted small ">
-      Current Lost and Found Cases Reported on this System.
+    <p class="text-muted small">
+      Current Lost, Found, and Resolved (Claimed) Cases Reported on this System.
     </p>
 
     <v-chart
@@ -103,6 +117,5 @@ onMounted(async () => {
   width: 100%;
   height: 320px;
   min-height: 300px;
-  /* background: #da7575; */
 }
 </style>

@@ -142,8 +142,9 @@ overViewData.value = {
       </div>
 
       <div class="contaner-fluid mt-5 pt-5">
-            <ResolveCasesChart :resolve="getResolve"/>
-            <ResolveCasesChartYearly :resolve="counts.claimed"/>
+           <!-- This get all the data not just by resolved according to the panelist huhu -->
+            <ResolveCasesChart :data="getReports"/>
+            <ResolveCasesChartYearly :data="getReports"/>
           </div>
 
       <OverAllResolved 
