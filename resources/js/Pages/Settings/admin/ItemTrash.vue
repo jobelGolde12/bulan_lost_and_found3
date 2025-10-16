@@ -9,6 +9,10 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    hasUnread: {
+        type: Boolean,
+        default: false
+    }
 });
 
 const trashedItems = ref([]);
@@ -51,7 +55,7 @@ const viewItem = (getId) => {
 
 <template>
     <Head title="Trash" />
-    <AdminSettingsLayout>
+    <AdminSettingsLayout :hasUnread="hasUnread">
         <TrashLayout>
             <div class="container mt-4">
                 <div v-if="trashedItems.length === 0" class="text-center">

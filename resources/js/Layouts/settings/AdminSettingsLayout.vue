@@ -1,6 +1,13 @@
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, defineProps } from "vue";
 import { usePage, Link } from "@inertiajs/vue3";
+
+const props = defineProps({
+  hasUnread: {
+    type: Boolean,
+    default: false
+  }
+});
 
 const page = usePage();
 const currentRoute = computed(() => page.url); // reactive route tracking

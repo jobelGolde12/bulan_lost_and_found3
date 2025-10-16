@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AnnouncementModel;
 use App\Models\ItemCategories;
 use App\Models\ItemModel;
 use App\Models\PendingRequest;
@@ -27,7 +28,7 @@ class DashboardController extends Controller
 
         $totalLost = TotalLost::all();
         $totalFound = TotalFound::all();
-
+        $announcement = AnnouncementModel::all();
         if (Auth::check() && Auth::user()->role === 'user') { 
             
         //get only the specific viewLater data base sa id ni user
@@ -44,6 +45,7 @@ class DashboardController extends Controller
                 'categories' => $categories,
                 'items' => $items,
                 'isHavePending' => $isHavePending,
+                'announcement' => $announcement,
         ]); 
         }else if (Auth::check() && Auth::user()->role === 'admin') { 
             $userCount = User::count();

@@ -82,7 +82,7 @@ onMounted(() => {
           </Link>
 
           <Link
-          :href="route('settings.index')"
+          :href="route('settings.notifications')"
           class="nav-link d-flex align-items-center rounded text-decoration-none text-dark settings-btn" 
         >
           <i class="bi bi-bell me-2"></i>

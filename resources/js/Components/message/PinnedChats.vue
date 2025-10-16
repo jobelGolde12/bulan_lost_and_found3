@@ -20,6 +20,7 @@ watch(
     () => props.pinned,
     (data) => {
         pinnedChats.value = data;
+        console.log(pinnedChats.value);
     },
     { immediate: true }
 );

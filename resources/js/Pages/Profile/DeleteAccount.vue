@@ -43,7 +43,7 @@ const submit = () => {
             <ul style="list-style-type: disc; padding-left: 1.5rem;">
               <li>Your profile and data will be erased.</li>
               <li>You won’t be able to recover your account later.</li>
-              <li>Your posts will remain and still appear in the admin analytics, but they will no longer be linked to you once your account is removed.
+              <li>Your posts will be deleted.
               </li>
             </ul>
 

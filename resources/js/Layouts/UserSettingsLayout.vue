@@ -1,11 +1,18 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, defineProps } from "vue";
 import { usePage } from "@inertiajs/vue3";
 import { Link } from "@inertiajs/vue3";
 import LogoutButton from "@/Components/user/LogoutButton.vue";
 const currentRoute = usePage().url; // Get the current route for active link styling
 const isSidebarOpen = ref(localStorage.getItem("isSidebarOpen") === "true");
 
+const props = defineProps({
+  hasUnread: {
+    type: Boolean,
+    default: false
+  }
+});
+console.log("Has Unread Notifications:", props.hasUnread);
 const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value;
   localStorage.setItem("isSidebarOpen", isSidebarOpen.value);
@@ -50,6 +57,10 @@ onMounted(() => {
             <i class="bi bi-person link me-2"></i>
           </div>
           <span v-if="isSidebarOpen">Profile</span>
+          
+            <span v-if="props.hasUnread" class="pending-badge">
+              
+            </span>
         </Link>
         
         <Link
@@ -79,4 +90,20 @@ onMounted(() => {
 .sidebar{
   min-width: 250px;
 }
+.pending-badge {
+  position: relative;
+  top: -8px;
+  right: 0;
+  background-color: #198754; /* Bootstrap bg-success */
+  color: #fff;
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
 </style>

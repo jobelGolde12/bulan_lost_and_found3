@@ -8,17 +8,22 @@ const props = defineProps({
   notifications: {
     type: Array,
     default: () => []
+  },
+  hasUnread: {
+    type: Boolean,
+    default: false
   }
 });
 
 const getData = ref([]);
 const sortOrder = ref("latest");
 const filterStatus = ref("all"); // all | viewed | unviewed
-
+const getHasUnread = ref(props.hasUnread);
 watch(
   () => props.notifications,
   (i) => {
     getData.value = i;
+    console.log("Notifications updated:", getData.value);
   },
   { immediate: true }
 );
@@ -54,7 +59,7 @@ const toggleFilter = () => {
 
 <template>
   <Head title="Notifications" />
-  <UserSettingsLayout>
+  <UserSettingsLayout :hasUnread="getHasUnread">
     <div>
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="mb-0">Notifications</h1>

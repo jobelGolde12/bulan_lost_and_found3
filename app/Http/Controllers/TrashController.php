@@ -22,11 +22,19 @@ class TrashController extends Controller
     public function index()
     {
         if(Auth::user()->role == 'admin'){
-            $trashedItems = ItemModel::where('user_id', Auth::id())->onlyTrashed()->get();  
-            return Inertia::render('Settings/admin/ItemTrash', ['items' => $trashedItems]);
+            $trashedItems = ItemModel::where('user_id', Auth::id())->onlyTrashed()->get(); 
+             $hasUnread = NotificationModel::where('user_id', Auth::id())->where('read_status', 0)->exists();   
+            return Inertia::render('Settings/admin/ItemTrash', [
+                'items' => $trashedItems,
+                'hasUnread' => $hasUnread,
+            ]);
         }else{
             $notifications = NotificationModel::where('user_id', Auth::id())->onlyTrashed()->get();
-            return Inertia::render('Settings/user/NotificationTrashed', ['notifications' => $notifications]);
+             $hasUnread = NotificationModel::where('user_id', Auth::id())->where('read_status', 0)->exists();   
+            return Inertia::render('Settings/user/NotificationTrashed', [
+                'notifications' => $notifications,
+                'hasUnread' => $hasUnread,
+            ]);
         }
     }
 

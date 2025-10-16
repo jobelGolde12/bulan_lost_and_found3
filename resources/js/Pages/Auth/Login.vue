@@ -73,7 +73,18 @@ const submit = () => {
   transform: translateY(-50%);
   cursor: pointer;
 }
-
+.status {
+  position: absolute;
+  top: 20px;
+  right: 5%;
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #38a169;
+  background-color: #f0fff4;
+}
 @media (min-width: 768px) {
   .main-container {
     flex-direction: row;
@@ -88,7 +99,7 @@ const submit = () => {
   <div class="main-container bg-light">
     <Head title="Log in" />
 
-    <div v-if="status" class="mb-4 text-sm font-medium text-green-600">
+    <div v-if="status" class="mb-4 text-sm font-medium text-green-600 status">
       {{ status }}
     </div>
 

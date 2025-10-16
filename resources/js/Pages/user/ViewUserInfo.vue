@@ -26,7 +26,14 @@ watch(
     },
     { immediate: true }
 );
-
+const message = () => {
+    if (props.isSelf) {
+        router.get('/chat');
+    } else {
+        modalQuestion.value = `Do you want to message ${getUser.value.name}?`;
+        showModal.value = true;
+    }
+};
 </script>
 
 <template>
@@ -57,14 +64,16 @@ watch(
                 <br>
 
                 <div class="d-flex gap-2">
-                    <button class="btn btn-success">Message</button>
+                     <Link :href="route('message.viewChat', {id: getUser?.id})" class="btn btn-success" title="Message">
+                    <i class="bi bi-chat-dots"></i>
+                    </Link>
                     <a 
                     :href="getUser.user_info?.facebook_links" 
                     class="btn btn-primary" 
                     v-if="getUser.user_info?.facebook_links"
                     >
-                        <i class="bi bi-facebook me-2"></i>
-                        Visit on Facebook
+                        <i class="bi bi-facebook"></i>
+                        
                     </a>
                 </div>
             </div>

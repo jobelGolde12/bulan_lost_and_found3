@@ -1,7 +1,7 @@
 <script setup>
 import { usePage } from "@inertiajs/vue3";
 import { Link } from "@inertiajs/vue3";
-import { ref, onMounted, defineProps,watch } from "vue";
+import { ref, onMounted, defineProps,watch, computed } from "vue";
 import LogoutButton from "@/Components/user/LogoutButton.vue";
 const currentRoute = usePage().url;
 
@@ -10,9 +10,14 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+ announcement: {
+  type: Array,
+  default: () => [],
+ }
 });
 
 const hasPendingRequests = ref(false);
+const hasAnnouncements = computed(() => props.announcement.length - 1 || 0);
 
 watch(() => props.isHavePending, (newValue) => {
   hasPendingRequests.value = newValue;
@@ -101,6 +106,10 @@ onMounted(() => {
         >
           <i class="bi bi-megaphone me-2"></i>
           <span v-if="isSidebarOpen">Announcements</span>
+
+           <span v-if="hasAnnouncements" class="pending-badge">
+              {{ hasAnnouncements }}
+            </span>
         </Link>
 
          <Link 
@@ -219,6 +228,22 @@ onMounted(() => {
 
 .sidebar.closed ~ .right {
   width: calc(100% - 5%);
+}
+
+.pending-badge {
+  position: absolute;
+  top: -4px;
+  right: -100px;
+  background-color: #198754; /* Bootstrap bg-success */
+  color: #fff;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
 }
 
 

@@ -28,8 +28,10 @@ class SettingsController extends Controller
             ]);
         }else{
             $notifications = NotificationModel::where('user_id', Auth::id())->get();
-            return Inertia::render('Settings/user/Notifications', [
+             $hasUnread = NotificationModel::where('user_id', Auth::id())->where('read_status', 0)->exists();   
+            return Inertia::render('Settings/user/Main', [
             'notifications' => $notifications,
+            'hasUnread' => $hasUnread,
             ]);
         }
     }
@@ -39,13 +41,16 @@ class SettingsController extends Controller
     public function notifications()
     {
         $notification = NotificationModel::where("user_id", Auth::id())->get();
+      $hasUnread = NotificationModel::where('user_id', Auth::id())->where('read_status', 0)->exists();   
         if(Auth::user()->role == 'admin'){
             return Inertia::render('Settings/admin/Notifications', [
                 'notification' => $notification,
+                'hasUnread' => $hasUnread,
             ]);
         }else{
             return Inertia::render('Settings/user/Notifications', [
-                'notification' => $notification,
+                'notifications' => $notification,
+                'hasUnread' => $hasUnread
             ]);
         }
     }
