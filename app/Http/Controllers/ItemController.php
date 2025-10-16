@@ -12,6 +12,8 @@ use App\Models\NotificationModel;
 use App\Models\PendingRequest;
 use App\Models\PinnedChatsModel;
 use App\Models\RemovePinnedMessages;
+use App\Models\TotalFound;
+use App\Models\TotalLost;
 use App\Models\User;
 use App\Models\UserInfo;
 use App\Services\SemaphoreService;
@@ -260,26 +262,40 @@ public function markAsResolve($id, $userId)
 {
     $item = ItemModel::find($id);
 
-    // if (!$item) {
-    //     return response()->json(['error' => 'Item not found'], 404);
-    // }
-    // if (!$userId) {
-    //     return response()->json(['error' => 'user_id not found'], 404);
-    // }
+    if (!$item) {
+        return response()->json(['error' => 'Item not found'], 404);
+    }
+    if (!$userId) {
+        return response()->json(['error' => 'user_id not found'], 404);
+    }
 
-    // $item->status = 'Claimed';
-    // $item->resolved_at = now();
-    // $item->save();
+    if($item->status === 'Lost'){
+        $totalLost = TotalLost::create([
+            'total' => 1,
+            'date_lost' => $item->created_at,
+        ]);
+        $totalLost->save();
+    }elseif($item->status === 'Found'){
+        $totalFound = TotalFound::create([
+            'total' => 1,
+            'date_found' => $item->created_at,
+        ]);
+        $totalFound->save();
+    }
 
-    // $notification = NotificationModel::create([
-    //     'title' => 'Item Marked as Resolved',
-    //     'user_id' => $userId,
-    //     'message' => 'The item you reported has been marked as resolved by the administrator. Thank you for using our service!',
-    //     'read_status' => 0,
-    // ]);
+    $item->status = 'Claimed';
+    $item->resolved_at = now();
+    $item->save();
 
-    // $notification->item_id = $item->id;
-    // $notification->save();
+    $notification = NotificationModel::create([
+        'title' => 'Item Marked as Resolved',
+        'user_id' => $userId,
+        'message' => 'The item you reported has been marked as resolved by the administrator. Thank you for using our service!',
+        'read_status' => 0,
+    ]);
+
+    $notification->item_id = $item->id;
+    $notification->save();
 
     $user = UserInfo::where('user_id', $userId)->first();
     

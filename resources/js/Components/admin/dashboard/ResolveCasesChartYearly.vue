@@ -13,8 +13,10 @@ use([CanvasRenderer, BarChart, GridComponent, TooltipComponent, LegendComponent]
 const props = defineProps({
   data: {
     type: Array,
-    default: () => []
-  }
+    default: () => [],
+  },
+  lost: { type: Array, default: () => [] },
+  found: { type: Array, default: () => [] },
 });
 
 // --- Refs ---
@@ -25,6 +27,26 @@ const chartOptions = ref({});
 const hasData = ref(false);
 
 // --- Helpers ---
+const groupByYear = (data, dateField) => {
+  const yearly = {};
+
+  if (Array.isArray(data)) {
+    data.forEach((item) => {
+      if (item[dateField]) {
+        const year = new Date(item[dateField]).getFullYear();
+        const count = item.total || 1;
+
+        if (!yearly[year]) {
+          yearly[year] = 0;
+        }
+        yearly[year] += count;
+      }
+    });
+  }
+
+  return yearly;
+};
+
 const groupByYearAndStatus = (data) => {
   const yearly = {};
 
@@ -50,23 +72,33 @@ const groupByYearAndStatus = (data) => {
 
 // --- Watch Props for Changes ---
 watch(
-  () => props.data,
-  (newData) => {
-    const yearlyStats = groupByYearAndStatus(newData);
-    const years = Object.keys(yearlyStats).sort();
+  () => [props.data, props.lost, props.found],
+  () => {
+    // Use props.lost with date_lost and props.found with date_found
+    const lostYearly = groupByYear(props.lost, 'date_lost');
+    const foundYearly = groupByYear(props.found, 'date_found');
+    const resolvedYearly = groupByYearAndStatus(props.data);
 
-    const lostCounts = years.map((year) => yearlyStats[year].Lost);
-    const foundCounts = years.map((year) => yearlyStats[year].Found);
-    const resolvedCounts = years.map((year) => yearlyStats[year].Resolved);
+    // Get all unique years from all data sources
+    const allYears = [
+      ...Object.keys(lostYearly),
+      ...Object.keys(foundYearly),
+      ...Object.keys(resolvedYearly)
+    ];
+    const uniqueYears = [...new Set(allYears)].sort();
+    
+    // Prepare data for chart
+    const lostCounts = uniqueYears.map(year => lostYearly[year] || 0);
+    const foundCounts = uniqueYears.map(year => foundYearly[year] || 0);
+    const resolvedCounts = uniqueYears.map(year => resolvedYearly[year]?.Resolved || 0);
 
-    hasData.value = years.length > 0;
+    hasData.value = uniqueYears.length > 0 && (lostCounts.some(count => count > 0) || 
+                     foundCounts.some(count => count > 0) || 
+                     resolvedCounts.some(count => count > 0));
 
     // Compute total per year for percentage display
-    const yearlyTotals = years.map(
-      (year) =>
-        yearlyStats[year].Lost +
-        yearlyStats[year].Found +
-        yearlyStats[year].Resolved
+    const yearlyTotals = uniqueYears.map((year, index) => 
+      lostCounts[index] + foundCounts[index] + resolvedCounts[index]
     );
 
     // --- Chart Options ---
@@ -74,7 +106,7 @@ watch(
       tooltip: {
         trigger: 'item',
         formatter: (params) => {
-          const yearIndex = years.indexOf(params.name);
+          const yearIndex = uniqueYears.indexOf(params.name);
           const total = yearlyTotals[yearIndex];
           const percentage = total
             ? ((params.value / total) * 100).toFixed(1)
@@ -93,7 +125,7 @@ watch(
       legend: { data: ['Lost Cases', 'Found Cases', 'Resolved Cases'] },
       xAxis: {
         type: 'category',
-        data: years,
+        data: uniqueYears,
         axisTick: { alignWithLabel: true },
         axisLabel: { color: '#555' }
       },

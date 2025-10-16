@@ -57,6 +57,14 @@ const props = defineProps({
   overall_resolved: {
     type: Number,
     default: 0
+  },
+  totalLost: {
+    type: Array,
+    default: () => []
+  },
+  totalFound: {
+    type: Array,
+    default: () => []
   }
 });
 
@@ -87,6 +95,10 @@ let getReports = ref([]);
 let getResolve = ref([]);
 let overall_resolved = ref(0);
 const getRecentLostAndFoundItem = ref([]);
+const getTotalLost = ref([]);
+const getTotalFound = ref([]);
+const totalLostCount = ref(0);
+const totalFoundCount = ref(0);
 watch(() => props.items, (newItem) => {
   getReports.value = newItem;
 }, { immediate: true });
@@ -99,6 +111,14 @@ watch(() => props.recentLostAndFound, (data) => {
 }, { immediate: true });
 watch(() => props.overall_resolved, (data) => {
   overall_resolved.value = data;
+}, { immediate: true });
+watch(() => props.totalLost, (data) => {
+  getTotalLost.value = data;
+  totalLostCount.value = data.reduce((sum, record) => sum + record.total, 0);
+}, { immediate: true });
+watch(() => props.totalFound, (data) => {
+  getTotalFound.value = data;
+  totalFoundCount.value = data.reduce((sum, record) => sum + record.total, 0);
 }, { immediate: true });
 // kuhaon ang resolve na item tas eh process
 // sa ResolveCasesChart
@@ -134,8 +154,8 @@ overViewData.value = {
           <div class="total-lost-and-found d-flex flex-column  justify-content-center align-items-center">
               <div class=" d-flex flex-row gap-2 pe-0">
             <TotalLostAndFound 
-            :totalFoundItems="counts.found"
-            :totalLostItems="counts.lost"
+            :totalFoundItems="totalFoundCount"
+            :totalLostItems="totalLostCount"
             />
             </div>
           </div>
@@ -143,8 +163,15 @@ overViewData.value = {
 
       <div class="contaner-fluid mt-5 pt-5">
            <!-- This get all the data not just by resolved according to the panelist huhu -->
-            <ResolveCasesChart :data="getReports"/>
-            <ResolveCasesChartYearly :data="getReports"/>
+            <ResolveCasesChart 
+            :data="getReports"
+            :lost="getTotalLost"
+            :found="getTotalFound"
+            />
+            <ResolveCasesChartYearly :data="getReports"
+            :lost="getTotalLost"
+            :found="getTotalFound"
+            />
           </div>
 
       <OverAllResolved 

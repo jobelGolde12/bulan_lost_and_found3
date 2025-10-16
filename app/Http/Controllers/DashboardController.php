@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\ItemCategories;
 use App\Models\ItemModel;
 use App\Models\PendingRequest;
+use App\Models\TotalFound;
+use App\Models\TotalLost;
 use App\Models\User;
 use App\Models\ViewLaterModel;
 use Carbon\Carbon;
@@ -22,6 +24,9 @@ class DashboardController extends Controller
         
         $categories = ItemCategories::all();
         $pendingRequestCount = PendingRequest::where('pending_status', 'pending')->count(); //Para sa admin (dashboard)
+
+        $totalLost = TotalLost::all();
+        $totalFound = TotalFound::all();
 
         if (Auth::check() && Auth::user()->role === 'user') { 
             
@@ -61,6 +66,8 @@ class DashboardController extends Controller
                 'user_count' => $userCount,
                 'recentLostAndFound' => $recentLostAndFound,
                 'overall_resolved' => $overAllResolved,
+                'totalLost' => $totalLost,
+                'totalFound' => $totalFound,
         ]); 
             }
            

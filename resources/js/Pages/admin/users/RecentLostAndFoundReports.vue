@@ -37,6 +37,11 @@ const filteredReports = computed(() => {
 const navigateTo = (id) => {
   router.visit(route('viewItemInfoAsAdmin', { item: id }));
 };
+const getStatusClass = (status) => {
+    if (status === 'Lost') return 'text-danger'
+    if (status === 'Found') return 'text-success'
+    return 'text-primary'
+  }
 </script>
 
 <template>
@@ -79,7 +84,7 @@ const navigateTo = (id) => {
                   <td>{{ item.category }}</td>
                   <td
                     class="fw-semibold"
-                    :class="{ 'text-danger': item.status === 'Lost' }"
+                    :class="getStatusClass(item.status)"
                   >
                     {{ item.status }}
                   </td>

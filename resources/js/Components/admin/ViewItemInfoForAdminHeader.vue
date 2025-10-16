@@ -72,7 +72,7 @@ const forceDelete = () => {
       <!-- profile, name, actions -->
       <div class="container-fluid d-flex flex-row justify-content-between align-items-center px-0">
 
-        <!-- ✅ If user exists -->
+        <!--  If user exists -->
 <div v-if="props.id">
   <Link
     :href="route('viewUserAsAdmin', { id: props.id })"
@@ -87,7 +87,7 @@ const forceDelete = () => {
   </Link>
 </div>
 
-<!-- ✅ Fallback for deleted user -->
+<!--  Fallback for deleted user -->
 <div v-else class="d-flex align-items-center gap-2 text-muted">
   <img
     src="../../../images/profile.jpeg"
