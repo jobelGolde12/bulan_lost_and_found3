@@ -233,8 +233,8 @@ const closePopup = () => {
               :class="['d-flex mb-2', msg.sender_id === getCurrentUserId ? 'justify-content-end' : 'justify-content-start']">
 
           <img v-if="msg.sender_id !== getCurrentUserId"
-                :src="getMessage?.data1?.user_info?.profile_pic"
-                class="rounded-circle me-2" width="40" height="40" />
+                :src="`/storage/${getMessage?.data1?.user_info?.profile_pic}` || '../../images/profile.jpeg'"
+                class=" me-2 profile" width="40" height="40" />
           <div :class="{'text-start': msg.sender_id === getCurrentUserId}">
             <div :class="['message-bubble', msg.sender_id === getCurrentUserId ? 'bg-success text-white' : 'bg-white']">
               {{ msg.message }}
@@ -261,7 +261,9 @@ const closePopup = () => {
 
     <!-- For the popup (togglePopup) -->
      <PopupForMessage :show="showPopup" ref="popupRef" :id="getMessage?.data1?.id"/>
-    <div class="container-fluid d-flex justify-content-center align-items-center fs-4" v-if="!getMessage?.data1?.name">
+    <div class="container-fluid d-flex flex-column gap-3 justify-content-center align-items-center fs-4" v-if="!getMessage?.data1?.name">
+      <img src="../../images/message/select-message.svg" alt="Select message" class="img-fluid" 
+      style="max-width: 300px;"/>
       No message selected
     </div>
   </div>
@@ -283,5 +285,10 @@ const closePopup = () => {
   border-radius: 15px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   word-wrap: break-word;
+}
+.profile{
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
 }
 </style>

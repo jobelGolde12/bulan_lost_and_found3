@@ -7,34 +7,11 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
-  pinned: {
-    type: Array,
-    default: () => []
-  },
 });
-
-let getPinned = ref([]);
-
-watch(
-  () => props.pinned,
-  (data) => {
-    getPinned.value = data;
-  },
-  { immediate: true }
-);
 </script>
 
 <template>
-  <div class="modal-overlay">
-    <div class="modal-content">
-
-      <!-- ✅ Back Link -->
-      <Link :href="route('message.index')" class="back-link">
-        ← Back
-      </Link>
-
-      <h2 class="modal-title">Search Results</h2>
-
+  <div class="">
       <div v-if="props.matchedUsers.length" class="results-wrapper">
         <ul class="ps-0">
           <li
@@ -62,47 +39,10 @@ watch(
       <div v-else class="no-results">
         <p>No users found.</p>
       </div>
-
-    </div>
   </div>
 </template>
 
 <style scoped>
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(255, 255, 255, 0.98);
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  overflow-y: auto;
-  z-index: 9999;
-}
-
-.modal-content {
-  width: 100%;
-  max-width: 100%;
-  padding: 2rem;
-}
-
-.back-link {
-  display: inline-block;
-  margin-bottom: 1rem;
-  font-weight: 600;
-  color: #2563eb;
-  text-decoration: none;
-}
-
-.back-link:hover {
-  text-decoration: underline;
-}
-
-.modal-title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 1rem;
-}
-
 .profile {
   width: 40px;
   height: 40px;

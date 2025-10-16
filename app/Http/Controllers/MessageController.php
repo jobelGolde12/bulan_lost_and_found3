@@ -16,93 +16,66 @@ class MessageController extends Controller
 {
     public function index()
 {
-    //para ma view sa search
     $currentUserId = Auth::id();
-    $removedUser = RemovePinnedMessages::where('user_id', $currentUserId)->get(['id', 'removed_user']);
-    $blockedUser = BlockedMessages::where('user_id', $currentUserId)->get(['id', 'blocked_user']);
-    $excludedIds = $removedUser->pluck('removed_user')->toArray(); // para sa removed
-    $excludedBlockedIds = $blockedUser->pluck('blocked_user')->toArray();
-    if (empty($excludedIds)) {
-    $users = User::select(['id', 'name'])->get();
-    } else {
-        $users = User::whereNotIn('id', $excludedIds)
-            ->select(['id', 'name'])
-            ->get();
-    }
 
+    // Removed and blocked users
+    $removedUser = RemovePinnedMessages::where('user_id', $currentUserId)->pluck('removed_user');
+    $blockedUser = BlockedMessages::where('user_id', $currentUserId)->pluck('blocked_user');
 
+    $excludedIds = $removedUser->toArray();
+    $excludedBlockedIds = $blockedUser->toArray();
 
+    // Get all users (excluding removed/blocked)
+    $users = User::whereNotIn('id', array_merge($excludedIds, $excludedBlockedIds))
+        ->select(['id', 'name'])
+        ->get();
+
+    // Get all messages related to this user
+    $hasMessages = MessageModel::where('receiver_id', $currentUserId)
+        ->orWhere('sender_id', $currentUserId)
+        ->get(['sender_id', 'receiver_id', 'created_at', 'read_at']);
+
+    // Get users who have unread messages
+    $unreadUserIds = MessageModel::where('receiver_id', $currentUserId)
+        ->whereNull('read_at')
+        ->pluck('sender_id')
+        ->unique()
+        ->toArray();
+
+    // Separate users into two groups
+    $usersWithUnread = $users->filter(fn($u) => in_array($u->id, $unreadUserIds));
+    $usersWithoutUnread = $users->reject(fn($u) => in_array($u->id, $unreadUserIds));
+
+    // Merge them so unread are at the top
+    $sortedUsers = $usersWithUnread->merge($usersWithoutUnread)->values();
+
+    // Fetch pinned users (same logic as before)
     $pinnedMessages = PinnedChatsModel::all();
-
     $pinnedUser = null;
-    $data1 = null;
-     $data2 = null;
 
     if ($pinnedMessages->isNotEmpty()) {
         $userIds = $pinnedMessages->pluck('user_id')->unique();
 
-        //Pinned user sabay ang info para ma kuha ang profile 
-        if (empty($excludedIds)) { //But first d muna eh include ang in remove ni user
-             $pinnedUser = User::with('userInfo')
+        $pinnedUser = User::whereNotIn('id', $excludedIds)
+            ->whereNotIn('id', $excludedBlockedIds)
+            ->with('userInfo')
             ->whereIn('id', $userIds)
             ->get()
-            ->map(function ($user) {
-                return [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'profile_pic' => $user->userInfo->profile_pic ?? null,
-                ];
-            });
-        }else{
-             $pinnedUser = User::whereNotIn('id', $excludedIds)
-             ->whereNotIn('id', $excludedBlockedIds)
-             ->with('userInfo')
-                ->whereIn('id', $userIds)
-                ->get()
-                ->map(function ($user) {
-                    return [
-                        'id' => $user->id,
-                        'name' => $user->name,
-                        'profile_pic' => $user->userInfo->profile_pic ?? null,
-                    ];
-                });
-        }
-
-        // Para namn sa blocked user d dapat eh include sa pinned user 
-        // Hiwalay ang logic para sa removed and block kay mag bug
-        if (!empty($excludedBlockedIds)) {
-             $pinnedUser = User::whereNotIn('id', $excludedIds)
-             ->whereNotIn('id', $excludedBlockedIds)
-             ->with('userInfo')
-                ->whereIn('id', $userIds)
-                ->get()
-                ->map(function ($user) {
-                    return [
-                        'id' => $user->id,
-                        'name' => $user->name,
-                        'profile_pic' => $user->userInfo->profile_pic ?? null,
-                    ];
-                });
-        }
-
+            ->map(fn($user) => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'profile_pic' => $user->userInfo->profile_pic ?? null,
+            ]);
     }
-        // =====================================
 
-    $message = [
-        'data1' => $data1,
-        'data2' => $data2,
-    ];
-    $hasMessages = MessageModel::where('receiver_id', $currentUserId)
-    ->orWhere('sender_id', $currentUserId)
-        ->get(['sender_id', 'created_at']);
     return Inertia::render('Message', [
         'pinned' => $pinnedUser ?: [],
-        'message' => $message ?: null,
-        'users' => $users,
-        'currentUserId' => Auth::id(),
-        'hasMessages' => $hasMessages ?: null,
+        'users' => $sortedUsers,
+        'currentUserId' => $currentUserId,
+        'hasMessages' => $hasMessages,
     ]);
 }
+
 
 
     public function send(Request $request)
@@ -179,212 +152,99 @@ public function search($id)
     return to_route('message.viewChat', ['id' => $id]);
 }
 
-public function searchV2(Request $request){
-     $currentUserId = Auth::id();
-    $removedUser = RemovePinnedMessages::where('user_id', $currentUserId)->get(['id', 'removed_user']);
-    $blockedUser = BlockedMessages::where('user_id', $currentUserId)->get(['id', 'blocked_user']);
-    $excludedIds = $removedUser->pluck('removed_user')->toArray(); // para sa removed
-    $excludedBlockedIds = $blockedUser->pluck('blocked_user')->toArray();
-    if (empty($excludedIds)) {
-    $users = User::select(['id', 'name'])->get();
-    } else {
-        $users = User::whereNotIn('id', $excludedIds)
-            ->select(['id', 'name'])
-            ->get();
+    public function searchV2(Request $request){
+        $name = $request->input('name');
+        $matchedUsers = User::where('name', 'LIKE', "%{$name}%")
+        ->with('userInfo')
+        ->get(['id', 'name']);
+        
+        return response()->json([
+            'matchedUsers' => $matchedUsers,
+        ], 200);
     }
 
+       public function viewChat($id)
+{
+    $currentUserId = Auth::id();
 
+    // 🧱 Removed and blocked users
+    $removedUser = RemovePinnedMessages::where('user_id', $currentUserId)->pluck('removed_user');
+    $blockedUser = BlockedMessages::where('user_id', $currentUserId)->pluck('blocked_user');
 
+    $excludedIds = $removedUser->toArray();
+    $excludedBlockedIds = $blockedUser->toArray();
+
+    // ✅ Mark messages as read
+    MessageModel::where('sender_id', $id)
+        ->where('receiver_id', $currentUserId)
+        ->whereNull('read_at')
+        ->update(['read_at' => now()]);
+
+    // 🧍 Get all users (excluding removed/blocked)
+    $users = User::whereNotIn('id', array_merge($excludedIds, $excludedBlockedIds))
+        ->select(['id', 'name'])
+        ->get();
+
+    // 📨 Get all messages related to this user (used by Vue)
+    $hasMessages = MessageModel::where('receiver_id', $currentUserId)
+        ->orWhere('sender_id', $currentUserId)
+        ->get(['sender_id', 'receiver_id', 'created_at', 'read_at']);
+
+    // 🔔 Users who still have unread messages
+    $unreadUserIds = MessageModel::where('receiver_id', $currentUserId)
+        ->whereNull('read_at')
+        ->pluck('sender_id')
+        ->unique()
+        ->toArray();
+
+    // 🧩 Separate users into two groups: unread and read
+    $usersWithUnread = $users->filter(fn($u) => in_array($u->id, $unreadUserIds));
+    $usersWithoutUnread = $users->reject(fn($u) => in_array($u->id, $unreadUserIds));
+
+    $sortedUsers = $usersWithUnread->merge($usersWithoutUnread)->values();
+
+    // 📌 Fetch pinned users (same logic as in index)
     $pinnedMessages = PinnedChatsModel::all();
-
-    $pinnedUser = null;
-    $data1 = null;
-     $data2 = null;
+    $pinnedUser = collect([]);
 
     if ($pinnedMessages->isNotEmpty()) {
         $userIds = $pinnedMessages->pluck('user_id')->unique();
 
-        //Pinned user sabay ang info para ma kuha ang profile 
-        if (empty($excludedIds)) { //But first d muna eh include ang in remove ni user
-             $pinnedUser = User::with('userInfo')
+        $pinnedUser = User::whereNotIn('id', $excludedIds)
+            ->whereNotIn('id', $excludedBlockedIds)
+            ->with('userInfo')
             ->whereIn('id', $userIds)
             ->get()
-            ->map(function ($user) {
-                return [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'profile_pic' => $user->userInfo->profile_pic ?? null,
-                ];
-            });
-        }else{
-             $pinnedUser = User::whereNotIn('id', $excludedIds)
-             ->whereNotIn('id', $excludedBlockedIds)
-             ->with('userInfo')
-                ->whereIn('id', $userIds)
-                ->get()
-                ->map(function ($user) {
-                    return [
-                        'id' => $user->id,
-                        'name' => $user->name,
-                        'profile_pic' => $user->userInfo->profile_pic ?? null,
-                    ];
-                });
-        }
-
-        // Para namn sa blocked user d dapat eh include sa pinned user 
-        // Hiwalay ang logic para sa removed and block kay mag bug
-        if (!empty($excludedBlockedIds)) {
-             $pinnedUser = User::whereNotIn('id', $excludedIds)
-             ->whereNotIn('id', $excludedBlockedIds)
-             ->with('userInfo')
-                ->whereIn('id', $userIds)
-                ->get()
-                ->map(function ($user) {
-                    return [
-                        'id' => $user->id,
-                        'name' => $user->name,
-                        'profile_pic' => $user->userInfo->profile_pic ?? null,
-                    ];
-                });
-        }
-
+            ->map(fn($user) => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'profile_pic' => $user->userInfo->profile_pic ?? null,
+            ]);
     }
-        // =====================================
 
-        
-    // =====< get all users  sa pinned >=== 
-     $pinnedUser = User::with('userInfo')
-            ->get()
-            ->map(function ($user) {
-                return [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'profile_pic' => $user->userInfo->profile_pic ?? null,
-                ];
-            });
-// ===========================================
+    // 💬 Get chat conversation between current user and selected user
+    $data1 = User::with('userInfo')->findOrFail($id);
+
+    $data2 = MessageModel::where(function ($query) use ($id, $currentUserId) {
+        $query->where('sender_id', $currentUserId)
+              ->where('receiver_id', $id);
+    })->orWhere(function ($query) use ($id, $currentUserId) {
+        $query->where('sender_id', $id)
+              ->where('receiver_id', $currentUserId);
+    })->orderBy('created_at', 'asc')
+      ->get();
 
     $message = [
         'data1' => $data1,
         'data2' => $data2,
     ];
 
-    $name = $request->input('name');
-    $matchedUsers = User::where('name', 'LIKE', "%{$name}%")
-    ->with('userInfo')
-    ->get(['id', 'name']);
-    
-    return Inertia::render('message/SearchResults', [
-        'pinned' => $pinnedUser ?: [],
-        'message' => $message ?: null,
-        'users' => $users,
-        'currentUserId' => Auth::id(),
-        'matchedUsers' => $matchedUsers,
-    ]);
-}
-
-        public function viewChat($id)
-{
-    $pinnedMessages = PinnedChatsModel::all();
-    $pinnedUser = null;
-
-    $currentUserId = Auth::id();
-    $removedUser = RemovePinnedMessages::where('user_id', $currentUserId)->get(['id', 'removed_user']);
-    $blockedUser = BlockedMessages::where('user_id', $currentUserId)->get(['id', 'blocked_user']);
-    $excludedIds = $removedUser->pluck('removed_user')->toArray(); // para sa removed
-    $excludedBlockedIds = $blockedUser->pluck('blocked_user')->toArray();
-
-    // if($pinnedMessages)
-    if (empty($excludedIds)) {
-    $users = User::select(['id', 'name'])->get();
-    } else {
-        $users = User::whereNotIn('id', $excludedIds)
-            ->select(['id', 'name'])
-            ->get();
-    }
-
-    // Retrieve pinned messages and their associated user information
-    if ($pinnedMessages->isNotEmpty()) {
-        $userIds = $pinnedMessages->pluck('user_id')->unique();
-
-         //Pinned user sabay ang info para ma kuha ang profile 
-        if (empty($excludedIds)) { //But first d muna eh include ang in remove ni user
-             $pinnedUser = User::with('userInfo')
-            ->whereIn('id', $userIds)
-            ->get()
-            ->map(function ($user) {
-                return [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'profile_pic' => $user->userInfo->profile_pic ?? null,
-                ];
-            });
-        }else{
-             $pinnedUser = User::whereNotIn('id', $excludedIds)
-             ->whereNotIn('id', $excludedBlockedIds)
-             ->with('userInfo')
-                ->whereIn('id', $userIds)
-                ->get()
-                ->map(function ($user) {
-                    return [
-                        'id' => $user->id,
-                        'name' => $user->name,
-                        'profile_pic' => $user->userInfo->profile_pic ?? null,
-                    ];
-                });
-        }
-
-        // Para namn sa blocked user d dapat eh include sa pinned user 
-        // Hiwalay ang logic para sa removed and block kay mag bug
-        if (!empty($excludedBlockedIds)) {
-             $pinnedUser = User::whereNotIn('id', $excludedIds)
-             ->whereNotIn('id', $excludedBlockedIds)
-             ->with('userInfo')
-                ->whereIn('id', $userIds)
-                ->get()
-                ->map(function ($user) {
-                    return [
-                        'id' => $user->id,
-                        'name' => $user->name,
-                        'profile_pic' => $user->userInfo->profile_pic ?? null,
-                    ];
-                });
-        }
-
-    }
-
-    $data1 = User::with('userInfo')->find($id);
-
-    $data2 = MessageModel::where(function ($query) use ($id) {
-        $query->where('sender_id', Auth::id())
-              ->where('receiver_id', $id);
-    })->orWhere(function ($query) use ($id) {
-        $query->where('sender_id', $id)
-              ->where('receiver_id', Auth::id());
-    })->orderBy('created_at', 'asc') // Ensure messages are in chronological order
-      ->get();
-
-    $message = [
-        'data1' => $data1, // Selected user's information
-        'data2' => $data2, // Conversation messages
-    ];
-
-    // =====< get all users  sa pinned >=== 
-     $pinnedUser = User::with('userInfo')
-            ->get()
-            ->map(function ($user) {
-                return [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'profile_pic' => $user->userInfo->profile_pic ?? null,
-                ];
-            });
-// ===========================================
     return Inertia::render('Message', [
         'pinned' => $pinnedUser,
-        'message' => $message ?: null,
-        'users' => $users,
-        'currentUserId' => Auth::id(),
+        'users' => $sortedUsers,
+        'hasMessages' => $hasMessages,
+        'message' => $message,
+        'currentUserId' => $currentUserId,
     ]);
 }
 
