@@ -44,6 +44,10 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  hasMessages: {
+    type: Array,
+    default: () => [],
+  },
 });
 
 // Reactive state
@@ -57,6 +61,7 @@ let newMessage = ref('');
 let chatBox = ref(null);
 let getCurrentUserId = ref(0);
 let echoChannel = null;
+let getHasMessages = ref([]);
 
 // Watchers
 watch(
@@ -90,7 +95,13 @@ watch(
   },
   { immediate: true }
 );
-
+watch(
+  () => props.hasMessages,
+  (newItem) => {
+    getHasMessages.value = newItem;
+  },
+  { immediate: true }
+);
 onMounted(() => {
   getPinnedvalue.value = Array.isArray(props.pinned)
     ? props.pinned
@@ -195,7 +206,13 @@ const closePopup = () => {
 </script>
 
 <template>
-<MessageLayout :users="getUsers" :getPinned="getPinnedvalue" :activeMessage="getMessage?.data1?.id" :currentUserId="getCurrentUserId">
+<MessageLayout 
+:users="getUsers" 
+:getPinned="getPinnedvalue" 
+:activeMessage="getMessage?.data1?.id" 
+:currentUserId="getCurrentUserId"
+:hasMessages="getHasMessages"
+>
   <div class="d-flex vh-100">
     <div class="flex-fill d-flex flex-column">
       <div class="d-flex align-items-center justify-content-between p-3 border-bottom bg-white" v-if="getMessage?.data1?.name">

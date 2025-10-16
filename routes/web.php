@@ -168,6 +168,7 @@ Route::delete('/delete-users/{id}', [TrashController::class, 'userDestroy'])->na
 //message
 Route::get('/message', [MessageController::class, 'index'])->name('message.index');
 Route::get('/message-search/{id}', [MessageController::class, 'search'])->name('message.search');
+Route::get('/message-search-v2', [MessageController::class, 'searchV2'])->name('message.searchV2');
 Route::get('/message-view-chat/{id}', [MessageController::class, 'viewChat'])->name('message.viewChat');
 Route::get('/message-admin', [ItemController::class, 'viewChat'])->name('message.admin');
 Route::post('/messages/send', [MessageController::class, 'send'])->middleware('auth');

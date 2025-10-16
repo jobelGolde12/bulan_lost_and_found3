@@ -22,7 +22,11 @@ const props = defineProps({
   },
   currentUserId: {
     type: Number,
-  }
+  },
+  hasMessages: {
+    type: Array,
+    default: () => []
+  },
 })
 
 const getUsers = ref([]);
@@ -54,7 +58,9 @@ watch(
 watch(
   () => props.getPinned,
   (newItem) => {
-    pinnedChats.value = newItem.filter(data => data.id != getCurrentUserId.value);
+    if (Array.isArray(newItem)) {
+        pinnedChats.value = newItem.filter(data => data.id != getCurrentUserId.value);
+    }
   },
   {immediate: true}
 )
@@ -89,9 +95,7 @@ onMounted(() => {
 });
 
 const search = () => {
-    if (userId.value) {
-        router.get(route("message.search", { id: userId.value }));
-    }
+     router.get(route('message.searchV2'), { name: searchQuery.value })
 };
 
 const selectUser = () => {
@@ -175,7 +179,18 @@ const pinnedChatAction = () => {
             </div>
             
            
-           <PinnedChats :pinned="pinnedChats" :active="getActiveMessage"/>
+           <PinnedChats 
+           :pinned="pinnedChats" 
+           :active="getActiveMessage"
+           :hasMessages="hasMessages"
+            />
+            <img
+                v-if="pinnedChats.length === 0"
+                src="/images/empty-chat.png"
+                alt="No pinned chats"
+                class="img-fluid mt-4"
+                style="opacity: 0.5"
+           />
         </div>
 
 
