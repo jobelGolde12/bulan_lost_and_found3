@@ -19,7 +19,7 @@ const isActiveRoute = (routeName) => {
   <div>
 
      <!-- Offcanvas for Admin Profile Settings Page -->
-      <button class="modern-menu-toggle d-block d-sm-none d-lg-none ms-2" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample" aria-label="Toggle navigation menu">
+      <button class="modern-menu-toggle ms-2" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample" aria-label="Toggle navigation menu">
           <div class="hamburger">
             <span class="hamburger-line hamburger-line-1"></span>
             <span class="hamburger-line hamburger-line-2"></span>

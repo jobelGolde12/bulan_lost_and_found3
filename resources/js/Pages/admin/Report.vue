@@ -43,6 +43,7 @@ const form = useForm({
   user_id: user.id,
   owner_phone_number: "",
   status: "lost",
+  date: null,
 });
 
 const locations = computed(() => props.locations);
@@ -253,6 +254,11 @@ const submitForm = () => {
             </select>
           </div>
 
+          <div>
+            <label>Date Lost/Found</label>
+            <input type="date" class="form-control py-3" v-model="form.date" required>
+          </div>
+
           <button
             type="submit"
             class="w-100 btn btn-dark py-3"
@@ -265,7 +271,7 @@ const submitForm = () => {
     </div>
   </AdminLayout>
 
-  <LoadingComponent v-if="isSubmitting" />
+  <LoadingComponent  v-if="isSubmitting"/>
 </template>
 
 <style scoped>

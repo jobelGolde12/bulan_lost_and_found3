@@ -3,7 +3,6 @@ import UserSettingsLayout from "@/Layouts/UserSettingsLayout.vue";
 import { Head, usePage, Link } from "@inertiajs/vue3";
 import { defineProps, onMounted, ref } from "vue";
 import MyPermission from "@/Components/MyPermission.vue";
-
 const user = usePage().props.auth.user;
 
 const props = defineProps({

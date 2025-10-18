@@ -18,6 +18,7 @@ use App\Models\User;
 use App\Models\UserInfo;
 use App\Services\SemaphoreService;
 use App\Services\TwilioService;
+use Carbon\Carbon as CarbonCarbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -40,6 +41,7 @@ class ItemController extends Controller
             'user_id' => 'required|integer',
             'owner_phone_number' => 'nullable|string|max:255|min:11',
             'status' => 'required|string|in:lost,found', 
+            'date' => 'required|date|before_or_equal:today'
         ]);
     
         $imagePath = $request->hasFile('image') 
@@ -71,7 +73,8 @@ class ItemController extends Controller
                 'category' => $category->name ?: "Uncategorized",
                 'user_id' => $request->user_id,
                 'owner_phone_number' => $request->owner_phone_number,
-                'pending_status' => 'pending'
+                'pending_status' => 'pending',
+                'created_at' => Carbon::parse($request->date)->timezone(config('app.timezone')),
             ]);
         }else{
             PendingRequest::create([
@@ -83,7 +86,8 @@ class ItemController extends Controller
                 'category' => $category->name ?: "Uncategorized",
                 'user_id' => $request->user_id,
                 'owner_phone_number' => $request->owner_phone_number,
-                'pending_status' => 'pending'
+                'pending_status' => 'pending',
+                'created_at' => Carbon::parse($request->date)->timezone(config('app.timezone')),
             ]);
         }
     

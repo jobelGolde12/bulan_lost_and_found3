@@ -3,5 +3,6 @@
     "report item sa user": "ma send sms notification once ma approve ni admin ang requested post ni user",
     "work flow":"sa hosting siteground.com",
     "messaging": "yung pinned message naka set sa intiro ",
-    "message": "kuhaon ang users na may message tas eh sort by created at (sa pinned)"
+    "message": "kuhaon ang users na may message tas eh sort by created at (sa pinned)",
+    "report": "ma add cancel functionality"
 }

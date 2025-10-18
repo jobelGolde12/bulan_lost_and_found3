@@ -2,7 +2,7 @@
 import { ref, onMounted, computed, defineProps } from "vue";
 import { usePage, Link } from "@inertiajs/vue3";
 import LogoutButton from "@/Components/user/LogoutButton.vue";
-
+import Offcanvas from "@/Components/settings/user/Offcanvas.vue";
 const props = defineProps({
   hasUnread: {
     type: Boolean,
@@ -110,6 +110,7 @@ onMounted(() => {
     <!-- Main Content -->
     <main class="main-content" :class="{ 'main-content--expanded': !isSidebarOpen }">
       <div class="content-wrapper">
+        <Offcanvas :hasUnread="props.hasUnread"/>
         <slot />
       </div>
     </main>

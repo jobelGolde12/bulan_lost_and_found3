@@ -1,6 +1,6 @@
 
 .modern-menu-toggle {
-  display: flex;
+  display: none;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -125,4 +125,9 @@
 .modern-menu-toggle:focus {
   outline: 2px solid #667eea;
   outline-offset: 2px;
+}
+@media screen and (max-width: 768px){
+    .modern-menu-toggle{
+        display: flex;
+    }
 }
