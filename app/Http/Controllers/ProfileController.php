@@ -32,15 +32,20 @@ class ProfileController extends Controller
     public function index(){
         $userInfo = UserInfo::where('user_id', Auth::id())->first();
         $permission = MyPermissionModel::where('user_id', Auth::id())->first();
+        $hasUnreadNotifications = NotificationModel::where('user_id', Auth::id())
+            ->where('read_status', false)
+            ->exists();
         if(Auth::check() && Auth::user()->role === 'admin'){
             return Inertia::render('admin/Profile', [
                 'userInfo' => $userInfo, 
                 'permission' => $permission,
+                'hasUnreadNotifications' => $hasUnreadNotifications,
             ]);
         }else{
             return Inertia::render('user/Profile', [
                 'userInfo' => $userInfo,
                 'permission' => $permission,
+                'hasUnreadNotifications' => $hasUnreadNotifications,
             ]);
         }
     }

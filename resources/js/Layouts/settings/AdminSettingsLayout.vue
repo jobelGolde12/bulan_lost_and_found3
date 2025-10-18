@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, computed, defineProps } from "vue";
 import { usePage, Link } from "@inertiajs/vue3";
-
+import Offcanvas from "@/Components/settings/admin/Offcanvas.vue";
 const props = defineProps({
   hasUnread: {
     type: Boolean,
@@ -10,13 +10,18 @@ const props = defineProps({
 });
 
 const page = usePage();
-const currentRoute = computed(() => page.url); // reactive route tracking
+const currentRoute = computed(() => page.url);
 const isSidebarOpen = ref(localStorage.getItem("isSidebarOpen") === "true");
 
-// Helper function to check if current route matches
+// Enhanced route matching with better pattern recognition
 const isActiveRoute = (routeName) => {
   const routePath = route(routeName);
-  return currentRoute.value === routePath || currentRoute.value.startsWith(routePath + '/');
+  const cleanCurrentRoute = currentRoute.value.split('?')[0]; // Remove query params
+  const cleanRoutePath = routePath.split('?')[0];
+  
+  return cleanCurrentRoute === cleanRoutePath || 
+         cleanCurrentRoute.startsWith(cleanRoutePath + '/') ||
+         (cleanRoutePath !== '/' && cleanCurrentRoute.includes(cleanRoutePath));
 };
 
 const toggleSidebar = () => {
@@ -30,76 +35,97 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="d-flex vh-100 bg-light main-container">
+  <div class="app-container">
+    <!-- Sidebar -->
     <aside
-      class="bg-white shadow-sm transition-all d-flex flex-column sidebar"
-      :class="isSidebarOpen ? 'p-4' : 'p-2'"
-      :style="{ 'min-width': isSidebarOpen ? '250px' : '70px' }"
+      class="sidebar"
+      :class="{ 'sidebar--collapsed': !isSidebarOpen }"
     >
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 v-if="isSidebarOpen" class="mb-0 text-dark">Settings</h5>
-        <button class="p-1" @click="toggleSidebar">
-          <i class="bi bi-list fs-3"></i>
+      <div class="sidebar__header">
+        <h5 v-if="isSidebarOpen" class="sidebar__title">Settings</h5>
+        <button 
+        class="sidebar__toggle" 
+        @click="toggleSidebar"
+        :class="{'ms-2': !isSidebarOpen}"
+        >
+          <i class="bi" :class="isSidebarOpen ? 'bi-chevron-left' : 'bi-chevron-right'"></i>
         </button>
       </div>
       
-      <!-- Sidebar Links -->
-      <nav class="nav d-flex flex-column gap-2">
+      <!-- Navigation -->
+      <nav class="sidebar__nav">
         <Link
           :href="route('dashboard')"
-          class="nav-link d-flex align-items-center p-2 rounded text-decoration-none text-dark"
-          :class="{ 'bg-primary text-white': isActiveRoute('dashboard') }"
+          class="nav-item"
+          :class="{ 
+            'nav-item--active': isActiveRoute('dashboard'),
+            'nav-item--collapsed': !isSidebarOpen
+          }"
         >
-          <i class="bi bi-house me-2"></i>
-          <span v-if="isSidebarOpen">Home</span>
+          <div class="nav-item__icon">
+            <i class="bi bi-house"></i>
+          </div>
+          <span class="nav-item__text">Dashboard</span>
+          <div class="nav-item__active-indicator"></div>
         </Link>
 
         <Link
           :href="route('settings.index')"
-          class="nav-link d-flex align-items-center p-2 rounded text-decoration-none text-dark"
-          :class="{ 'bg-primary text-white': isActiveRoute('settings.index') }"
+          class="nav-item"
+          :class="{ 
+            'nav-item--active': isActiveRoute('settings.index'),
+            'nav-item--collapsed': !isSidebarOpen
+          }"
         >
-          <i class="bi bi-trash me-2"></i>
-          <span v-if="isSidebarOpen">Trash</span>
+          <div class="nav-item__icon">
+            <i class="bi bi-trash"></i>
+          </div>
+          <span class="nav-item__text">Trash</span>
+          <div class="nav-item__active-indicator"></div>
         </Link>
-      
 
         <Link
           :href="route('profile')"
-          class="nav-link d-flex align-items-center p-2 rounded text-decoration-none text-dark"
-          :class="{ 'bg-success text-white': isActiveRoute('profile') }"
+          class="nav-item"
+          :class="{ 
+            'nav-item--active': isActiveRoute('profile'),
+            'nav-item--collapsed': !isSidebarOpen
+          }"
         >
-          <div :class="{ 'icon-container': !isSidebarOpen }">
-            <i class="bi bi-person link pe-2"></i>
+          <div class="nav-item__icon">
+            <i class="bi bi-person"></i>
           </div>
-          <span v-if="isSidebarOpen">Profile</span>
+          <span class="nav-item__text">Profile</span>
+          <div class="nav-item__active-indicator"></div>
         </Link>
         
         <Link
           :href="route('settings.privacy')"
-          class="nav-link d-flex align-items-center p-2 rounded text-decoration-none text-dark"
-          :class="{ 'bg-primary text-white': isActiveRoute('settings.privacy') }"
+          class="nav-item"
+          :class="{ 
+            'nav-item--active': isActiveRoute('settings.privacy'),
+            'nav-item--collapsed': !isSidebarOpen
+          }"
         >
-          <i class="bi bi-shield-check me-2"></i>
-          <span v-if="isSidebarOpen">Privacy</span>
+          <div class="nav-item__icon">
+            <i class="bi bi-shield-check"></i>
+          </div>
+          <span class="nav-item__text">Privacy</span>
+          <div class="nav-item__active-indicator"></div>
         </Link>
       </nav>
     </aside>
     
     <!-- Main Content -->
-    <main class="flex-grow-1 p-4">
-      <slot />
+    <main class="main-content" :class="{ 'main-content--expanded': !isSidebarOpen }">
+      <div class="content-wrapper">
+        <Offcanvas />
+        <slot />
+      </div>
     </main>
   </div>
 </template>
 
 <style scoped>
-.sidebar{
-  min-width: 250px;
-}
-.main-container {
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-}
+@import '../../../css/setttings/admin/layout.css';
 </style>

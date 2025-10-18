@@ -1,7 +1,7 @@
 <script setup>
 import { useForm, Head } from "@inertiajs/vue3";
 import UploadImage from "@/Components/UploadImage.vue";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import UserSettingsLayout from "@/Layouts/UserSettingsLayout.vue";
 import { defineProps, ref } from "vue";
 
 const props = defineProps({
@@ -51,7 +51,7 @@ const submit = () => {
 </script>
 
 <template>
-  <AuthenticatedLayout>
+  <UserSettingsLayout>
     <Head title="Edit profile" />
     <div class="container container-top">
       <div>
@@ -110,7 +110,7 @@ const submit = () => {
         <button type="submit" class="btn btn-dark w-100">Save Changes</button>
       </form>
     </div>
-  </AuthenticatedLayout>
+  </UserSettingsLayout>
 </template>
 
 <style scoped>
@@ -121,7 +121,6 @@ const submit = () => {
   align-items: center;
   width: 100%;
   height: 100%;
-  padding-top: 20rem;
   overflow-y: scroll;
   overflow-x: hidden;
 }
