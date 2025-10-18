@@ -55,6 +55,21 @@ class DashboardController extends Controller
             ->orderBy('created_at', 'desc')->get();
             $overAllResolved = ItemModel::where('status', 'Claimed')->count();
 
+            $oneYearAgo = Carbon::now()->subYear()->startOfDay();
+              $allLost = ItemModel::where('status', 'Lost')
+            ->whereNotNull('created_at')
+            ->where('created_at', '>', $oneYearAgo)
+            ->orderByDesc('created_at')
+            ->get(['id', 'title', 'created_at']);
+
+            $allFound = ItemModel::where('status', 'Found')
+            ->where('created_at', '>', $oneYearAgo)
+            ->get(["id", "title", "created_at"]);
+            $unSolved = ItemModel::where('created_at', '<=', $oneYearAgo)
+            ->whereIn('status', ['Lost', 'Found']) 
+            ->get(["id", "title", "created_at"]);
+
+            Log::info('Unsolved items count: ' . $unSolved->count());
             // move to storage cleaner if more than 1000 items 
             if($getItemAsAdmin->count() > 1000){
                  return Inertia::render('admin/storageCleaner/Index', [
@@ -70,6 +85,9 @@ class DashboardController extends Controller
                 'overall_resolved' => $overAllResolved,
                 'totalLost' => $totalLost,
                 'totalFound' => $totalFound,
+                'allLost' => $allLost,
+                'allFound' => $allFound,
+                'unSolved' => $unSolved,
         ]); 
             }
            

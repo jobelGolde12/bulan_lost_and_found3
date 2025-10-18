@@ -20,6 +20,9 @@ import { CanvasRenderer } from 'echarts/renderers';
 import TotalLostAndFound from '@/Components/admin/dashboard/TotalLostAndFound.vue';
 import { usePendingRequestStore } from "@/piniaStore/pendingRequestStore";
 import OverAllResolved from '@/Components/admin/dashboard/OverAllResolved.vue';
+import TotalLosts from './reportTable/TotalLosts.vue';
+import TotalFounds from './reportTable/TotalFounds.vue';
+import Unsolved from './reportTable/Unsolved.vue';
 
 echarts.use([PieChart, TitleComponent, TooltipComponent, LegendComponent, CanvasRenderer]);
 
@@ -65,7 +68,19 @@ const props = defineProps({
   totalFound: {
     type: Array,
     default: () => []
-  }
+  },
+  allLost: {
+    type: Array,
+    default: () => []
+  },
+  allFound: {
+    type: Array,
+    default: () => []
+  },
+  unSolved: {
+    type: Array,
+    default: () => []
+  },
 });
 
 const store = usePendingRequestStore();
@@ -73,7 +88,7 @@ watch(
   () => props.pending_request_count,
   (val) => {
     if (val !== undefined) {
-      store.setCount(val);
+      store.setCount(val);  
     }
   },
   { immediate: true }
@@ -99,6 +114,10 @@ const getTotalLost = ref([]);
 const getTotalFound = ref([]);
 const totalLostCount = ref(0);
 const totalFoundCount = ref(0);
+const getAllLost = ref([]);
+const getAllFound = ref([]);
+const getUnSolved = ref([]);
+
 watch(() => props.items, (newItem) => {
   getReports.value = newItem;
 }, { immediate: true });
@@ -120,6 +139,17 @@ watch(() => props.totalFound, (data) => {
   getTotalFound.value = data;
   totalFoundCount.value = data.reduce((sum, record) => sum + record.total, 0);
 }, { immediate: true });
+watch(() => props.allLost, (data) => {
+  getAllLost.value = data;
+}, { immediate: true });
+watch(() => props.allFound, (data) => {
+  getAllFound.value = data;
+}, { immediate: true });
+watch(() => props.unSolved, (data) => {
+  getUnSolved.value = data;
+
+}, { immediate: true });
+
 // kuhaon ang resolve na item tas eh process
 // sa ResolveCasesChart
 getResolve.value = props.items.filter(item => item.status === 'Claimed');
@@ -178,21 +208,17 @@ overViewData.value = {
       :overallResolved="overall_resolved"
       />
       <!-- Cards Section -->
-      <div class="card-bottom">
+      <div class="card-bottom mt-5">
         <Overview :data="overViewData"/>
-
       </div>
 
-      <!-- <div class="container">
-        
-        <div class="">
-          <UserRegistration :getUserCountValue="getUserCount" class="registered-user"/>
-        </div>
-      </div> -->
 
-
-        <!-- Recent Files Section -->
-       <RecentLostAndFoundReports :reports="getRecentLostAndFoundItem"/>
+      <TotalLosts :totalLosts="getAllLost" />
+      <TotalFounds :totalFounds="getAllFound" />
+      <Unsolved 
+      :totalLost="getTotalLost"
+      :totalFound="getTotalFound"
+      />
     </div>
   </AdminLayout>
 </template>

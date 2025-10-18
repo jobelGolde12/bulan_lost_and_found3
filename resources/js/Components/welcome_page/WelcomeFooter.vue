@@ -56,10 +56,11 @@ import {Link} from "@inertiajs/vue3";
                         </ul>
                     </div>
                     <div class="col-md-3">
-                        <h5>Company</h5>
+                        <h5>Lost and Found</h5>
                         <ul class="list-unstyled">
-                            <li><a href="#">Terms & Conditions</a></li>
-                            <li><a href="#">Privacy Policy</a></li>
+                            <li>
+                                <Link :href="route('view.privacy')">Terms & Conditions</Link>
+                            </li>
                         </ul>
                     </div>
                 </div>
