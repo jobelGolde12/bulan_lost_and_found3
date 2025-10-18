@@ -6,8 +6,11 @@ use App\Models\DeniedRequest;
 use App\Models\ItemModel;
 use App\Models\NotificationModel;
 use App\Models\PendingRequest;
+use App\Models\TotalFound;
+use App\Models\TotalLost;
 use App\Models\TrashModel;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Log;
@@ -39,7 +42,6 @@ class PendingRequestController extends Controller
             'owner_phone_number',
             'reported_at',
         ]);
-        Log::info(['Approved item data:' => $data]);
         $notification = NotificationModel::create([
             'title' => 'Request Approved',
             'user_id' => $approveItem->user_id,
@@ -48,6 +50,20 @@ class PendingRequestController extends Controller
         ]);
        
         $item = ItemModel::create($data);
+        if(strtolower($item->status) === 'lost'){
+                $totalLost = TotalLost::create([
+                    'total' => 1,
+                    'date_lost' => Carbon::parse($item->created_at)->timezone(config('app.timezone')),
+                ]);
+                $totalLost->save();
+            }elseif(strtolower($item->status) === 'Found'){
+                $totalFound = TotalFound::create([
+                    'total' => 1,
+                    'date_found' => Carbon::parse($item->created_at)->timezone(config('app.timezone')),
+                ]);
+                $totalFound->save();
+            }
+
         $notification->item_id = $item->id;
         $notification->save();
 

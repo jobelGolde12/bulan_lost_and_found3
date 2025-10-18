@@ -174,6 +174,7 @@ Route::get('/message-admin', [ItemController::class, 'viewChat'])->name('message
 Route::post('/messages/send', [MessageController::class, 'send'])->middleware('auth');
 Route::post('/remove-message/{id}', [MessageController::class, 'remove'])->name('message.remove');
 Route::post('/block-message/{id}', [MessageController::class, 'block'])->name('message.block');
+Route::middleware('auth')->get('/message/has', [AdminDashboard::class, 'hasMessage'])->name('message.has');
 
 // View more users (saro na route na ma iimud sa messages page) || iba ini sa view.users san admin
 Route::prefix('viewMoreUsers')->name('viewMoreUsers.')->middleware('auth')->group(function () {

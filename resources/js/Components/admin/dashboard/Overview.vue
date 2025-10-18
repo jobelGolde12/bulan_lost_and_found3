@@ -430,7 +430,6 @@ onMounted(async () => {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   border: 1px solid rgba(0, 0, 0, 0.03);
   transition: all 0.3s ease;
-  cursor: pointer;
 }
 
 .stat-card:hover {

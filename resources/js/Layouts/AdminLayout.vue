@@ -5,6 +5,7 @@ import { ref, onMounted, defineProps, watch } from "vue";
 import { usePendingRequestStore } from "@/piniaStore/pendingRequestStore";
 import { storeToRefs } from "pinia"
 import { computed } from "vue";
+import axios from "axios";
 
 const currentRoute = usePage().url;
 const user = usePage().props.auth?.user;
@@ -12,7 +13,7 @@ const isSidebarOpen = ref(localStorage.getItem('isSidebarOpen') === 'true');
 
 const { count } = storeToRefs(usePendingRequestStore());
 const hasPendingRequest = computed(() => count.value || 0);
-
+let hasMessages = ref(false);
 
 const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value;
@@ -22,6 +23,19 @@ const toggleSidebar = () => {
 onMounted(() => {
   isSidebarOpen.value = localStorage.getItem('isSidebarOpen') === 'true';
 });
+
+const checkIfHasMessage = async () => {
+  try{
+    const response = await axios.get('/message/has')
+    hasMessages.value = response.data;
+    console.log("has message: ", hasMessages.value)
+  }catch(e){
+    console.log("An error while checking if has message", e);  
+  }
+}
+onMounted(() => {
+  checkIfHasMessage();
+})
 </script>
 
 <template>
@@ -94,12 +108,14 @@ onMounted(() => {
           <span v-if="isSidebarOpen">Settings</span>
         </Link>
 
-        <Link :href="route('message.index')" :class="{ active: currentRoute === route('settings.index') }">
-          <div :class="{ 'icon-container': !isSidebarOpen }">
-            <i class="bi bi-chat-dots link"></i>
-          </div>
-          <span v-if="isSidebarOpen">Message</span>
-        </Link>
+       <Link :href="route('message.index')" :class="{ active: currentRoute === route('message.index') }">
+            <div :class="{ 'icon-container': !isSidebarOpen }" class="icon-wrapper">
+              <i class="bi bi-chat-dots link"></i>
+
+              <span v-if="hasMessages" class="has-message">{{ hasMessages }}</span>
+            </div>
+            <span v-if="isSidebarOpen">Message</span>
+          </Link>
 
         <Link :href="route('view.users')" :class="{ active: currentRoute === '/view-users' }">
           <div :class="{ 'icon-container': !isSidebarOpen }">
@@ -231,6 +247,22 @@ onMounted(() => {
 }
 
 .pending-badge {
+  position: absolute;
+  top: -4px;
+  right: -100px;
+  background-color: #198754; /* Bootstrap bg-success */
+  color: #fff;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.has-message {
   position: absolute;
   top: -4px;
   right: -100px;

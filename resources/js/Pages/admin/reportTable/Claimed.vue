@@ -3,7 +3,7 @@ import { defineProps, ref, watch, computed } from 'vue';
 import { router } from '@inertiajs/vue3';
 
 const props = defineProps({
-  unSolved: {
+  claimed: {
     type: Array,
     default: () => [],
   },
@@ -16,8 +16,6 @@ const formatDate = (dateString) => {
 };
 
 const getDuration = (dateString) => {
-  if (!dateString) return 'N/A';
-  
   const created = new Date(dateString);
   const now = new Date();
   const diffMs = now - created;
@@ -37,13 +35,14 @@ const getDuration = (dateString) => {
   return `${diffYears} year${diffYears > 1 ? "s" : ""} ago`;
 };
 
-let getUnSolved = ref([]);
+let getClaimed = ref([]);
 let searchQuery = ref('');
 
 watch(
-  () => props.unSolved,
-  (newItems) => {
-    getUnSolved.value = newItems || [];
+  () => props.claimed,
+  (newItem) => {
+    getClaimed.value = newItem || [];
+    console.log('Total Found:', getClaimed.value);
   },
   { immediate: true }
 );
@@ -53,25 +52,17 @@ const filteredReports = computed(() => {
   const oneYearAgo = new Date();
   oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
 
-  // Filter items that are one year or older
-  const oneYearOrOlderItems = getUnSolved.value.filter((item) => {
-    if (!item?.created_at) return false;
-    
-    const createdAt = new Date(item.created_at);
-    const isOneYearOrOlder = createdAt <= oneYearAgo;
-    
-    return isOneYearOrOlder;
-  });
+  return getClaimed.value.filter((item) => {
+    const createdAt = new Date(item?.created_at);
+    const isWithinOneYear = createdAt >= oneYearAgo; 
+    if (!isWithinOneYear) return false;
 
-  // Then apply search filter
-  return oneYearOrOlderItems.filter((item) => {
     const titleMatch = item?.title?.toLowerCase().includes(query);
     const dateMatch = formatDate(item?.created_at)?.toLowerCase().includes(query);
-    const statusMatch = item?.status?.toLowerCase().includes(query);
-    
-    return titleMatch || dateMatch || statusMatch;
+    return titleMatch || dateMatch;
   });
 });
+
 
 const navigateTo = (id) => {
   router.visit(route('viewItemInfoAsAdmin', { item: id }));
@@ -83,13 +74,13 @@ const navigateTo = (id) => {
     <div class="card border-0">
       <div class="card-body">
         <div class="header-container d-flex mb-3 container-fluid justify-content-between">
-          <h5 class="card-title">All Unsolved Reports</h5>
+          <h5 class="card-title">All Claimed Reports</h5>
           <div class="search-container">
             <input
               v-model="searchQuery"
               type="text"
               class="form-control search"
-              placeholder="Search by name, date, or status..."
+              placeholder="Search by name or date..."
             />
           </div>
         </div>
@@ -99,7 +90,6 @@ const navigateTo = (id) => {
             <thead>
               <tr>
                 <th>Name</th>
-                <th>Status</th>
                 <th>Date</th>
                 <th>Since</th>
               </tr>
@@ -112,27 +102,21 @@ const navigateTo = (id) => {
                 class="clickable-row"
               >
                 <td>{{ item.title || 'N/A' }}</td>
-                <td>
-                  <span :class="`badge ${item.status === 'Lost' ? 'bg-danger' : 'bg-success'}`">
-                    {{ item.status || 'N/A' }}
-                  </span>
-                </td>
                 <td>{{ formatDate(item.created_at) }}</td>
                 <td>{{ getDuration(item.created_at) }}</td>
               </tr>
               <tr v-if="filteredReports.length === 0">
-                <td colspan="4" class="text-center text-muted">
-                  No Unsolved Reports older than 1 year.
-                </td>
+                <td colspan="3" class="text-center text-muted">No Item Found.</td>
               </tr>
             </tbody>
           </table>
         </div>
-        
+
         <!-- Summary Info -->
         <div class="mt-3 text-muted small">
-          Showing {{ filteredReports.length }} items that are 1 year or older and not claimed
+          Showing {{ filteredReports.length }} items that are claimed.
         </div>
+
       </div>
     </div>
   </div>

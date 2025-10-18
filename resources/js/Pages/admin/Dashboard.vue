@@ -23,6 +23,7 @@ import OverAllResolved from '@/Components/admin/dashboard/OverAllResolved.vue';
 import TotalLosts from './reportTable/TotalLosts.vue';
 import TotalFounds from './reportTable/TotalFounds.vue';
 import Unsolved from './reportTable/Unsolved.vue';
+import Claimed from './reportTable/Claimed.vue';
 
 echarts.use([PieChart, TitleComponent, TooltipComponent, LegendComponent, CanvasRenderer]);
 
@@ -116,10 +117,12 @@ const totalLostCount = ref(0);
 const totalFoundCount = ref(0);
 const getAllLost = ref([]);
 const getAllFound = ref([]);
+const getClaimed = ref([]);
 const getUnSolved = ref([]);
 
 watch(() => props.items, (newItem) => {
   getReports.value = newItem;
+  getClaimed.value = getReports?.value.filter(item => item.status === 'Claimed');
 }, { immediate: true });
 
 watch(() => props.user_count, (newItem) => {
@@ -186,6 +189,7 @@ overViewData.value = {
             <TotalLostAndFound 
             :totalFoundItems="totalFoundCount"
             :totalLostItems="totalLostCount"
+            :totalClaimedItems="getClaimed"
             />
             </div>
           </div>
@@ -198,10 +202,13 @@ overViewData.value = {
             :lost="getTotalLost"
             :found="getTotalFound"
             />
-            <ResolveCasesChartYearly :data="getReports"
+           
+            <div class="my-5">
+               <ResolveCasesChartYearly :data="getReports"
             :lost="getTotalLost"
             :found="getTotalFound"
             />
+            </div>
           </div>
 
       <OverAllResolved 
@@ -215,6 +222,7 @@ overViewData.value = {
 
       <TotalLosts :totalLosts="getAllLost" />
       <TotalFounds :totalFounds="getAllFound" />
+      <Claimed :claimed="getClaimed"/>
       <Unsolved 
       :totalLost="getTotalLost"
       :totalFound="getTotalFound"

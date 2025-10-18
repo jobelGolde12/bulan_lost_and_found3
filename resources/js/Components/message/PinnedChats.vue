@@ -9,7 +9,7 @@ const props = defineProps({
   active: { type: Number, default: 0 },
   hasMessages: { type: Array, default: () => [] },
 });
-console.log("users prop:", props.users);
+
 const pinnedChats = ref([]);
 const remainingUsers = ref([]);
 const getActiveMessage = ref(0);
@@ -84,7 +84,7 @@ watch(
       if (info) continue; // skip users already with messages
       bottomUsers.push({
         id,
-        name: user.name, // ✅ only include name, not entire object
+        name: user.name, 
       });
       added.add(id);
     }

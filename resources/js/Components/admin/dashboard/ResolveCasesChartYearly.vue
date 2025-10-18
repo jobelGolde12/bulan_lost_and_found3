@@ -438,21 +438,7 @@ watch(
   padding: 2rem;
   position: relative;
   overflow: hidden;
-  box-shadow: 
-    0 20px 40px rgba(0, 0, 0, 0.05),
-    0 8px 16px rgba(0, 0, 0, 0.03),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
   transition: all 0.3s ease;
-}
-
-.modern-yearly-stats:hover {
-  transform: translateY(-2px);
-  box-shadow: 
-    0 25px 50px rgba(0, 0, 0, 0.08),
-    0 12px 24px rgba(0, 0, 0, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .card-background {
@@ -674,8 +660,13 @@ watch(
     text-align: center;
     gap: 0.75rem;
   }
-  
+  .title-section{
+    margin-left: auto;
+  margin-right: auto;
+}
   .text-content {
+    display: flex;
+    justify-content: center;
     align-items: center;
   }
   

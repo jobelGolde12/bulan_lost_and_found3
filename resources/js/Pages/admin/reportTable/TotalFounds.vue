@@ -74,7 +74,7 @@ const navigateTo = (id) => {
     <div class="card border-0">
       <div class="card-body">
         <div class="header-container d-flex mb-3 container-fluid justify-content-between">
-          <h5 class="card-title">All <span class="text-success">Found</span> Reports</h5>
+          <h5 class="card-title">All Found Reports</h5>
           <div class="search-container">
             <input
               v-model="searchQuery"

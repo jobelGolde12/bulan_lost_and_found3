@@ -63,8 +63,9 @@ class ItemController extends Controller
     ])->withInput();
 }
 
+
         if(Auth::check() && Auth::user()->role == 'admin'){
-            ItemModel::create([
+            $item = ItemModel::create([
                 'title' => $request->name,
                 'description' => $request->description,
                 'status' => $request->status,
@@ -76,6 +77,20 @@ class ItemController extends Controller
                 'pending_status' => 'pending',
                 'created_at' => Carbon::parse($request->date)->timezone(config('app.timezone')),
             ]);
+
+            if(strtolower($item->status) === 'lost'){
+                $totalLost = TotalLost::create([
+                    'total' => 1,
+                    'date_lost' => Carbon::parse($request->date)->timezone(config('app.timezone')),
+                ]);
+                $totalLost->save();
+            }elseif(strtolower($item->status) === 'Found'){
+                $totalFound = TotalFound::create([
+                    'total' => 1,
+                    'date_found' => Carbon::parse($request->date)->timezone(config('app.timezone')),
+                ]);
+                $totalFound->save();
+            }
         }else{
             PendingRequest::create([
                 'title' => $request->name,
@@ -271,20 +286,6 @@ public function markAsResolve($id, $userId)
     }
     if (!$userId) {
         return response()->json(['error' => 'user_id not found'], 404);
-    }
-
-    if($item->status === 'Lost'){
-        $totalLost = TotalLost::create([
-            'total' => 1,
-            'date_lost' => $item->created_at,
-        ]);
-        $totalLost->save();
-    }elseif($item->status === 'Found'){
-        $totalFound = TotalFound::create([
-            'total' => 1,
-            'date_found' => $item->created_at,
-        ]);
-        $totalFound->save();
     }
 
     $item->status = 'Claimed';
