@@ -164,6 +164,8 @@ Route::get('/view-privacy', function(){
 Route::get('/view-users', [AdminDashboard::class, 'viewUsers'])->name('view.users');
 Route::get('/view-user-info-as-admin/{id}', [AdminDashboard::class, 'viewUser'])->name('viewUserAsAdmin'); //specific user
 Route::delete('/delete-users/{id}', [TrashController::class, 'userDestroy'])->name('user.destroy');
+Route::patch('/target/resolved/{target}/{type}', [AdminDashboard::class, 'targetResolveCases']);
+Route::get('/get/target/resolved', [AdminDashboard::class, 'getTargetResolveCases']);
 
 //message
 Route::get('/message', [MessageController::class, 'index'])->name('message.index');

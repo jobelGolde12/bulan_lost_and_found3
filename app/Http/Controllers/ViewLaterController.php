@@ -14,7 +14,6 @@ class ViewLaterController extends Controller
         $viewLater = ViewLaterModel::where('item_id', $id)->first();
         if($viewLater){
         $viewLater->delete();
-        return redirect()->back()->with(['message' => 'item deleted.']);
         }else{
              ViewLaterModel::create([
             'user_id' => Auth::id(),
@@ -22,7 +21,7 @@ class ViewLaterController extends Controller
         ]);
         }
        
-        return redirect()->back()->with(['success' => 'item added in view later.']);
+        return response()->json(['message' => 'the view later action was successfull'], 201);
     }
     public function viewWatchLater(){
          //get only the specific viewLater data base sa id ni user

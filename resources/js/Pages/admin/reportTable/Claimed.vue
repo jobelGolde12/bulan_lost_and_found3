@@ -42,7 +42,6 @@ watch(
   () => props.claimed,
   (newItem) => {
     getClaimed.value = newItem || [];
-    console.log('Total Found:', getClaimed.value);
   },
   { immediate: true }
 );

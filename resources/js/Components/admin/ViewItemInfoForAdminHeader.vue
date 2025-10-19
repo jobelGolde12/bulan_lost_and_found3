@@ -59,10 +59,13 @@ const markAsResolveFunc = () => {
 
 // Force delete
 const forceDelete = () => {
-  router.delete(route('forceDeleteItem', {id: props.item_id}), {}, {
+  if(confirm("Are you sure you want to delete this item? ")){
+      router.delete(route('forceDeleteItem', {id: props.item_id}), {}, {
     onSuccess: () => alert('Item deleted.'),
     onError: () => alert('An error occurred, please try again.')
   });
+  }
+
 };
 </script>
 

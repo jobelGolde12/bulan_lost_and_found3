@@ -14,10 +14,6 @@ const props = defineProps({
   found: { type: Array, default: () => [] },
 });
 
-console.log("losts:", props.lost);
-console.log("founds:", props.found);
-console.log("data:", props.found);
-
 const isLoading = ref(true);
 const resolvedData = ref([]);
 
@@ -144,9 +140,6 @@ const updateChart = () => {
   const lostCounts = getMonthlyCounts(props.lost, 'date_lost');
   const foundCounts = getMonthlyCounts(props.found, 'date_found');
   const resolvedCounts = getMonthlyCounts(resolvedData.value, 'reported_at');
-
-  console.log("Updating chart for year:", selectedYear.value);
-  console.log("Lost:", lostCounts, "Found:", foundCounts, "Resolved:", resolvedCounts);
 
   chartOptions.value.series = [
     {

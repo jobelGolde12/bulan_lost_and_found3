@@ -112,7 +112,7 @@ onMounted(() => {
             <div :class="{ 'icon-container': !isSidebarOpen }" class="icon-wrapper">
               <i class="bi bi-chat-dots link"></i>
 
-              <span v-if="hasMessages" class="has-message">{{ hasMessages }}</span>
+              <span v-if="hasMessages && (hasMessages - 1) != 0" class="has-message">{{ hasMessages - 1 }}</span>
             </div>
             <span v-if="isSidebarOpen">Message</span>
           </Link>

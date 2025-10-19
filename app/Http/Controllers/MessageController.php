@@ -31,8 +31,7 @@ class MessageController extends Controller
         ->get();
 
     // Get all messages related to this user
-    $hasMessages = MessageModel::where('receiver_id', $currentUserId)
-        ->orWhere('sender_id', $currentUserId)
+    $hasMessages = MessageModel::where('sender_id', '!=', $currentUserId)
         ->get(['sender_id', 'receiver_id', 'created_at', 'read_at']);
 
     // Get users who have unread messages

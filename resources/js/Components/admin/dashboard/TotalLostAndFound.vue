@@ -17,8 +17,6 @@ const props = defineProps({
   },
 });
 
-console.log("claimed: ", props.totalClaimedItems);
-
 const chartRef = ref(null);
 let chartInstance = null;
 

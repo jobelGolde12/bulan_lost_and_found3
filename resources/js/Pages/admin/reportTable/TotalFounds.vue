@@ -42,7 +42,6 @@ watch(
   () => props.totalFounds,
   (newItem) => {
     getTotalFounds.value = newItem || [];
-    console.log('Total Found:', getTotalFounds.value);
   },
   { immediate: true }
 );

@@ -6,10 +6,9 @@ import { BarChart } from 'echarts/charts';
 import { GridComponent, TooltipComponent, LegendComponent } from 'echarts/components';
 import VChart from 'vue-echarts';
 
-// Register necessary ECharts modules
+
 use([CanvasRenderer, BarChart, GridComponent, TooltipComponent, LegendComponent]);
 
-// --- Props ---
 const props = defineProps({
   data: {
     type: Array,
@@ -19,11 +18,9 @@ const props = defineProps({
   found: { type: Array, default: () => [] },
 });
 
-// --- Refs ---
 const isLoading = ref(true);
 const resolvedData = ref([]);
 
-// --- Modern Color Scheme ---
 const colors = {
   lost: {
     primary: '#FF6B6B',
@@ -375,7 +372,7 @@ watch(
             </svg>
           </div>
           <div class="text-content">
-            <h3 class="card-title">Yearly Overview</h3>
+            <h3 class="card-title fs-5">Yearly Overview</h3>
             <p class="card-subtitle">Case trends and distribution across years</p>
           </div>
         </div>
@@ -383,11 +380,11 @@ watch(
         <!-- Stats Summary -->
         <div class="stats-summary">
           <div class="stat-item">
-            <div class="stat-value">{{ totalCases }}</div>
+            <div class="stat-value fs-5">{{ totalCases }}</div>
             <div class="stat-label">Total Cases</div>
           </div>
           <div class="stat-item">
-            <div class="stat-value">{{ yearRange }}</div>
+            <div class="stat-value fs-5">{{ yearRange }}</div>
             <div class="stat-label">Year Range</div>
           </div>
         </div>

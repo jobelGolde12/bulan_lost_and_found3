@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ItemCategories;
 use App\Models\ItemModel;
 use App\Models\MessageModel;
+use App\Models\TargetResolvedCases;
 use App\Models\User;
 use App\Models\UserInfo;
 use App\Models\ViewLaterModel;
@@ -53,17 +54,33 @@ class AdminDashboard extends Controller
     public function hasMessage(){
         $currentUserId = Auth::id();
         $hasMessages = MessageModel::where(function ($query) use ($currentUserId) {
-        $query->where('receiver_id', $currentUserId)
+        $query->where('sender_id', '!=', $currentUserId)
               ->whereNull('read_at');
     })
-    ->orWhere(function ($query) use ($currentUserId) {
-        $query->where('sender_id', $currentUserId)
-              ->whereNull('read_at');
-    })
-    // ✅ ensure uniqueness: count unique sender_id or receiver_id pairs
+    //  ensure uniqueness: count unique sender_id or receiver_id pairs
     ->selectRaw('DISTINCT sender_id')
     ->get()
     ->count();
         return response()->json($hasMessages);
+    }
+
+    public function targetResolveCases($target, $type){
+        $currentTarget = TargetResolvedCases::select(['id','target_value'])->first();
+        
+        if($type == 'increase'){
+            $target = $target + 100;
+        }else{
+            $target = $target - 100;
+        }
+        
+        $currentTarget->update([
+            'target_value' => $target
+        ]);
+
+        return response()->json($currentTarget->target_value);
+    }
+    public function getTargetResolveCases(){
+        $currentTarget = TargetResolvedCases::select(['id','target_value'])->first();
+        return response()->json($currentTarget->target_value);
     }
 }

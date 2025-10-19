@@ -355,6 +355,13 @@ public function markAsResolve($id, $userId)
     //Kapag d nag follow c user sa privacy & policy
     public function forceDelete($id){
         $item = ItemModel::findOrFail($id);
+        
+        NotificationModel::create([
+            'title' => 'Post Deleted by Admin',
+            'user_id' => $item->user_id,
+            'message' => "Your post titled '{$item->title}' has been deleted by an admin due to violating our guidelines.",
+            'read_status' => 0
+        ]);
         $item->forceDelete();
         return redirect()->route('items')->with(['success' => 'item deleted successfully...']);
     }
