@@ -208,7 +208,7 @@ private function getCachedProfanityWords()
 
     // para sa dashboard (sa na himo san kada user na item)
     public function viewItemInfo($item){
-        $getItem = ItemModel::with('comments')->findOrFail($item);
+        $getItem = ItemModel::with('comments.userInfo')->findOrFail($item);
         $created_by = User::find($getItem?->user_id);
         $profile = UserInfo::where('user_id' , $getItem->user_id)->value('profile_pic');
         $currentUser = Auth::id();
@@ -223,7 +223,7 @@ private function getCachedProfanityWords()
 
     //kapag in view ni admin ang item
         public function viewItemInfoAsAdmin($item){
-            $getItem = ItemModel::with('comments')->findOrFail($item);
+            $getItem = ItemModel::with('comments.userInfo')->findOrFail($item);
             $created_by = User::find($getItem?->user_id);
             $profile = UserInfo::where('user_id' , $getItem->user_id)->value('profile_pic');
              $currentUser = Auth::id();

@@ -68,7 +68,7 @@ onMounted(() => {
           <div class="nav-item__icon">
             <i class="bi bi-house"></i>
           </div>
-          <span class="nav-item__text">Dashboard</span>
+          <span class="nav-item__text">Home</span>
           <div class="nav-item__active-indicator"></div>
         </Link>
 

@@ -21,5 +21,7 @@ class AdminSeeder extends Seeder
             'password' => Hash::make('iloveu3000'),
             'role' => 'admin',
         ]);
+        // goldejhermaine1@gmail.com / iammaryjane123 
+        // jobelgolde43@gmail.com / iamjobel123
     }
 }

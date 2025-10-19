@@ -17,36 +17,21 @@ class CommentController extends Controller
 {
     public function store(Request $request){
         $request->validate([
-            'user_id' => 'required|string|max:255',
+            'user_id' => 'required',
             'item_id' => 'required|string|max:255',
             'content' => 'required|string|max:255',
         ]);
-        Comment::create([
+        $comment = Comment::create([
             'user_id' => FacadesAuth::id(),
             'item_id' => $request->item_id,
             'content' => $request->content,
         ]);
-         $getItem = ItemModel::with('comments')->findOrFail($request->item_id);
-            $created_by = User::find($getItem?->user_id);
-            $profile = UserInfo::where('user_id' , $getItem->user_id)->value('profile_pic');
-            $currentUser = FacadesAuth::id();
-            if(FacadesAuth::user()->role == 'admin'){
-                return Inertia::render('admin/ViewItemInfoAsAdmin', [
-                'item' => $getItem,
-                'created_by' => $created_by,
-                'profile' => $profile ?: 'NA',
-                'comments' => $getItem->comments,
-                'currentUser' => $currentUser ?: null,
-            ]);
-            }else{
-                return Inertia::render('ViewItemInfo', [
-                'item' => $getItem,
-                'created_by' => $created_by,
-                'profile' => $profile ?: 'NA',
-                'comments' => $getItem->comments,
-                'currentUser' => $currentUser ?: null,
-            ]);
-            }
+
+        if(!$comment){
+            return response()->json(['error' => 'an error while posting comment'], 500);
+        }
+            
+        // return response()->json("Comment created");
     }
 
     public function delete($id){

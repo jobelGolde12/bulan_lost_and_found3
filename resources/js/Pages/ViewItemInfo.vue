@@ -61,6 +61,7 @@ watch(
   () => props.comments,
   (newItem) => {
     getComment.value = newItem;
+    console.log("comments: ", getComment.value)
   },
   {immediate: true}
 )
@@ -68,7 +69,6 @@ watch(
   () => props.currentUser,
   (id) => {
     currentUserId.value = id;
-    console.log("user id => ", currentUserId.value)
   },
   {immediate: true}
 )
@@ -116,6 +116,20 @@ const deleteComment = (getId) => {
       getComment.value = getComment?.value.filter(comment => comment.id != getId);
 
 }
+const getProfileImage = (profilePic) => {
+  const defaultImage = '../../images/profile.jpeg';
+
+  // If no profile picture, use default
+  if (!profilePic) return defaultImage;
+
+  // If it's a full URL (starts with http), use it directly
+  if (profilePic.startsWith('http://') || profilePic.startsWith('https://')) {
+    return profilePic;
+  }
+
+  // Otherwise, assume it's stored in /storage
+  return `/storage/${profilePic}`;
+};
 </script> 
 
 <template>
@@ -187,51 +201,99 @@ const deleteComment = (getId) => {
         </div>
 
         <!-- Comment section  -->
-        <div class="container-fluid comment-main-container">
-         <form @submit.prevent="addComment" class="form d-flex flex-row gap-4 align-items-center">
-          <div class="mt-2">
-           <img
-              :src="getProfile == 'NA' ? '../../images/profile.jpeg' : `/storage/${getProfile}`"
-              alt="User"
-              class="profile-pic-in-comment"
-              style="width: 45px;"
-            />
-          </div>
+        <div class="comments-section mt-4">
+  <!-- Comment Form -->
+  <form @submit.prevent="addComment" class="comment-form">
+    <div class="comment-form__header">
+      <div class="comment-form__avatar">
+        <img
+          :src="getProfile == 'NA' ? '../../images/profile.jpeg' : `/storage/${getProfile}`"
+          alt="Your profile picture"
+          class="comment-form__avatar-img"
+        />
+      </div>
+      <div class="comment-form__input-group">
+        <input
+          type="text"
+          class="comment-form__input"
+          v-model="commentForm.content"
+          placeholder="Write a comment..."
+          maxlength="500"
+        />
+        <button class="comment-form__submit" type="submit" :disabled="!commentForm.content.trim()">
+          <i class="bi bi-send-fill"></i>
+          <span>Post</span>
+        </button>
+      </div>
+    </div>
+  </form>
 
-          <div class="w-100 mt-3 d-flex flex-row gap-1">
-            <input type="text" class="form-control w-100 py-2" v-model="commentForm.content">
-            <button class="btn btn-success" type="submit">post</button>
-          </div>
-         </form>
-
-         <div class="container my-3 px-0 mx-0 comment-container d-flex flex-column gap-2" v-if="getComment">
-            <div class="comment p-3 rounded" v-for="data in getComment" :key="data.id">
-              <div class="d-flex flex-row justify-content-between align-items-center">
-                <div class="profile-in-comment">
-                  <img src="../../images/profile.jpeg" alt="">
-                </div>
-                <div class="date d-flex align-items-center gap-2">
-                  <p class="d-inline-block">{{ formatDate(data.created_at) || "No date available"}}</p>
-                  <i class="bi bi-three-dots-vertical d-inline-block action-in-comment" 
-                  v-if="data?.user_id === currentUserId"
-                   @click="toggleActionMenu(data.id)"
-                  ></i>
-                </div>
-
-                <div class="action-container rounded py-2 px-4 "
-                v-if="activeActionCommentId === data.id"
-                >
-                  <div @click="deleteComment(data.id)" class="text-dark">Delete </div>
-                </div>
-              </div>
-
-              <div class="content-container mt-4">
-                {{ data.content || 'None' }}
-              </div>
+  <!-- Comments List -->
+  <div class="comments-list" v-if="getComment && getComment.length > 0">
+    <div
+      class="comment-card"
+      v-for="data in getComment"
+      :key="data.id"
+    >
+      <div class="comment-card__header">
+        <div class="comment-card__user">
+          <img
+            :src="getProfileImage(data?.user_info?.profile_pic)"
+            alt="User profile"
+            class="comment-card__avatar"
+          />
+        </div>
+        
+        <div class="comment-card__meta">
+          <time class="comment-card__date">
+            {{ formatDate(data.created_at) || "No date available" }}
+          </time>
+          
+          <div class="comment-card__actions" v-if="data?.user_id == currentUserId">
+            <button
+              class="comment-card__action-btn"
+              @click="toggleActionMenu(data.id)"
+              :aria-expanded="activeActionCommentId === data.id"
+              aria-label="Comment options"
+            >
+              <i class="bi bi-three-dots-vertical"></i>
+            </button>
+            
+            <!-- Action Dropdown -->
+            <div
+              class="comment-card__dropdown"
+              v-if="activeActionCommentId === data.id"
+              v-click-outside="closeActionMenu"
+            >
+              <button
+                class="comment-card__dropdown-item comment-card__dropdown-item--delete"
+                @click="deleteComment(data.id)"
+              >
+                <i class="bi bi-trash"></i>
+                <span>Delete Comment</span>
+              </button>
             </div>
           </div>
-          
         </div>
+      </div>
+
+      <div class="comment-card__content">
+        <p class="comment-card__text">
+          {{ data.content || "No content" }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="comments-empty" v-else-if="getComment">
+    <div class="comments-empty__icon">
+      <i class="bi bi-chat-left"></i>
+    </div>
+    <p class="comments-empty__text">No comments yet</p>
+    <p class="comments-empty__subtext">Be the first to share your thoughts!</p>
+  </div>
+</div>
        
       </div>
       <div v-else>
@@ -263,4 +325,5 @@ const deleteComment = (getId) => {
 </template>
 <style scoped>
 @import "../../css/viewItemInfo.css";
+@import '../../css/items/comment.css';
 </style>
