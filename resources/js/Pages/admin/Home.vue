@@ -5,7 +5,8 @@ import { Head, useForm } from "@inertiajs/vue3";
 import { defineProps, ref, watch, computed } from "vue";
 import CategoriesList from "@/Components/user/CategoriesList.vue";
 import ItemCardForAdmin from "@/Components/admin/ItemCardForAdmin.vue";
-import FindMatch from "@/Components/admin/dashboard/FindMatchButton.vue";
+import FIlterByLocation from "@/Components/user/FIlterByLocation.vue";
+
 const props = defineProps({
   categories: {
     type: Array,
@@ -18,6 +19,14 @@ const props = defineProps({
   role: {
     type: String,
     default: ''
+  },
+  locations: {
+    type: Array,
+    default: () => []
+  },
+  currentLocation: {
+    type: String,
+    default: "Location"
   }
 });
 const itemNameContainer = ref(props.items.map((item) => item.title));
@@ -30,6 +39,8 @@ const selectedCategory = ref("");
 const filterStatus = ref("all");
 const searchForm = useForm({ query: "" });
 const getItems = ref([...props.items]);
+const getLocations = ref([]);
+const getCurrentLocation = ref("Location");
 const getCurrentItemCategory = computed(() => {
   return [...new Set(getItems.value.map(item => item.category))];
 });
@@ -59,7 +70,18 @@ const filterItemsByCategory = (categoryName) => {
   }
 };
 
-
+watch(
+  () => props.locations,
+  (newLocations) => {
+    getLocations.value = newLocations;
+  }, {immediate: true}
+)
+watch(
+  () => props.currentLocation,
+  (newLocations) => {
+    getCurrentLocation.value = newLocations || 0;
+  }, {immediate: true}
+)
 const handleCategoryChange = (categoryName) => {
   selectedCategory.value = categoryName;
   filterItemsByCategory(categoryName); 
@@ -114,7 +136,15 @@ const handleSearch = () => {
         @categorySelected="handleCategoryChange"
       />
 
-      <FilterComponent @filterSelected="handleFilterChange" :role="props.role"/>
+      <div class="d-flex gap-2 align-items-center">
+         <div class="w-[15]">
+          <FIlterByLocation 
+          :locations="getLocations"
+          :currentLocation="getCurrentLocation"
+          />
+         </div>
+        <FilterComponent @filterSelected="handleFilterChange" :role="props.role"/>
+      </div>
       <!-- Items List -->
       <ItemCardForAdmin :items="getItems"/>
 

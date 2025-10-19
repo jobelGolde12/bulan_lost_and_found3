@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AnnouncementModel;
 use App\Models\ItemCategories;
 use App\Models\ItemModel;
+use App\Models\LocationModel;
 use App\Models\PendingRequest;
 use App\Models\TotalFound;
 use App\Models\TotalLost;
@@ -41,11 +42,13 @@ class DashboardController extends Controller
          }])->orderBy('created_at', 'desc')->get();
         
          $isHavePending = PendingRequest::where('user_id', Auth::id())->exists();
+         $locations = LocationModel::select('id', 'name')->get();
             return Inertia::render('user/Dashboard', [
                 'categories' => $categories,
                 'items' => $items,
                 'isHavePending' => $isHavePending,
                 'announcement' => $announcement,
+                'locations' => $locations   
         ]); 
         }else if (Auth::check() && Auth::user()->role === 'admin') { 
             $userCount = User::count();
@@ -92,5 +95,30 @@ class DashboardController extends Controller
             }
            
         }
+    }
+    public function filterByLocation($id){
+        $userId = Auth::id();
+        $currentLocation = LocationModel::findOrFail($id);
+        $categories = ItemCategories::all();
+        $announcement = AnnouncementModel::all();
+
+        $items = ItemModel::select('id','user_id', 'title', 'description', 'category', 'status', 'image_url', 'created_at')
+        ->whereIn('status', ['Lost', 'Found'])
+        ->where('location', $currentLocation->name)
+        ->with(['user', 'user.userInfo:id,user_id,profile_pic'])
+        ->with(['viewLater' => function ($query) use ($userId) {
+        $query->where('user_id', $userId);
+         }])->orderBy('created_at', 'desc')->get();
+        
+         $isHavePending = PendingRequest::where('user_id', Auth::id())->exists();
+         $locations = LocationModel::select('id', 'name')->get();
+            return Inertia::render('user/Dashboard', [
+                'categories' => $categories,
+                'items' => $items,
+                'isHavePending' => $isHavePending,
+                'announcement' => $announcement,
+                'currentLocation' => $currentLocation->name,
+                'locations' => $locations,
+        ]); 
     }
 }

@@ -9,7 +9,7 @@
         v-model="selectedFilter"
         @change="emitFilter"
       >
-        <option disabled value="">Filter</option>
+        <option disabled value="">Status</option>
         <option value="all">All</option>
         <option value="Lost">Lost</option>
         <option value="Found">Found</option>
@@ -32,7 +32,6 @@
     </div> -->
    </div>
 
-    <FindMatchButton v-if="role == 'admin'" class="ms-5"/>
 
     <div class="change-text d-none d-lg-block">
       <p class="text-dark">

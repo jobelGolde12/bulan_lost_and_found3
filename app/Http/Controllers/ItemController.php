@@ -82,12 +82,14 @@ class ItemController extends Controller
                 $totalLost = TotalLost::create([
                     'total' => 1,
                     'date_lost' => Carbon::parse($request->date)->timezone(config('app.timezone')),
+                    'location' => $request->location
                 ]);
                 $totalLost->save();
             }elseif(strtolower($item->status) === 'Found'){
                 $totalFound = TotalFound::create([
                     'total' => 1,
                     'date_found' => Carbon::parse($request->date)->timezone(config('app.timezone')),
+                    'location' => $request->location
                 ]);
                 $totalFound->save();
             }

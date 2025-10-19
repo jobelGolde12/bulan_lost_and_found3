@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ItemCategories;
 use App\Models\ItemModel;
+use App\Models\LocationModel;
 use App\Models\MessageModel;
 use App\Models\TargetResolvedCases;
 use App\Models\User;
@@ -30,10 +31,37 @@ class AdminDashboard extends Controller
         $query->where('user_id', $userId);
         }])->orderBy('created_at', 'desc')->get();
 
+        $locations = LocationModel::select('id','name')->get();
+
             return Inertia::render('admin/Home', [
                 'categories' => $categories,
                 'items' => $items,
                 'role' => 'admin',
+                'locations' => $locations,
+        ]); 
+}
+    public function filterByLocation($id){
+
+        $currentLocation = LocationModel::findOrFail($id);
+
+        $categories = ItemCategories::all();
+        //get only the specific viewLater data base sa id ni user
+        $userId = Auth::id();
+        $items = ItemModel::whereIn('status', ['Lost', 'Found'])
+        ->where('location', $currentLocation->name)
+        ->with('user', 'user.userInfo:id,user_id,profile_pic')
+        ->with(['viewLater' => function ($query) use ($userId) {
+        $query->where('user_id', $userId);
+        }])->orderBy('created_at', 'desc')->get();
+
+        $locations = LocationModel::select('id','name')->get();
+
+            return Inertia::render('admin/Home', [
+                'categories' => $categories,
+                'items' => $items,
+                'role' => 'admin',
+                'locations' => $locations,
+                'currentLocation' => $currentLocation->name,
         ]); 
 }
 

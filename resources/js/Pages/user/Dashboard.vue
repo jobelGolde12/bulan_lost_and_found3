@@ -2,10 +2,10 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import FilterComponent from "@/Components/user/FilterComponent.vue";
 import { Head, useForm } from "@inertiajs/vue3";
-import { defineProps, ref, computed, defineEmits, onMounted } from "vue";
+import { defineProps, ref, computed, defineEmits, onMounted, watch } from "vue";
 import CategoriesList from "@/Components/user/CategoriesList.vue";
 import ItemCard from "@/Components/ItemCard.vue";
-
+import FilteredByLocationFoUser from "@/Components/user/FilteredByLocationFoUser.vue";
 const props = defineProps({
   categories: {
     type: Array,
@@ -19,6 +19,14 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  locations: {
+    type: Array,
+    default: () => []
+  },
+  currentLocation: {
+    type: String,
+    default: "Location"
+  }
 });
 
 
@@ -38,6 +46,8 @@ const getCurrentItemCategory = computed(() => {
   return [...new Set(getItems.value.map(item => item.category))];
 });
 
+const getLocations = ref([]);
+const getCurrentLocation = ref("Location");
 const filterItems = () => {
   getItems.value = props.items.filter((item) => {
     const category = props.categories.find((cat) => cat.id === item.category_id);
@@ -64,7 +74,18 @@ const filterItemsByCategory = (categoryName) => {
   }
 };
 
-
+watch(
+  () => props.locations,
+  (newLocations) => {
+    getLocations.value = newLocations;
+  }, {immediate: true}
+)
+watch(
+  () => props.currentLocation,
+  (newLocations) => {
+    getCurrentLocation.value = newLocations || 0;
+  }, {immediate: true}
+)
 const handleCategoryChange = (categoryName) => {
   selectedCategory.value = categoryName;
   filterItemsByCategory(categoryName); 
@@ -119,7 +140,15 @@ const handleSearch = () => {
         @categorySelected="handleCategoryChange"
       />
 
-      <FilterComponent @filterSelected="handleFilterChange" />
+      <div class="d-flex gap-2 align-items-center">
+         <div class="w-[15]">
+          <FilteredByLocationFoUser 
+          :locations="getLocations"
+          :currentLocation="getCurrentLocation"
+          />
+         </div>
+        <FilterComponent @filterSelected="handleFilterChange" :role="props.role"/>
+      </div>
 
       <!-- Items List -->
       <ItemCard :items="getItems" />

@@ -98,6 +98,16 @@ onMounted(() => {
           <span v-if="isSidebarOpen">Requests</span>
         </Link>
 
+        <Link
+          :href="route('findMatch.index')"
+          :class="{ active: currentRoute === '/find-match' }"
+          class="nav-link"
+        >
+          <div :class="{ 'icon-container': !isSidebarOpen }" class="icon-wrapper">
+            <i class="bi bi-magic link"></i>
+          </div>
+          <span v-if="isSidebarOpen">Find Match</span>
+        </Link>
 
         <hr />
 

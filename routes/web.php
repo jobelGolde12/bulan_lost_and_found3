@@ -37,6 +37,7 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard/location/filter/{id}', [DashboardController::class, 'filterByLocation'])->name('filterByLocationFoUser');
 
 Route::middleware('auth')->group(function () {
     Route::get('/my-profile', [ProfileController::class, 'index'])->name('profile');
@@ -130,6 +131,7 @@ Route::get('/view-item-info/{item}', [ItemController::class, 'viewItemInfo'])->n
 Route::get('/view-item/{item}', [ItemController::class, 'viewItem'])->name('viewItem');
 Route::delete('delete-item/{id}', [ItemController::class, 'deleteItem'])->name('deleteItem');
 Route::get('/items', [AdminDashboard::class, 'item'])->name('items');
+Route::get('/items/location/filtered/{id}', [AdminDashboard::class, 'filterByLocation'])->name('filterByLocation');
 Route::get('/admin-dashboard', [AdminDashboard::class, 'index'])->name('adminDashboard');
 
 
