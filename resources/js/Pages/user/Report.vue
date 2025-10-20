@@ -136,8 +136,11 @@ const submitForm = () => {
 <style scoped>
 .main-container {
   width: 100%;
-  height: 100%;
+  min-height: 100vh;
+  height: 100vh;          /* ✅ add this */
   overflow-x: hidden;
+  overflow-y: auto;       /* ✅ auto is smoother, you can keep scroll if you want */
+  margin-bottom: 3rem;
 }
 
 .alert-danger {

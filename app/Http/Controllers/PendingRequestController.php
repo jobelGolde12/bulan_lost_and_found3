@@ -54,12 +54,14 @@ class PendingRequestController extends Controller
                 $totalLost = TotalLost::create([
                     'total' => 1,
                     'date_lost' => Carbon::parse($item->created_at)->timezone(config('app.timezone')),
+                    'location' => $data["location"],
                 ]);
                 $totalLost->save();
             }elseif(strtolower($item->status) === 'Found'){
                 $totalFound = TotalFound::create([
                     'total' => 1,
                     'date_found' => Carbon::parse($item->created_at)->timezone(config('app.timezone')),
+                    'location' => $data["location"],
                 ]);
                 $totalFound->save();
             }

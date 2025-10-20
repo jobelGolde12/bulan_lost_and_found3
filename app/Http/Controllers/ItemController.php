@@ -30,85 +30,90 @@ use Inertia\Inertia;
 
 class ItemController extends Controller
 {
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:5120',
-            'description' => 'required|string|max:255',
-            'category' => 'required|string',
-            'location' => 'required|string|max:255',
-            'user_id' => 'required|integer',
-            'owner_phone_number' => 'nullable|string|max:255|min:11',
-            'status' => 'required|string|in:lost,found', 
-            'date' => 'required|date|before_or_equal:today'
-        ]);
-        $imagePath = $request->hasFile('image') 
-            ? $request->file('image')->store('images', 'public') 
-            : null;
-    
-        $category = CategoryModel::find($request->category);
-        if (!$category) {
-            return redirect()->back()->withErrors(['category' => 'Invalid category selected.'])->withInput();
-        }
+   public function store(Request $request)
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:5120',
+        'description' => 'required|string|max:255',
+        'category' => 'required|string',
+        'location' => 'required|string|max:255',
+        'user_id' => 'required|integer',
+        'owner_phone_number' => 'nullable|string|max:255|min:11',
+        'status' => 'required|string|in:lost,found', 
+        'date' => 'required|date|before_or_equal:today'
+    ]);
 
-        // Check if the item has a profanity words
-        $wordsToCheck = $request->name . ' ' . $request->description;
-        $profanityWords = $this->checkProfanity($wordsToCheck);
-        if (!empty($profanityWords)) {
-    
-    return back()->withErrors([
-        'description' => 'The information you provide contains profanity, please avoid using such words.',
-    ])->withInput();
+    //  Upload image to storage/app/public/images
+    $imagePath = $request->hasFile('image')
+        ? $request->file('image')->storePublicly('images', 'public')
+        : null;
+
+    $category = CategoryModel::find($request->category);
+    if (!$category) {
+        return redirect()->back()
+            ->withErrors(['category' => 'Invalid category selected.'])
+            ->withInput();
+    }
+
+    $wordsToCheck = $request->name . ' ' . $request->description;
+    $profanityWords = $this->checkProfanity($wordsToCheck);
+
+    if (!empty($profanityWords)) {
+        return back()->withErrors([
+            'description' => 'The information you provide contains profanity, please avoid using such words.',
+        ])->withInput();
+    }
+
+    $imageUrl = $imagePath
+        ? url('storage/' . $imagePath)
+        : url('images/noImage.jpg');
+
+    if (Auth::check() && Auth::user()->role == 'admin') {
+        $item = ItemModel::create([
+            'title' => $request->name,
+            'description' => $request->description,
+            'status' => $request->status,
+            'location' => $request->location,
+            'image_url' => $imageUrl,
+            'category' => $category->name ?: "Uncategorized",
+            'user_id' => $request->user_id,
+            'owner_phone_number' => $request->owner_phone_number,
+            'pending_status' => 'pending',
+            'created_at' => Carbon::parse($request->date)->timezone(config('app.timezone')),
+        ]);
+
+        if (strtolower($item->status) === 'lost') {
+            TotalLost::create([
+                'total' => 1,
+                'date_lost' => Carbon::parse($request->date)->timezone(config('app.timezone')),
+                'location' => $request->location ?: 'N/A'
+            ]);
+        } elseif (strtolower($item->status) === 'found') {
+            TotalFound::create([
+                'total' => 1,
+                'date_found' => Carbon::parse($request->date)->timezone(config('app.timezone')),
+                'location' => $request->location ?: 'N/A'
+            ]);
+        }
+    } else {
+        PendingRequest::create([
+            'title' => $request->name,
+            'description' => $request->description,
+            'status' => $request->status,
+            'location' => $request->location,
+            'image_url' => $imageUrl,
+            'category' => $category->name ?: "Uncategorized",
+            'user_id' => $request->user_id,
+            'owner_phone_number' => $request->owner_phone_number,
+            'pending_status' => 'pending',
+            'created_at' => Carbon::parse($request->date)->timezone(config('app.timezone')),
+        ]);
+    }
+
+    return redirect()->back()->with(['message' => 'Item created.']);    
 }
 
-
-        if(Auth::check() && Auth::user()->role == 'admin'){
-            $item = ItemModel::create([
-                'title' => $request->name,
-                'description' => $request->description,
-                'status' => $request->status,
-                'location' => $request->location,
-                'image_url' => $imagePath ? asset('storage/' . $imagePath) : asset('images/noImage.jpg'),
-                'category' => $category->name ?: "Uncategorized",
-                'user_id' => $request->user_id,
-                'owner_phone_number' => $request->owner_phone_number,
-                'pending_status' => 'pending',
-                'created_at' => Carbon::parse($request->date)->timezone(config('app.timezone')),
-            ]);
-
-            if(strtolower($item->status) === 'lost'){
-                $totalLost = TotalLost::create([
-                    'total' => 1,
-                    'date_lost' => Carbon::parse($request->date)->timezone(config('app.timezone')),
-                    'location' => $request->location ?: 'N/A'
-                ]);
-                $totalLost->save();
-            }elseif(strtolower($item->status) === 'Found'){
-                $totalFound = TotalFound::create([
-                    'total' => 1,
-                    'date_found' => Carbon::parse($request->date)->timezone(config('app.timezone')),
-                    'location' => $request->location ?: 'N/A'
-                ]);
-                $totalFound->save();
-            }
-        }else{
-            PendingRequest::create([
-                'title' => $request->name,
-                'description' => $request->description,
-                'status' => $request->status,
-                'location' => $request->location,
-                'image_url' => $imagePath ? asset('storage/' . $imagePath) : asset('images/noImage.jpg'),
-                'category' => $category->name ?: "Uncategorized",
-                'user_id' => $request->user_id,
-                'owner_phone_number' => $request->owner_phone_number,
-                'pending_status' => 'pending',
-                'created_at' => Carbon::parse($request->date)->timezone(config('app.timezone')),
-            ]);
-        }
-    
-        return redirect()->back()->with(['message' => 'Item created.']);    
-    }
 
        public function checkProfanity($words)
 {

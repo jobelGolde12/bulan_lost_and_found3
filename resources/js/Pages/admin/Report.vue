@@ -132,7 +132,7 @@ const submitForm = () => {
 <template>
   <Head title="Report Item" />
   <AdminLayout>
-    <div class="main-container">
+    <div class="main-container mb-5">
       <h1 class="text-3xl font-light text-center mt-6">Report Item</h1>
 
       <div class="container mx-auto px-6 py-8">
@@ -277,8 +277,11 @@ const submitForm = () => {
 <style scoped>
 .main-container {
   width: 100%;
-  height: 100%;
+  min-height: 100vh;
+  height: 100vh;          /* ✅ add this */
   overflow-x: hidden;
+  overflow-y: auto;       /* ✅ auto is smoother, you can keep scroll if you want */
+  margin-bottom: 3rem;
 }
 
 .alert-danger {

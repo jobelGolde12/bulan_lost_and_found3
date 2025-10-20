@@ -134,6 +134,22 @@ onMounted(() => {
             </div>
           </Link>
 
+          <Link
+            :href="route('post.view')"
+            class="setting-card saved-reports"
+          >
+            <div class="setting-icon">
+              <i class="bi bi-pencil-square"></i>
+            </div>
+            <div class="setting-content">
+              <h3 class="setting-title">My Posts</h3>
+              <p class="setting-description">Access your posts</p>
+            </div>
+            <div class="setting-arrow">
+              <i class="bi bi-chevron-right"></i>
+            </div>
+          </Link>
+
           <MyPermission :permission="props.permission" class="setting-card permissions" />
 
           <Link
