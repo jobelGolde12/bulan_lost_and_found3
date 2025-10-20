@@ -10,7 +10,8 @@ class TotalLost extends Model
 
     protected $fillable = [
         'total',
-        'date_lost'
+        'date_lost',
+        'location',
     ];
 
 

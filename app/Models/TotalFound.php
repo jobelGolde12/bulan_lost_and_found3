@@ -10,6 +10,7 @@ class TotalFound extends Model
 
     protected $fillable = [
         'total',
-        'date_found'
+        'date_found',
+        'location',
     ];
 }

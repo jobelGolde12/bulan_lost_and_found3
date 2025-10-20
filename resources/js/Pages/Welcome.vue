@@ -66,22 +66,35 @@ import HeroSection from "@/Components/welcome_page/HeroSection.vue";
                     aria-label="Close"
                 ></button>
             </div>
-            <div class="offcanvas-body">
-                <Link
+            <div class="offcanvas-body d-flex flex-column gap-3">
+                <div>
+                    <Link
                     :href="route('aboutUs')"
                     class="text-dark text-decoration-none"
-                    >AboutUs</Link
+                    >
+                    <i class="bi bi-info-circle me-2"></i>
+                    AboutUs</Link
                 >
-                <Link
+                </div>
+                
+                <div>
+                    <Link
                     :href="route('login')"
                     class="d-block mb-2 text-dark text-decoration-none"
-                    >Login</Link
+                    >
+                    <i class="bi bi-box-arrow-in-right me-2"></i>
+                    Login</Link
                 >
-                <Link
+                </div>
+                <div>
+                    <Link
                     :href="route('register')"
-                    class="d-block mb-2 text-decoration-none bg-dark text-light px-2 py-1 signup-link"
-                    >Signup</Link
+                    class="d-block mb-2 text-dark text-decoration-none"
+                    >
+                    <i class="bi bi-file-person me-2"></i>
+                    Signup</Link
                 >
+                </div>
             </div>
         </div>
         

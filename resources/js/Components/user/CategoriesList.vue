@@ -48,7 +48,7 @@ function chooseCategoryFunc(name, id) {
 
 <template>
   <div class="container-fluid d-flex align-items-center gap-2">
-    <div>Categories:</div>
+    <div class="d-none d-md-block d-lg-block">Categories:</div>
     <div class="category-scroll d-flex gap-2">
       <div
         class="list px-2 py-1 rounded"

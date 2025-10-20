@@ -36,48 +36,30 @@ onMounted(() => {
   isSidebarOpen.value = localStorage.getItem('isSidebarOpen') === 'true';
 });
 </script>
-<template>
-  <div class="main-container bg-light d-flex flex-row justify-content-between align-items-center">
-    <div
-      class="sidebar d-none d-lg-block"
-      :class="{ 'closed': !isSidebarOpen }"
-      :style="{
-        width: isSidebarOpen ? '250px' : '5%',
-        padding: isSidebarOpen ? '20px' : '0'
-      }"
-    >
-      <div class="d-flex flex-row justify-content-between align-items-center">
-        <Link
-          v-if="isSidebarOpen"
-          :href="route('profile')"
-          class="pointer user-name text-dark text-decoration-none d-flex flex-column gap-0"
-        >
-          <span class="mb-0 d-block name">{{ user.name }} </span>
-          <span class="text-success text-lighter text-sm d-block user-text">user</span>
-        </Link>
-        <div
-          class="bi bi-list pointer text-dark fw-bolder fs-3"
-          @click="toggleSidebar"
-          :class="{ 'mt-3': !isSidebarOpen }"
-        ></div>
-      </div>
 
-      <div class="list mt-4">
+<template>
+  <div>
+      <div
+      class="sidebar w-100 px-0  px-0"
+      style="transform: translateY(-5%);"
+    >
+
+       <div class="list mt-4">
         <Link
           :href="route('dashboard')"
           :class="{ active: currentRoute === '/dashboard' }"
         >
-          <div :class="{'icon-container' : !isSidebarOpen}">
+          <div class="icon-wrapper">
             <i class="bi bi-journal-text link"></i>
           </div>
-          <span v-if="isSidebarOpen">Reports</span>
+          <span>Reports</span>
         </Link>
 
         <Link :href="route('reportItem')" :class="{ active: currentRoute === '/report-item' }">
-          <div :class="{ 'icon-container': !isSidebarOpen }">
+          <div class="icon-wrapper">
             <i class="bi bi-pencil-square link"></i>
           </div>
-          <span v-if="isSidebarOpen">Post</span>
+          <span >Post</span>
         </Link>
 
         <hr>
@@ -85,17 +67,17 @@ onMounted(() => {
         
 
         <Link :href="route('settings.index')" :class="{ active: currentRoute === route('settings.index') }">
-          <div :class="{ 'icon-container': !isSidebarOpen }">
+          <div class="icon-wrapper">
             <i class="bi bi-gear link"></i>
           </div>
-          <span v-if="isSidebarOpen">Settings</span>
+          <span>Settings</span>
         </Link>
 
          <Link :href="route('message.index')" :class="{ active: currentRoute === route('settings.index') }">
-          <div :class="{ 'icon-container': !isSidebarOpen }">
+          <div class="icon-wrapper">
             <i class="bi bi-chat-dots link"></i>
           </div>
-          <span v-if="isSidebarOpen">Message</span>
+          <span >Message</span>
         </Link>
 
        
@@ -106,7 +88,7 @@ onMounted(() => {
           :class="{ 'bg-success text-white': currentRoute === '/settings/announcements' }"
         >
           <i class="bi bi-megaphone me-2"></i>
-          <span v-if="isSidebarOpen">Announcements</span>
+          <span >Announcements</span>
 
            <span v-if="hasAnnouncements" class="pending-badge">
               {{ hasAnnouncements }}
@@ -120,51 +102,16 @@ onMounted(() => {
         v-if="props.isHavePending"
         >
           <span class="spinner-grow spinner-grow-sm me-2" role="status" aria-hidden="true"></span>
-          <span v-if="isSidebarOpen">Pending Requests</span>
+          <span >Pending Requests</span>
         </Link>
         
       </div>
     </div>
-    <!-- Page Content -->
-    <main 
-    :style="{ width: isSidebarOpen ? '80%' : '95%' }" 
-    class="right">
-     <div class="container-fluid d-flex justify-content-between align-items-center mt-3 d-block d-lg-none">
-        <div>
-          <i class="bi bi-list fs-1" data-bs-toggle="offcanvas" data-bs-target="#openSidebar" aria-controls="openSidebar"></i>
-        </div>
-
-        <div>
-          <img src="../../images/lost_and_found_logo.png" alt="" class="profile">
-        </div>
-      </div>
-
-      <slot />
-    </main>
-
-    <div class="offcanvas offcanvas-start" tabindex="-1" id="openSidebar" aria-labelledby="openSidebarLabel">
-  <div class="offcanvas-header">
-        <Link
-          :href="route('profile')"
-          class="pointer user-name text-dark text-decoration-none d-flex flex-column gap-0"
-        >
-          <span class="mb-0 d-block name">{{ user.name }}</span>
-          <span class="text-success text-lighter text-sm d-block admin-text">user</span>
-        </Link>
-
-    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-  </div>
-  <div class="offcanvas-body">
-    <div>
-      <LayoutRoutes />
-    </div>
-  </div>
-</div>
-
   </div>
 </template>
 
-<style scoped>
-@import '../../css/global.css';
 
+
+<style>
+@import '../../../css/user/layout.css';
 </style>

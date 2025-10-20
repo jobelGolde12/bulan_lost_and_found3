@@ -43,7 +43,6 @@ class ItemController extends Controller
             'status' => 'required|string|in:lost,found', 
             'date' => 'required|date|before_or_equal:today'
         ]);
-    
         $imagePath = $request->hasFile('image') 
             ? $request->file('image')->store('images', 'public') 
             : null;
@@ -82,14 +81,14 @@ class ItemController extends Controller
                 $totalLost = TotalLost::create([
                     'total' => 1,
                     'date_lost' => Carbon::parse($request->date)->timezone(config('app.timezone')),
-                    'location' => $request->location
+                    'location' => $request->location ?: 'N/A'
                 ]);
                 $totalLost->save();
             }elseif(strtolower($item->status) === 'Found'){
                 $totalFound = TotalFound::create([
                     'total' => 1,
                     'date_found' => Carbon::parse($request->date)->timezone(config('app.timezone')),
-                    'location' => $request->location
+                    'location' => $request->location ?: 'N/A'
                 ]);
                 $totalFound->save();
             }

@@ -22,6 +22,7 @@ class ItemModel extends Model
         'image_url',
         'category_id',
         'owner_phone_number', 
+        'location',
     ];
 
     public function user(){
