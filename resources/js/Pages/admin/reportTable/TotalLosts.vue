@@ -8,6 +8,7 @@ const props = defineProps({
     default: () => [],
   },
 });
+console.log("lost: ", JSON.stringify(props.totalLosts))
 
 const formatDate = (dateString) => {
   if (!dateString) return 'N/A';

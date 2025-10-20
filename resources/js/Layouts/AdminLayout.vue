@@ -44,7 +44,10 @@ onMounted(() => {
     <div
       class="sidebar d-none d-lg-block"
       :class="{ closed: !isSidebarOpen, open: isSidebarOpen }"
-      
+      :style="{
+        minWidth: isSidebarOpen ? '250px' : '5%',
+        padding: isSidebarOpen ? '20px' : '0'
+      }"
     >
       <div class="d-flex flex-row justify-content-between align-items-center">
         <Link
@@ -58,7 +61,7 @@ onMounted(() => {
         <div
           class="bi bi-list pointer text-dark fw-bolder fs-3"
           @click="toggleSidebar"
-          :class="{ 'mt-3': !isSidebarOpen }"
+          :class="{ 'mt-3 mx-auto': !isSidebarOpen }"
         ></div>
       </div>
 
@@ -149,7 +152,9 @@ onMounted(() => {
     </div>
 
     <!-- Main Content -->
-    <main class="right" :class="{ 'sidebar-open': isSidebarOpen }">
+    <main class="right"
+    :style="{ width: isSidebarOpen ? '80%' : '95%' }" 
+    :class="{ 'sidebar-open': isSidebarOpen }">
       <div class="container-fluid d-flex justify-content-between align-items-center mt-3 d-block d-lg-none">
         <div>
           <i class="bi bi-list fs-1" data-bs-toggle="offcanvas" data-bs-target="#openSidebar" aria-controls="openSidebar"></i>

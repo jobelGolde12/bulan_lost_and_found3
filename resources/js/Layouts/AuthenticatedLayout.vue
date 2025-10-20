@@ -58,7 +58,7 @@ onMounted(() => {
         <div
           class="bi bi-list pointer text-dark fw-bolder fs-3"
           @click="toggleSidebar"
-          :class="{ 'mt-3': !isSidebarOpen }"
+          :class="{ 'mt-3 mx-auto': !isSidebarOpen }"
         ></div>
       </div>
 

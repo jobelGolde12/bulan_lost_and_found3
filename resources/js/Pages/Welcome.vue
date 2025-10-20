@@ -36,7 +36,7 @@ import HeroSection from "@/Components/welcome_page/HeroSection.vue";
                 >
                 <Link
                     :href="route('register')"
-                    class="text-decoration-none bg-dark text-light px-2 py-1 signup-link"
+                    class="text-decoration-none bg-dark text-light px-2 py-1 rounded"
                     >Signup</Link
                 >
             </div>

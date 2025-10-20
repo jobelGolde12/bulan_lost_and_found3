@@ -7,6 +7,7 @@ use App\Models\ItemModel;
 use App\Models\LocationModel;
 use App\Models\MessageModel;
 use App\Models\TargetResolvedCases;
+use App\Models\TotalLost;
 use App\Models\User;
 use App\Models\UserInfo;
 use App\Models\ViewLaterModel;
@@ -110,5 +111,25 @@ class AdminDashboard extends Controller
     public function getTargetResolveCases(){
         $currentTarget = TargetResolvedCases::select(['id','target_value'])->first();
         return response()->json($currentTarget->target_value);
+    }
+
+    public function getItems(Request $request)
+    {
+        $status = $request->query('status');
+        $query = ItemModel::query();
+
+        if ($status) {
+        if ($status === 'Unsolved') {
+            $query->whereDate('created_at', '<=', now()->subYear());
+        } elseif ($status === 'Resolved') {
+            $query->where('status', 'Claimed');
+        } else {
+            $query->where('status', $status);
+        }
+    }
+
+        $items = $query->orderBy('created_at', 'desc')->paginate(15);
+
+        return response()->json($items);
     }
 }

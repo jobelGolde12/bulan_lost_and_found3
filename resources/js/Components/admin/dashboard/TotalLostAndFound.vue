@@ -39,14 +39,13 @@ function initChart() {
         name: "Reports",
         type: "pie",
         radius: "50%",
-        // ✅ Move the circle lower using center (x, y)
         center: ["50%", "58%"], // default is ["50%", "50%"]
         data: [
           { value: props.totalLostItems, name: "Lost Cases" },
           { value: props.totalFoundItems, name: "Found Cases" },
-          { value: claimedCount, name: "Claimed Cases" },
+          { value: claimedCount, name: "Resolved Cases" },
         ],
-        color: ["#768fb8", "#4C9AFF", "#2ecc71"],
+        color: ["#FF6B6B", "#2ecc71", "#007BFF"],
         emphasis: {
           itemStyle: {
             shadowBlur: 10,
@@ -98,7 +97,7 @@ onBeforeUnmount(() => {
           <p class="text-center">{{ props.totalFoundItems }}</p>
         </div>
         <div>
-          <h5 class="claimed">Claimed Cases</h5>
+          <h5 class="claimed">Resolved Cases</h5>
           <p class="text-center">{{ props.totalClaimedItems.length }}</p>
         </div>
       </div>

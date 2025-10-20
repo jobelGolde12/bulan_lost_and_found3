@@ -133,7 +133,8 @@ Route::delete('delete-item/{id}', [ItemController::class, 'deleteItem'])->name('
 Route::get('/items', [AdminDashboard::class, 'item'])->name('items');
 Route::get('/items/location/filtered/{id}', [AdminDashboard::class, 'filterByLocation'])->name('filterByLocation');
 Route::get('/admin-dashboard', [AdminDashboard::class, 'index'])->name('adminDashboard');
-
+Route::get('/admin/items/paginate', [AdminDashboard::class, 'getItems'])
+    ->name('admin.items');
 
 Route::get('/total-lost-item', [TotalLostItem::class, 'index'])->name('totalLostItemIndex');
 Route::get('/view-lost-item/{id}', [TotalLostItem::class, 'view'])->name('viewLostItem'); //view the specific lost item
