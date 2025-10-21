@@ -49,7 +49,7 @@ watch(
               {{ user.name.charAt(0).toUpperCase() }}
             </div>
           </div>
-          <div class="admin-indicator d-none d-lg-block">
+          <div class="admin-indicator d-none d-lg-flex">
             <i class="bi bi-shield-check "></i>
           </div>
         </div>
@@ -71,12 +71,12 @@ watch(
         <h2 class="section-title">Contact Information</h2>
         <div class="contact-list">
           <div class="contact-item">
-            <div class="contact-icon admin">
+            <div class="contact-icon admin ">
               <i class="bi bi-envelope"></i>
             </div>
             <div class="contact-details">
-              <span class="contact-label">Email Address</span>
-              <span class="contact-value">{{ user.email ?? "N/A" }}</span>
+              <span class="contact-label ">Email Address</span>
+              <span class="contact-value modify">{{ user.email ?? "N/A" }}</span>
             </div>
           </div>
           <div class="contact-item">
@@ -85,7 +85,7 @@ watch(
             </div>
             <div class="contact-details">
               <span class="contact-label">Phone Number</span>
-              <span class="contact-value">{{ getUserInfo?.contact ?? "No phone provided" }}</span>
+              <span class="contact-value modify">{{ getUserInfo?.contact ?? "No phone provided" }}</span>
             </div>
           </div>
         </div>
@@ -365,6 +365,8 @@ watch(
   transition: all 0.3s ease;
   background: #f8fafc;
   border: 1px solid #edf2f7;
+  width: auto;
+  overflow: hidden;
 }
 
 .contact-item:hover {
@@ -377,8 +379,8 @@ watch(
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 50px;
-  height: 50px;
+    width: 56px;
+  height: 56px;
   border-radius: 12px;
   background: linear-gradient(135deg, #2d3748, #4a5568);
   color: white;
@@ -585,6 +587,7 @@ watch(
   .admin-actions-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+
 }
 
 @media (max-width: 480px) {

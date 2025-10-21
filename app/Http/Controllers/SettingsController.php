@@ -22,9 +22,11 @@ class SettingsController extends Controller
     public function index()
     {
         if(Auth::check() && Auth::user()->role === 'admin'){
-           $trashedItems = ItemModel::where('user_id', Auth::id())->onlyTrashed()->get();  
-            return Inertia::render('Settings/admin/ItemTrash', [
-                'items' => $trashedItems,
+            $notifications = NotificationModel::where('user_id', Auth::id())->get();
+             $hasUnread = NotificationModel::where('user_id', Auth::id())->where('read_status', 0)->exists();   
+            return Inertia::render('Settings/admin/Main', [
+                'notifications' => $notifications,
+                 'hasUnread' => $hasUnread,
             ]);
         }else{
             $notifications = NotificationModel::where('user_id', Auth::id())->get();
@@ -34,6 +36,12 @@ class SettingsController extends Controller
             'hasUnread' => $hasUnread,
             ]);
         }
+    }
+    public function trash(){
+                $trashedItems = ItemModel::where('user_id', Auth::id())->onlyTrashed()->get();  
+            return Inertia::render('Settings/admin/ItemTrash', [
+                'items' => $trashedItems,
+            ]);
     }
 
     // sa user pakadto padin ang route sa notification 

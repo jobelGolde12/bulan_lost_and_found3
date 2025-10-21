@@ -343,7 +343,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
+  min-width: 48px;
   height: 48px;
   border-radius: 12px;
   background: linear-gradient(135deg, #667eea, #764ba2);
@@ -505,8 +505,13 @@ onMounted(() => {
   .settings-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+ 
 }
-
+@media screen and (max-width: 768px){
+    :deep(.contact-item .contact-icon) {
+    display: none !important;
+  }
+}
 @media (max-width: 480px) {
   .profile-container {
     padding: 1rem;

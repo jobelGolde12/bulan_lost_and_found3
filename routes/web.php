@@ -73,6 +73,7 @@ Route::get('get-owner-profile/{id}', [ItemController::class, 'getOwnerProfile'])
 //Para sa route na related lang sa settings (diri sa trash)
 Route::prefix('settings')->name('settings.')->group(function () {
     Route::get('/view-settings', [SettingsController::class, 'index'])->name('index');
+    Route::get('/trash', [SettingsController::class, 'trash'])->name('trash');
     Route::get('/notifications', [SettingsController::class, 'notifications'])->name('notifications');
     Route::get('/announcements', [SettingsController::class, 'announcements'])->name('announcements');
     Route::get('/add-announcement-page', [SettingsController::class , 'addAnnouncementPage'])->name('addAnnouncementPage');

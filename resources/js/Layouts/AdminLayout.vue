@@ -115,7 +115,7 @@ onMounted(() => {
 
         <hr />
 
-        <Link :href="route('trash.index')" :class="{ active: currentRoute === '/trash-trash-item' }">
+        <Link :href="route('settings.index')" :class="{ active: currentRoute === '/trash-trash-item' }">
           <div :class="{ 'icon-container': !isSidebarOpen }">
             <i class="bi bi-gear link"></i>
           </div>

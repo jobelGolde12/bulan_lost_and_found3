@@ -42,7 +42,7 @@ function toggle(index) {
           <img src="../../images/lost_and_found_logo.png" class="rounded-circle me-2 logo" alt="Logo">
           <Link :href="route('dashboard')" class="logo-text text-decoration-none text-dark">Lost & Found</Link>
         </div>
-        <Link :href="route('settings.notifications')" class="back-link text-decoration-none text-dark">Back <i class="bi bi-caret-right-fill back-link-i"></i></Link>
+        <Link :href="route('settings.index')" class="back-link text-decoration-none text-dark">Back <i class="bi bi-caret-right-fill back-link-i"></i></Link>
       </div>
     </nav>
 

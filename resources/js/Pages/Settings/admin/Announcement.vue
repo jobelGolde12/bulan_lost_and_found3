@@ -60,8 +60,7 @@ const toggleFilter = () => {
 
 watch(
   () => props.ann,
-  (newVal) => {
-    // Store original data and apply current filters/sorting
+  () => {
     applyFiltersAndSorting();
   },
   { immediate: true }
@@ -85,32 +84,24 @@ const deleteAnnouncement = () => {
   <Head title="Announcements" />
 
   <AdminLayout>
-    <div class="main-container">
+    <div class="main-container bg-light container-fluid py-4">
       <!-- Header -->
-      <div class="container-fluid d-flex flex-row justify-content-between align-items-center mb-4 mt-3">
-        <div>
-          <h1 class="text-dark fw-light">Announcements</h1>
-        </div>
-        <div class="d-flex align-items-center gap-3">
-          <!-- Filter and Sort Controls -->
-          <div class="d-flex align-items-center gap-3 me-3">
-            <!-- Filter Button -->
+      <div class="header-container d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <h1 class="text-dark fw-light mb-3 mb-md-0">Announcements</h1>
 
-            <!-- Sort Button -->
-            <div
-              class="text-dark fs-5 pointer d-flex align-items-center"
-              @click="toggleSortOrder"
-              title="Sort announcements"
-            >
-              <i class="bi bi-sort-down me-1"></i>
-              <span style="font-size: 0.9rem;">
-                {{ sortOrder === "latest" ? "Latest → Oldest" : "Oldest → Latest" }}
-              </span>
-            </div>
+        <div class="d-flex flex-wrap align-items-center gap-3">
+          <!-- Sort Button -->
+          <div
+            class="sort-btn text-dark fs-6 pointer d-flex align-items-center"
+            @click="toggleSortOrder"
+            title="Sort announcements"
+          >
+            <i class="bi bi-sort-down me-2"></i>
+            <span>{{ sortOrder === "latest" ? "Latest → Oldest" : "Oldest → Latest" }}</span>
           </div>
 
           <!-- New Announcement Button -->
-          <Link :href="route('settings.addAnnouncementPage')" class="btn btn-success me-4">
+          <Link :href="route('settings.addAnnouncementPage')" class="btn btn-success d-flex align-items-center">
             <i class="bi bi-plus-lg me-2"></i>
             New
           </Link>
@@ -118,20 +109,17 @@ const deleteAnnouncement = () => {
       </div>
 
       <!-- Announcements Grid -->
-      <div class="row announcement-grid" v-if="announcements.length">
+      <div class="row d-flex flex-row mx-auto announcement-grid g-3" v-if="announcements.length">
         <div
           v-for="announcement in announcements"
           :key="announcement.id"
-          class="col-md-6 col-lg-4 mb-4"
+          class="col-12 col-6 "
         >
-          <AnnouncementCard 
+          <AnnouncementCard
             :announcement="announcement"
-            :key="announcement.id"
             v-model:selected="selectedAnnouncementId"
           />
         </div>
-        <!-- Extra space at the bottom -->
-        <div class="bottom-container container"></div>
       </div>
 
       <!-- No Announcements Message -->
@@ -167,30 +155,17 @@ const deleteAnnouncement = () => {
           Are you sure you want to delete the announcement?
         </div>
         <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            data-bs-dismiss="modal"
-            id="liveToastBtn"
-          >
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
             No
           </button>
-          <button type="button" class="btn btn-danger" @click="deleteAnnouncement" data-bs-dismiss="modal" id="liveToastBtn">
+          <button
+            type="button"
+            class="btn btn-danger"
+            @click="deleteAnnouncement"
+            data-bs-dismiss="modal"
+          >
             Yes
           </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Toast for delete message -->
-    <div class="toast-container position-fixed bottom-0 end-0 p-3">
-      <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="toast-header">
-          <strong class="me-auto">Notification</strong>
-          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-        <div class="toast-body">
-          {{ toastMessage }}
         </div>
       </div>
     </div>
@@ -202,54 +177,96 @@ body {
   background-color: #f8f9fa;
 }
 
-.card {
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.profile-container {
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
-  overflow: hidden;
-}
-
-.profile-container img {
-  position: relative;
-  width: 90%;
-  height: 90%;
-  border-radius: inherit;
-}
-
-.date {
-  font-size: 0.8rem;
-}
-
-.bi-trash {
-  font-size: 1.2rem;
-  cursor: pointer;
-}
-
-.btn-link {
-  text-decoration: none;
-}
-
-.announcement-grid {
-  height: 600px;
+.main-container {
   overflow-y: scroll;
-  padding-right: 15px;
+  overflow-x: none;
+  height: 100vh;
+  width: 100%;
+}
+.main-container::-webkit-scrollbar {
+  /* width: 6px; */
+  display: block;
+}
+/* Header */
+.header-container {
+  border-bottom: 1px solid #eaeaea;
+  padding-bottom: 1rem;
 }
 
-.bottom-container {
-  width: 100%;
-  height: 20%;
+.sort-btn {
+  transition: color 0.2s;
+}
+
+.sort-btn:hover {
+  color: #007bff;
 }
 
 .pointer {
   cursor: pointer;
 }
 
-/* Style for active filter/sort buttons */
-.text-dark:hover {
-  color: #007bff !important;
+/* Announcement Grid */
+.announcement-grid {
+  width: 60%;
+  height: 100vh;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e0 #f1f1f1;
+}
+
+.announcement-grid::-webkit-scrollbar {
+  /* width: 6px; */
+  display: none;
+}
+
+.announcement-grid::-webkit-scrollbar-thumb {
+  background-color: #cbd5e0;
+  border-radius: 3px;
+}
+
+.announcement-grid::-webkit-scrollbar-track {
+  background-color: #f1f1f1;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+  .main-container {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .header-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .announcement-grid {
+    max-height: none;
+    overflow-y: visible;
+  }
+
+  .sort-btn span {
+    font-size: 0.85rem;
+  }
+
+  .btn.btn-success {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-container {
+    padding: 1rem;
+  }
+
+  .sort-btn {
+    font-size: 0.9rem;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
 }
 </style>

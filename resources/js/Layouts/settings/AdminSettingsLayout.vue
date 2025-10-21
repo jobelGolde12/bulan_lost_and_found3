@@ -70,7 +70,7 @@ onMounted(() => {
         </Link>
 
         <Link
-          :href="route('settings.index')"
+          :href="route('settings.trash')"
           class="nav-item"
           :class="{ 
             'nav-item--active': isActiveRoute('settings.index'),
