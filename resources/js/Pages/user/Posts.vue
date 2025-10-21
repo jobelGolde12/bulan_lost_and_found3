@@ -1,7 +1,7 @@
 <script setup>
 import UserSettingsLayout from '@/Layouts/UserSettingsLayout.vue'
-import ItemCard from '@/Components/ItemCard.vue'
 import { Link } from '@inertiajs/vue3';
+import PostsCard from '@/Components/user/PostsCard.vue';
 
 const props = defineProps({
   items: {
@@ -19,7 +19,7 @@ const props = defineProps({
         <div class="flex items-center justify-between align-items-center mb-8">
           <h1 class="text-3xl font-semibold text-gray-800 flex items-center gap-3">
             <i class="bi bi-box-seam text-indigo-500 text-4xl"></i>
-            <span>Your Posts</span>
+            <span class="post-text">Your Posts</span>
           </h1>
 
          <div>
@@ -28,7 +28,7 @@ const props = defineProps({
             class="add-post flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-xl hover:bg-indigo-700 transition-all duration-300 shadow-md hover:shadow-lg text-decoration-none"
           >
             <i class="bi bi-plus-lg text-lg"></i>
-            Add Post
+            <span class="d-none d-lg-block">Add Post</span>
     </Link>
          </div>
         </div>
@@ -40,7 +40,7 @@ const props = defineProps({
         >
           <!-- Pass items to ItemCard -->
           <div >
-            <ItemCard :items="props.items" />
+            <PostsCard :items="props.items" />
           </div>
 
         </div>
@@ -64,5 +64,16 @@ const props = defineProps({
 .add-post{
     position: relative;
     transform: translateY(-40%);
+}
+.post-text{
+  font-size: 2rem;
+}
+@media screen and (max-width: 756px){
+  .post-text{
+    font-size: 1rem;
+  }
+  .add-post{
+    transform: translateY(-20%);
+  }
 }
 </style>

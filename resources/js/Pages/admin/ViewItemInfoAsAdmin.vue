@@ -156,8 +156,8 @@ const getProfileImage = (profilePic) => {
   <Head title="View Item Info" />
   <AdminLayout>
     <div class="main-container">
-      <div class="container">
-        <div class="bg-white rounded-lg shadow-md w-full max-w-3xl p-6">
+      <div class="container ">
+        <div class="post-container rounded-lg">
           <div v-if="Object.keys(data).length > 0">
             <ViewItemInfoForAdminHeader
               :id="props?.created_by?.id || null"

@@ -160,7 +160,7 @@ onMounted(() => {
             <div class="setting-icon">
               <i class="bi bi-box-arrow-right"></i>
             </div>
-            <div class="setting-content">
+            <div class="setting-content text-start">
               <h3 class="setting-title">Logout</h3>
               <p class="setting-description">Sign out of your account</p>
             </div>

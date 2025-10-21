@@ -84,7 +84,7 @@ onBeforeUnmount(() => {
     <div ref="chartRef" class="chart-box"></div>
 
     <!-- Summary -->
-    <div class="summary">
+    <div class="summary d-none d-lg-block">
       <div class="summary-title">Number of Cases Recorded in the System</div>
 
       <div class="summary-stats">
@@ -113,6 +113,7 @@ onBeforeUnmount(() => {
   gap: 1rem;
   width: 100%;
   margin-right: 3rem;
+  top: 0;
 }
 
 .chart-box {
@@ -147,12 +148,17 @@ onBeforeUnmount(() => {
 .summary .claimed {
   color: #2ecc71;
 }
-
+@media screen and (max-width: 990px){
+  .chart-wrapper{
+    transform: translateY(-20%);
+  }
+}
 @media (max-width: 893px) {
   .chart-wrapper {
     flex-direction: row;
     align-items: center;
     justify-content: flex-start;
+    transform: translateY(0%);
   }
 
   .summary {
@@ -192,11 +198,16 @@ onBeforeUnmount(() => {
 @media screen and (max-width: 619px) {
   .chart-wrapper {
     margin-bottom: 5rem;
+    transform: translateY(0%);
   }
 }
-@media screen and (max-width: 500px) {
+@media screen and (max-width: 576px) {
   .summary-title {
     font-size: 0.8rem;
+  }
+  .chart-wrapper{
+    margin-top: 2rem;
+    transform: translateY(0%);
   }
 }
 </style>

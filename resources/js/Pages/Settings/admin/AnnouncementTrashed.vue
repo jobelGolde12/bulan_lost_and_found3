@@ -27,7 +27,7 @@ watch(
     <Head title="View Announcement Trashed" />
     <AdminSettingsLayout>
         <TrashLayout>
-        <div class="main-container p-4">
+        <div class="announcement-trash-container p-4">
             <div v-if="getTrashed.length > 0">
                     <AnnouncementTrashedTable :data="getTrashed"/>
             </div>
@@ -41,7 +41,7 @@ watch(
 </template>
 
 <style scoped>
-.main-container {
+.announcement-trash-container {
     width: 100%;
 }
 </style>

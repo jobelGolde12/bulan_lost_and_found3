@@ -45,6 +45,7 @@ const submit = () => {
 * {
   font-family: "Poppins", sans-serif;
 }
+
 .main-container {
   position: absolute;
   width: 100vw;
@@ -56,6 +57,7 @@ const submit = () => {
   align-items: center;
   padding: 20px;
 }
+
 .form {
   width: 90%;
   max-width: 500px;
@@ -63,9 +65,11 @@ const submit = () => {
   padding: 20px;
   border-radius: 10px;
 }
+
 .password-wrapper {
   position: relative;
 }
+
 .eye-icon {
   position: absolute;
   top: 70%;
@@ -73,6 +77,7 @@ const submit = () => {
   transform: translateY(-50%);
   cursor: pointer;
 }
+
 .status {
   position: absolute;
   top: 20px;
@@ -85,14 +90,45 @@ const submit = () => {
   border: 1px solid #38a169;
   background-color: #f0fff4;
 }
-@media (min-width: 768px) {
+.forgot-pass, .ask{
+  font-size: 1rem;
+}
+@media (max-width: 1024px) {
   .main-container {
     flex-direction: row;
+    justify-content: center;
+    align-items: center;
   }
+
   .form {
-    width: 45%;
+    width: 60%;
+    max-width: none;
   }
 }
+
+@media (max-width: 768px) {
+  .main-container {
+    flex-direction: column;
+  }
+
+  .form {
+    width: 70%;
+    max-width: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .form {
+    width: 90%;
+    max-width: none;
+    padding: 0;
+  }
+  .forgot-pass, .ask{
+  font-size: .8rem;
+}
+}
+
+
 </style>
 
 <template>
@@ -150,7 +186,7 @@ const submit = () => {
         <Link
           v-if="canResetPassword"
           :href="route('password.request')"
-          class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          class="rounded-md forgot-pass text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
         >
           Forgot your password?
         </Link>
@@ -164,7 +200,7 @@ const submit = () => {
           Log in
         </PrimaryButton>
 
-        <p class="text-dark fw-light mt-3 text-center">
+        <p class="text-dark fw-light mt-3 text-center ask">
           Didn't have an account? |
           <Link :href="route('register')"> Signup </Link>
         </p>

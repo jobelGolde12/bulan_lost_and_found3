@@ -84,13 +84,25 @@
   min-height: 700px !important;
 
 }
+.post-container{
+  padding: 1.5rem;
+  box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075) !important;
+}
 @media screen and (max-width: 768px){
   .image-item{
-    max-width: 350px;
+    max-width: 100%;
     height: 300px;
     margin: 0;
   }
   .header, .mark-as-resolve-container , .comment-main-container{
     max-width: 350px;
+  }
+  .post-container{
+    width: 90%;
+    margin: auto;
+    /* width: 75%; */
+    margin-top: 1rem;
+    padding: 0;
+    box-shadow: none !important;
   }
 }

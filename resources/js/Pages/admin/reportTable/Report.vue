@@ -1,9 +1,8 @@
 <script setup>
-import { ref, onMounted, watch, computed } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
 import { router } from '@inertiajs/vue3';
 
-// Reactive data
 const items = ref([]);
 const currentPage = ref(1);
 const hasMore = ref(true);
@@ -12,7 +11,6 @@ const observer = ref(null);
 const selectedFilter = ref('');
 const searchQuery = ref('');
 
-// Fetch data with pagination
 const fetchItems = async (page = 1, reset = false) => {
   if (isLoading.value) return;
   isLoading.value = true;
@@ -26,12 +24,8 @@ const fetchItems = async (page = 1, reset = false) => {
     });
 
     const fetched = response.data.data || [];
-
-    if (reset) {
-      items.value = fetched;
-    } else {
-      items.value.push(...fetched);
-    }
+    if (reset) items.value = fetched;
+    else items.value.push(...fetched);
 
     hasMore.value = !!response.data.next_page_url;
     currentPage.value = response.data.current_page;
@@ -42,7 +36,6 @@ const fetchItems = async (page = 1, reset = false) => {
   }
 };
 
-// Infinite scroll observer
 const setupObserver = () => {
   const target = document.querySelector('#scroll-trigger');
   if (!target) return;
@@ -59,7 +52,6 @@ const setupObserver = () => {
   observer.value.observe(target);
 };
 
-// Utils
 const formatDate = (dateString) => {
   if (!dateString) return 'N/A';
   const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -79,23 +71,15 @@ const getDuration = (dateString) => {
   const diffMonths = Math.floor(diffDays / 30);
   if (diffMonths < 12) return `${diffMonths} month${diffMonths > 1 ? 's' : ''} ago`;
   const diffYears = Math.floor(diffDays / 365);
-
-  // Mark unsolved if >= 1 year
   if (diffYears >= 1) return `Unsolved (${diffYears} year${diffYears > 1 ? 's' : ''} ago)`;
   return `${diffYears} year${diffYears > 1 ? 's' : ''} ago`;
 };
 
-// Filter change
 const changeFilter = async (status) => {
-    // console.log("status: ", status)
-    // if(status == 'Resolved'){
-    //     selectedFilter.value = 'Claimed';
-    // }
   selectedFilter.value = status;
   await fetchItems(1, true);
 };
 
-// Search
 const filteredReports = computed(() => {
   const query = searchQuery.value.toLowerCase();
   return items.value.filter((item) => {
@@ -106,12 +90,10 @@ const filteredReports = computed(() => {
   });
 });
 
-// Navigate to item view
 const navigateTo = (id) => {
   router.visit(route('viewItemInfoAsAdmin', { item: id }));
 };
 
-// Lifecycle
 onMounted(async () => {
   await fetchItems();
   setupObserver();
@@ -120,26 +102,43 @@ onMounted(async () => {
 
 <template>
   <div class="container-fluid mt-5 px-0">
-    <div class="card border-0">
+    <div class="card border-0 shadow-sm">
       <div class="card-body">
-        <div class="header-container d-flex mb-3 container-fluid justify-content-between align-items-center">
-          <h5 class="card-title">Reports</h5>
+        <!-- Header -->
+        <div class="header-container d-flex flex-wrap justify-content-between align-items-center mb-3">
+          <h5 class="card-title mb-2 mb-md-0">Reports</h5>
 
           <!-- Filter Buttons -->
-          <div class="d-flex gap-2">
+          <div class="filter-buttons d-flex flex-wrap justify-content-center gap-2">
             <button
               v-for="status in ['Lost', 'Found', 'Resolved', 'Unsolved']"
               :key="status"
-              class="btn"
+              class="btn filter-btn d-flex align-items-center gap-1"
               :class="selectedFilter === status ? 'btn-primary' : 'btn-outline-secondary'"
               @click="changeFilter(status)"
             >
-              {{ status }}
+              <i
+                v-if="status === 'Lost'"
+                class="bi bi-exclamation-triangle-fill"
+              ></i>
+              <i
+                v-else-if="status === 'Found'"
+                class="bi bi-check-circle-fill"
+              ></i>
+              <i
+                v-else-if="status === 'Resolved'"
+                class="bi bi-flag-fill"
+              ></i>
+              <i
+                v-else-if="status === 'Unsolved'"
+                class="bi bi-question-circle-fill"
+              ></i>
+              <span class="filter-text">{{ status }}</span>
             </button>
           </div>
 
           <!-- Search -->
-          <div class="search-container">
+          <div class="search-container mt-2 mt-md-0">
             <input
               v-model="searchQuery"
               type="text"
@@ -151,7 +150,7 @@ onMounted(async () => {
 
         <!-- Table -->
         <div class="table-container">
-          <table class="table">
+          <table class="table table-hover">
             <thead>
               <tr>
                 <th>Name</th>
@@ -191,14 +190,10 @@ onMounted(async () => {
             </tbody>
           </table>
 
-          <!-- Loading Indicator -->
           <div v-if="isLoading" class="text-center py-3 text-muted">Loading...</div>
-
-          <!-- Infinite scroll trigger -->
           <div id="scroll-trigger" class="py-3"></div>
         </div>
 
-        <!-- Summary -->
         <div class="mt-3 text-muted small">
           Showing {{ filteredReports.length }} items in record.
         </div>
@@ -212,12 +207,13 @@ onMounted(async () => {
   max-height: 60vh;
   overflow-y: auto;
 }
+
 .table {
   width: 100%;
   border-collapse: collapse;
   background-color: #fff;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+
 .table thead th {
   background-color: #f8f9fa;
   color: #333;
@@ -227,24 +223,127 @@ onMounted(async () => {
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
+
 .clickable-row {
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.3s ease;
   border-bottom: 1px solid #ddd;
 }
+
 .clickable-row:hover {
   background-color: #f0f0f0 !important;
   transform: translateY(-2px);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
+/* Filter Buttons */
+.filter-buttons .btn {
+  border-radius: 20px;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.filter-buttons .btn i {
+  font-size: 1rem;
+}
+
+.filter-buttons .btn:hover {
+  transform: translateY(-2px);
+}
+
+/* Search box */
 .search {
   width: 20vw;
+  min-width: 200px;
 }
+
 .header-container {
-  flex-wrap: wrap;
   gap: 10px;
 }
-.btn {
-  border-radius: 20px;
+
+/* 🌐 RESPONSIVE DESIGN */
+
+/* Medium devices (≤992px) */
+@media (max-width: 992px) {
+  .header-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-container {
+    width: 100%;
+  }
+
+  .search {
+    width: 100%;
+  }
+
+  .filter-buttons {
+    justify-content: space-between;
+    width: 100%;
+  }
+}
+
+/* Small devices (≤768px) */
+@media (max-width: 768px) {
+  .filter-buttons {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* Hide text, show icons only */
+  .filter-text {
+    display: none;
+  }
+
+  .filter-buttons .btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    justify-content: center;
+  }
+
+  .filter-buttons .btn i {
+    font-size: 1.4rem;
+  }
+
+  .search {
+    width: 100%;
+  }
+}
+
+/* Extra small (≤480px) */
+@media (max-width: 480px) {
+  .filter-buttons .btn {
+    width: 45px;
+    height: 45px;
+  }
+
+  .filter-buttons {
+    gap: 6px;
+  }
+
+  .table-container {
+    max-height: none;
+    overflow-x: auto;
+  }
+
+  .table thead {
+    display: none;
+  }
+
+  .table tr {
+    display: block;
+    margin-bottom: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 0.5rem;
+  }
+
+  .table td {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem;
+  }
 }
 </style>

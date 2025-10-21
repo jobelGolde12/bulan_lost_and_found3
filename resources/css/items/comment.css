@@ -32,7 +32,7 @@
   flex: 1;
   display: flex;
   gap: 0.75rem;
-  align-items: flex-start;
+  align-items: center;
 }
 
 .comment-form__input {
@@ -260,6 +260,9 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  .comment-form{
+    width: 100%;
+  }
   .comment-form__header {
     gap: 0.75rem;
   }
@@ -269,9 +272,14 @@
     height: 40px;
   }
   
-  .comment-form__input-group {
-    flex-direction: column;
-    gap: 0.75rem;
+  .comment-form__input-group{
+    align-items: center;
+  }
+  .comment-form__input-group .comment-form__submit{
+    transform: translateY(-20%);
+  }
+  .comment-form__input-group .comment-form__input{
+    max-width: 40% !important;
   }
   
   .comment-form__submit {
@@ -311,7 +319,8 @@
   
   .comment-form__avatar-img {
     width: 36px;
-    height: 36px;
+    min-height: 45px;
+
   }
   
   .comment-card {
@@ -330,9 +339,4 @@
   .comments-empty__subtext {
     font-size: 0.875rem;
   }
-}
-
-/* Utility for click outside directive */
-.v-click-outside {
-  /* This would be handled by your click-outside directive */
 }

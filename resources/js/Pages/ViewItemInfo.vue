@@ -137,7 +137,7 @@ const getProfileImage = (profilePic) => {
   <AuthenticatedLayout>
       <div class="main-container">
         <div class="container">
-    <div class="bg-white rounded-lg shadow-md w-full max-w-3xl p-6">
+    <div class="post-container  rounded-lg shadow-md w-full max-w-3xl p-6">
       <div v-if="Object.keys(data).length > 0">
          
         <ViewItemInfoHeader

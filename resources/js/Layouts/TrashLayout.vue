@@ -12,10 +12,10 @@ const changeRouteName = (text) => {
 };
 </script>
 <template>
-    <div class="main-container">
+    <div class="trash-container">
         
 
-        <div class="container-fluid d-flex flex-row align-items-center gap-2">
+        <div class=" d-flex flex-row align-items-center gap-2">
             <Link
                 :href="route('trash.trashItemRoute')"
                 @click="changeRouteName('Items')"
@@ -48,9 +48,10 @@ const changeRouteName = (text) => {
     </div>
 </template>
 <style lang="css" scoped>
-.main-container {
-    width: 100%;
+.trash-container {
+    width: 100% !important;
     height: 100%;
+    overflow-x: hidden;
 }
 .list {
     background: rgba(0, 0, 0, 0.1);

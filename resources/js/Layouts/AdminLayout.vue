@@ -153,7 +153,7 @@ onMounted(() => {
 
     <!-- Main Content -->
     <main class="right"
-    :style="{ width: isSidebarOpen ? '80%' : '95%' }" 
+    :style="{ width: isSidebarOpen ? '80%' : '100%' }" 
     :class="{ 'sidebar-open': isSidebarOpen }">
       <div class="container-fluid d-flex justify-content-between align-items-center mt-3 d-block d-lg-none">
         <div>

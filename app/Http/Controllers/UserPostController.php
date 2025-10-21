@@ -12,6 +12,7 @@ class UserPostController extends Controller
 {
     public function index(){
     $items = ItemModel::where('user_id', Auth::id())
+    ->orderBy('created_at', 'desc')
     ->get();
     return Inertia::render('user/Posts', [
         'items' => $items,

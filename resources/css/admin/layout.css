@@ -141,6 +141,11 @@
   flex-shrink: 0;
 }
 
+@media screen and (max-width: 990px){
+  .right{
+    width: 100vw !important;
+  }
+}
 /* Mobile View */
 @media screen and (max-width: 800px) {
   .sidebar {
@@ -155,12 +160,8 @@
     width: 90% !important;
   }
 
-  .sidebar.closed ~ .right {
-    width: 90% !important;
-  }
-
-  .sidebar.open ~ .right {
-    width: calc(100% - 250px) !important;
+  .right {
+    width: 100vw !important;
   }
 }
 @media screen and (max-width: 756px){

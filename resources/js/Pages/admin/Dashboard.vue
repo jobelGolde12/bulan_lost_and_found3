@@ -180,7 +180,7 @@ overViewData.value = {
   <Head title="Dashboard" />
   <AdminLayout>
     <div class="dashboard-container">
-        <div class="container-top container-fluid pe-0 d-flex justify-content-between " style="min-height: 300px;  max-height: 200px;" >
+        <div class="container-top container-fluid pe-0 d-flex justify-content-between " >
             <div class=" header">
               <h1 class="fw-bold mb-2">Lost & Found Admin Dashboard</h1>
               <p class="text-muted">Manage reports, users, and system settings effectively.</p>
@@ -228,93 +228,5 @@ overViewData.value = {
 </template>
 
 <style scoped>
-.container-top{
-  position: relative;
-  flex-direction: row;
-  top: 10%;
-}
-.container-top .header, .container-top .total-lost-and-found{
-  max-width: 50%;
-  max-height: 50%;
-}
-.card-top{
-  max-height: 10vh;
-}
-.dashboard-container {
-  padding: 20px;
-  height: 100%;
-  overflow-x: hidden;
-  overflow-y: scroll;
-}
-.header h1{
-  font-size: 3rem;
-}
-.progress-circle {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  background: url("../../../images/overview-bg.jpg") no-repeat center center fixed;
-  background-size: cover;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #fff; 
-  overflow: hidden;
-}
-
-.progress-circle span {
-  position: absolute;
-}
-.dot {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  margin-right: 5px;
-}
-.overview-chart {
-  width: 300px;
-  height: 250px;
-  margin: auto;
-}
-.card-bottom{
-  flex-direction: row;
-}
-
-@media screen and (max-width: 1082px){ 
-  .header h1{
-    font-size: 2.7rem;
-  }
-}
-@media screen and (max-width: 1008px){ 
-  .header h1{
-    font-size: 2.3rem;
-  }
-}
-@media screen and (max-width: 893px){ 
-  .container-top{
-    flex-direction: column;
-    height: auto;
-    top: 0;
-  }
-  .container-top .header{
-    text-align: center;
-    margin-bottom: 1rem;
-    max-width: 100%;
-    max-height: 100%;
-  }
-  .container-top .total-lost-and-found{
-    max-width: 100%;
-    max-height: 100%;
-  }
-}
-
-@media screen and (max-width: 576px){ 
-  .card-bottom{
-    flex-direction: column;
-  }
-}
-
+@import '../../../css/admin/dashboard/dashboard.css';
 </style>

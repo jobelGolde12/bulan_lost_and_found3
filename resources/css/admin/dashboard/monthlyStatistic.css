@@ -254,7 +254,7 @@
 
 @media (max-width: 768px) {
   .modern-monthly-stats {
-    padding: 1.5rem;
+    padding: 0;
     border-radius: 16px;
   }
   
@@ -281,11 +281,16 @@
   .modern-chart {
     height: 350px;
   }
+  .text-content{
+    position: relative;
+    width: 91vw;
+  }
 }
 
 @media (max-width: 480px) {
   .modern-monthly-stats {
-    padding: 1.25rem;
+    padding: 0rem;
+    margin: 0;
   }
   
   .title-section {
