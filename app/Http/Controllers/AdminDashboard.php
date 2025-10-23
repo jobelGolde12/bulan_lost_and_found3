@@ -7,11 +7,13 @@ use App\Models\ItemModel;
 use App\Models\LocationModel;
 use App\Models\MessageModel;
 use App\Models\TargetResolvedCases;
+use App\Models\TotalFound;
 use App\Models\TotalLost;
 use App\Models\User;
 use App\Models\UserInfo;
 use App\Models\ViewLaterModel;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -114,22 +116,33 @@ class AdminDashboard extends Controller
     }
 
     public function getItems(Request $request)
-    {
-        $status = $request->query('status');
-        $query = ItemModel::query();
+        {
+            $status = $request->query('status');
+            $query = ItemModel::query();
+            
+            if ($status) {
+                if ($status === 'Unsolved') {
+                    $query->whereDate('created_at', '<=', now()->subYear());
+                } elseif ($status === 'Resolved') {
+                    $query->where('status', 'Claimed');
+                } else {
+                    $query->where('status', $status);
+                }
+            }
 
-        if ($status) {
-        if ($status === 'Unsolved') {
-            $query->whereDate('created_at', '<=', now()->subYear());
-        } elseif ($status === 'Resolved') {
-            $query->where('status', 'Claimed');
-        } else {
-            $query->where('status', $status);
+            $items = $query->orderBy('created_at', 'desc')->paginate(15);
+
+            return response()->json($items);
         }
-    }
-
-        $items = $query->orderBy('created_at', 'desc')->paginate(15);
-
-        return response()->json($items);
+    public function getReportPerBarangay(){
+        try{
+            $losts = TotalLost::all();
+            $founds = TotalFound::all();
+            $losts->push($founds);
+            $data = $losts;
+                return response()->json($data, 200);
+        }catch(Exception $e){
+            Log::info(['error: ' => $e]);
+        }
     }
 }

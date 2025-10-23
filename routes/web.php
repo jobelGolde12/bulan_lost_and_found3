@@ -138,6 +138,8 @@ Route::get('/admin-dashboard', [AdminDashboard::class, 'index'])->name('adminDas
 Route::get('/admin/items/paginate', [AdminDashboard::class, 'getItems'])
     ->name('admin.items');
 
+Route::get('/barangay/reports', [AdminDashboard::class, 'getReportPerBarangay'])->name('getReportPerBarangay');
+
 Route::get('/total-lost-item', [TotalLostItem::class, 'index'])->name('totalLostItemIndex');
 Route::get('/view-lost-item/{id}', [TotalLostItem::class, 'view'])->name('viewLostItem'); //view the specific lost item
 Route::get('/contact-admin', [ContactAdminController::class, 'index'])->name('contactAdmin');

@@ -25,6 +25,7 @@ import TotalFounds from './reportTable/TotalFounds.vue';
 import Unsolved from './reportTable/Unsolved.vue';
 import Claimed from './reportTable/Claimed.vue';
 import Report from './reportTable/Report.vue';
+import PerBarangay from './PerBarangay.vue';
 
 echarts.use([PieChart, TitleComponent, TooltipComponent, LegendComponent, CanvasRenderer]);
 
@@ -123,7 +124,6 @@ const getUnSolved = ref([]);
 
 watch(() => props.items, (newItem) => {
   getReports.value = newItem;
-  console.log("reports: " , getReports.value)
   getClaimed.value = getReports?.value.filter(item => item.status === 'Claimed');
 }, { immediate: true });
 
@@ -223,6 +223,11 @@ overViewData.value = {
 
 
       <Report :items="getReports"/>
+      <PerBarangay :items="getReports"
+      :totalLost="getTotalLost"
+      :totalFound="getTotalFound"
+      />
+
     </div>
   </AdminLayout>
 </template>

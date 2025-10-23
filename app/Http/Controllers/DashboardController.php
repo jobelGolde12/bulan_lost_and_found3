@@ -72,7 +72,7 @@ class DashboardController extends Controller
             ->whereIn('status', ['Lost', 'Found']) 
             ->get(["id", "title", "created_at"]);
 
-            Log::info('Unsolved items count: ' . $unSolved->count());
+    
             // move to storage cleaner if more than 1000 items 
             if($getItemAsAdmin->count() > 1000){
                  return Inertia::render('admin/storageCleaner/Index', [
