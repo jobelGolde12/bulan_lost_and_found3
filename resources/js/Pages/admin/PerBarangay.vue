@@ -1,10 +1,9 @@
 <template>
-  <div class="dashboard-container">
+  <div class="dashboard-container1 container-fluid">
     <!-- Header Section -->
     <div class="dashboard-header">
       <div class="header-content">
-        <h1 class="dashboard-title">Reports Dashboard</h1>
-        <p class="dashboard-subtitle">Manage and monitor lost and found items across barangays</p>
+        <h1 class="dashboard-title">Barangay Overview </h1>
       </div>
     </div>
 
@@ -128,13 +127,7 @@
     <!-- Barangay Summary -->
     <div class="summary-section">
       <div class="section-header">
-        <h2>Barangay Summary</h2>
-        <div class="header-actions">
-          <button class="action-btn" @click="exportSummary">
-            <i class="bi bi-download"></i>
-            Export
-          </button>
-        </div>
+    
       </div>
 
       <div class="table-container">
@@ -385,12 +378,13 @@ const navigateTo = (id) => {
 </script>
 
 <style scoped>
-.dashboard-container {
+.dashboard-container1 {
   width: 100%;
+  height: auto; /* full screen height */
+  overflow-y: hidden; /* allow vertical scrolling */
   background: #f8fafc;
-  height: auto;
-  overflow: hidden;
-  margin-top: 2rem;
+  margin-top: 5rem;
+  padding-bottom: 1rem;
 }
 
 .dashboard-header {
@@ -398,7 +392,7 @@ const navigateTo = (id) => {
 }
 
 .dashboard-title {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 800;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   -webkit-background-clip: text;

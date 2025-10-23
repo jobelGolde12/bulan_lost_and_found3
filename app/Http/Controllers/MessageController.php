@@ -18,61 +18,70 @@ class MessageController extends Controller
 {
     $currentUserId = Auth::id();
 
-    // Removed and blocked users
-    $removedUser = RemovePinnedMessages::where('user_id', $currentUserId)->pluck('removed_user');
-    $blockedUser = BlockedMessages::where('user_id', $currentUserId)->pluck('blocked_user');
+    $currentUserId = Auth::id();
 
-    $excludedIds = $removedUser->toArray();
-    $excludedBlockedIds = $blockedUser->toArray();
+// Removed and blocked users
+$removedUser = RemovePinnedMessages::where('user_id', $currentUserId)->pluck('removed_user');
+$blockedUser = BlockedMessages::where('user_id', $currentUserId)->pluck('blocked_user');
 
-    // Get all users (excluding removed/blocked)
-    $users = User::whereNotIn('id', array_merge($excludedIds, $excludedBlockedIds))
-        ->select(['id', 'name'])
-        ->get();
+$excludedIds = $removedUser->toArray();
+$excludedBlockedIds = $blockedUser->toArray();
 
-    // Get all messages related to this user
-    $hasMessages = MessageModel::where('sender_id', '!=', $currentUserId)
-        ->get(['sender_id', 'receiver_id', 'created_at', 'read_at']);
+// Get all users (excluding removed/blocked)
+$users = User::whereNotIn('id', array_merge($excludedIds, $excludedBlockedIds))
+    ->select(['id', 'name'])
+    ->get();
 
-    // Get users who have unread messages
-    $unreadUserIds = MessageModel::where('receiver_id', $currentUserId)
-        ->whereNull('read_at')
-        ->pluck('sender_id')
-        ->unique()
-        ->toArray();
+// Get all messages related to this user
+$hasMessages = MessageModel::where('sender_id', '!=', $currentUserId)
+    ->get(['sender_id', 'receiver_id', 'created_at', 'read_at']);
 
-    // Separate users into two groups
-    $usersWithUnread = $users->filter(fn($u) => in_array($u->id, $unreadUserIds));
-    $usersWithoutUnread = $users->reject(fn($u) => in_array($u->id, $unreadUserIds));
+// Get users who have unread messages (unique sender_id)
+$unreadFromUniqueSenders = MessageModel::where('receiver_id', $currentUserId)
+    ->whereNull('read_at')
+    ->select('sender_id')
+    ->distinct()
+    ->pluck('sender_id')
+    ->toArray();
 
-    // Merge them so unread are at the top
-    $sortedUsers = $usersWithUnread->merge($usersWithoutUnread)->values();
+// Separate users into two groups
+$usersWithUnread = $users->filter(fn($u) => in_array($u->id, $unreadFromUniqueSenders));
+$usersWithoutUnread = $users->reject(fn($u) => in_array($u->id, $unreadFromUniqueSenders));
 
-    // Fetch pinned users (same logic as before)
-    $pinnedMessages = PinnedChatsModel::all();
-    $pinnedUser = null;
+// Merge them so unread are at the top
+$sortedUsers = $usersWithUnread->merge($usersWithoutUnread)->values();
 
-    if ($pinnedMessages->isNotEmpty()) {
-        $userIds = $pinnedMessages->pluck('user_id')->unique();
+// Fetch pinned users (from PinnedChats table)
+$pinnedMessages = PinnedChatsModel::all();
+$pinnedUserIds = collect();
 
-        $pinnedUser = User::whereNotIn('id', $excludedIds)
-            ->whereNotIn('id', $excludedBlockedIds)
-            ->with('userInfo')
-            ->whereIn('id', $userIds)
-            ->get()
-            ->map(fn($user) => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'profile_pic' => $user->userInfo->profile_pic ?? null,
-            ]);
-    }
+// Add users who are already pinned
+if ($pinnedMessages->isNotEmpty()) {
+    $pinnedUserIds = $pinnedMessages->pluck('user_id')->unique();
+}
 
-    return Inertia::render('Message', [
-        'pinned' => $pinnedUser ?: [],
-        'users' => $sortedUsers,
-        'currentUserId' => $currentUserId,
-        'hasMessages' => $hasMessages,
+// Merge with users that have unread messages (auto-pinned unread senders)
+$pinnedUserIds = $pinnedUserIds->merge($unreadFromUniqueSenders)->unique();
+
+// Fetch all pinned users (including unread senders)
+$pinnedUser = User::whereNotIn('id', $excludedIds)
+    ->whereNotIn('id', $excludedBlockedIds)
+    ->with('userInfo')
+    ->whereIn('id', $pinnedUserIds)
+    ->get()
+    ->map(fn($user) => [
+        'id' => $user->id,
+        'name' => $user->name,
+        'profile_pic' => $user->userInfo->profile_pic ?? null,
     ]);
+
+return Inertia::render('Message', [
+    'pinned' => $pinnedUser ?: [],
+    'users' => $sortedUsers,
+    'currentUserId' => $currentUserId,
+    'hasMessages' => $hasMessages,
+]);
+
 }
 
 
@@ -166,65 +175,70 @@ public function search($id)
 {
     $currentUserId = Auth::id();
 
-    // 🧱 Removed and blocked users
-    $removedUser = RemovePinnedMessages::where('user_id', $currentUserId)->pluck('removed_user');
-    $blockedUser = BlockedMessages::where('user_id', $currentUserId)->pluck('blocked_user');
+//  Removed and blocked users
+$removedUser = RemovePinnedMessages::where('user_id', $currentUserId)->pluck('removed_user');
+$blockedUser = BlockedMessages::where('user_id', $currentUserId)->pluck('blocked_user');
 
-    $excludedIds = $removedUser->toArray();
-    $excludedBlockedIds = $blockedUser->toArray();
+$excludedIds = $removedUser->toArray();
+$excludedBlockedIds = $blockedUser->toArray();
 
-    // ✅ Mark messages as read
-    MessageModel::where('sender_id', $id)
-        ->where('receiver_id', $currentUserId)
-        ->whereNull('read_at')
-        ->update(['read_at' => now()]);
+//  Mark messages as read
+MessageModel::where('sender_id', $id)
+    ->where('receiver_id', $currentUserId)
+    ->whereNull('read_at')
+    ->update(['read_at' => now()]);
 
-    // 🧍 Get all users (excluding removed/blocked)
-    $users = User::whereNotIn('id', array_merge($excludedIds, $excludedBlockedIds))
-        ->select(['id', 'name'])
-        ->get();
+//  Get all users (excluding removed/blocked)
+$users = User::whereNotIn('id', array_merge($excludedIds, $excludedBlockedIds))
+    ->select(['id', 'name'])
+    ->get();
 
-    // 📨 Get all messages related to this user (used by Vue)
-    $hasMessages = MessageModel::where('receiver_id', $currentUserId)
-        ->orWhere('sender_id', $currentUserId)
-        ->get(['sender_id', 'receiver_id', 'created_at', 'read_at']);
+//  Get all messages related to this user (used by Vue)
+$hasMessages = MessageModel::where('receiver_id', $currentUserId)
+    ->orWhere('sender_id', $currentUserId)
+    ->get(['sender_id', 'receiver_id', 'created_at', 'read_at']);
 
-    // 🔔 Users who still have unread messages
-    $unreadUserIds = MessageModel::where('receiver_id', $currentUserId)
-        ->whereNull('read_at')
-        ->pluck('sender_id')
-        ->unique()
-        ->toArray();
+//  Users who still have unread messages (unique senders)
+$unreadFromUniqueSenders = MessageModel::where('receiver_id', $currentUserId)
+    ->whereNull('read_at')
+    ->select('sender_id')
+    ->distinct()
+    ->pluck('sender_id')
+    ->toArray();
 
-    // 🧩 Separate users into two groups: unread and read
-    $usersWithUnread = $users->filter(fn($u) => in_array($u->id, $unreadUserIds));
-    $usersWithoutUnread = $users->reject(fn($u) => in_array($u->id, $unreadUserIds));
+//  Separate users into two groups: unread and read
+$usersWithUnread = $users->filter(fn($u) => in_array($u->id, $unreadFromUniqueSenders));
+$usersWithoutUnread = $users->reject(fn($u) => in_array($u->id, $unreadFromUniqueSenders));
 
-    $sortedUsers = $usersWithUnread->merge($usersWithoutUnread)->values();
+$sortedUsers = $usersWithUnread->merge($usersWithoutUnread)->values();
 
-    // 📌 Fetch pinned users (same logic as in index)
-    $pinnedMessages = PinnedChatsModel::all();
-    $pinnedUser = collect([]);
+//  Fetch pinned users and merge with unread senders
+$pinnedMessages = PinnedChatsModel::all();
+$pinnedUserIds = collect();
 
-    if ($pinnedMessages->isNotEmpty()) {
-        $userIds = $pinnedMessages->pluck('user_id')->unique();
+if ($pinnedMessages->isNotEmpty()) {
+    $pinnedUserIds = $pinnedMessages->pluck('user_id')->unique();
+}
 
-        $pinnedUser = User::whereNotIn('id', $excludedIds)
-            ->whereNotIn('id', $excludedBlockedIds)
-            ->with('userInfo')
-            ->whereIn('id', $userIds)
-            ->get()
-            ->map(fn($user) => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'profile_pic' => $user->userInfo->profile_pic ?? null,
-            ]);
-    }
+//  Add users with unread messages to pinned list (auto-pinned)
+$pinnedUserIds = $pinnedUserIds->merge($unreadFromUniqueSenders)->unique();
 
-    // 💬 Get chat conversation between current user and selected user
-    $data1 = User::with('userInfo')->findOrFail($id);
+// 🧍 Fetch all pinned users (including those with unread messages)
+$pinnedUser = User::whereNotIn('id', $excludedIds)
+    ->whereNotIn('id', $excludedBlockedIds)
+    ->with('userInfo')
+    ->whereIn('id', $pinnedUserIds)
+    ->get()
+    ->map(fn($user) => [
+        'id' => $user->id,
+        'name' => $user->name,
+        'profile_pic' => $user->userInfo->profile_pic ?? null,
+    ]);
 
-    $data2 = MessageModel::where(function ($query) use ($id, $currentUserId) {
+//  Get chat conversation between current user and selected user
+$data1 = User::with('userInfo')->findOrFail($id);
+
+$data2 = MessageModel::where(function ($query) use ($id, $currentUserId) {
         $query->where('sender_id', $currentUserId)
               ->where('receiver_id', $id);
     })->orWhere(function ($query) use ($id, $currentUserId) {
@@ -233,18 +247,19 @@ public function search($id)
     })->orderBy('created_at', 'asc')
       ->get();
 
-    $message = [
-        'data1' => $data1,
-        'data2' => $data2,
-    ];
+$message = [
+    'data1' => $data1,
+    'data2' => $data2,
+];
 
-    return Inertia::render('Message', [
-        'pinned' => $pinnedUser,
-        'users' => $sortedUsers,
-        'hasMessages' => $hasMessages,
-        'message' => $message,
-        'currentUserId' => $currentUserId,
-    ]);
+return Inertia::render('Message', [
+    'pinned' => $pinnedUser,
+    'users' => $sortedUsers,
+    'hasMessages' => $hasMessages,
+    'message' => $message,
+    'currentUserId' => $currentUserId,
+]);
+
 }
 
 public function remove($id){

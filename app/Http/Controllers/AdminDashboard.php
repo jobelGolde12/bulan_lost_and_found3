@@ -17,6 +17,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class AdminDashboard extends Controller
@@ -82,18 +83,20 @@ class AdminDashboard extends Controller
             'user' => $user,
         ]);
     }
-    public function hasMessage(){
+  public function hasMessage()
+    {
         $currentUserId = Auth::id();
-        $hasMessages = MessageModel::where(function ($query) use ($currentUserId) {
-        $query->where('sender_id', '!=', $currentUserId)
-              ->whereNull('read_at');
-    })
-    //  ensure uniqueness: count unique sender_id or receiver_id pairs
-    ->selectRaw('DISTINCT sender_id')
-    ->get()
-    ->count();
-        return response()->json($hasMessages);
+
+        $unreadFromUniqueSenders = MessageModel::where('receiver_id', $currentUserId)
+            ->whereNull('read_at')
+            ->select('sender_id')         
+            ->distinct()                  
+            ->count();                   
+
+        return response()->json(['unique_senders' => $unreadFromUniqueSenders]);
     }
+
+
 
     public function targetResolveCases($target, $type){
         $currentTarget = TargetResolvedCases::select(['id','target_value'])->first();
@@ -145,4 +148,71 @@ class AdminDashboard extends Controller
             Log::info(['error: ' => $e]);
         }
     }
+    public function itemEdit($id){
+         $item = ItemModel::findOrFail($id);
+
+        return Inertia::render('admin/item/Edit', [
+            'item' => $item
+        ]);
+    }
+
+        public function itemUpdate(Request $request, $id)
+        {
+            $request->validate([
+                'title' => 'required|string|max:255',
+                'description' => 'nullable|string',
+                'category' => 'nullable|string|max:255',
+                'location' => 'nullable|string|max:255',
+                'status' => 'required|in:Lost,Found,Claimed',
+                'contact_info' => 'nullable|string|max:255',
+                'owner_phone_number' => 'nullable|string|max:255',
+                'date' => 'nullable|date',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:5120', // max 5MB
+                'remove_image' => 'nullable|boolean',
+            ]);
+
+            $item = ItemModel::findOrFail($id);
+
+            // Handle remove image flag first
+            if ($request->boolean('remove_image')) {
+                if ($item->image_url) {
+                    // Stored as Storage::url($path) -> /storage/images/...
+                    $storagePath = preg_replace('#^/storage/#', '', $item->image_url);
+                    if (Storage::disk('public')->exists($storagePath)) {
+                        Storage::disk('public')->delete($storagePath);
+                    }
+                }
+                $item->image_url = null;
+            }
+
+            // Handle new uploaded image (replace old)
+            if ($request->hasFile('image')) {
+                // delete old if exists
+                if ($item->image_url) {
+                    $oldPath = preg_replace('#^/storage/#', '', $item->image_url);
+                    if (Storage::disk('public')->exists($oldPath)) {
+                        Storage::disk('public')->delete($oldPath);
+                    }
+                }
+
+                $path = $request->file('image')->store('images', 'public'); // saved to storage/app/public/images
+                $item->image_url = Storage::url($path); // returns /storage/images/...
+            }
+
+            // Update other fields
+            $item->title = $request->input('title');
+            $item->description = $request->input('description');
+            $item->category = $request->input('category');
+            $item->location = $request->input('location');
+            $item->status = $request->input('status');
+            $item->contact_info = $request->input('contact_info');
+            $item->owner_phone_number = $request->input('owner_phone_number');
+            $item->date = $request->input('date');
+            $item->resolved_at = $request->input('resolved_at') ?? $item->resolved_at;
+
+            $item->save();
+
+            return redirect()->route('dashboard')->with('success', 'Item updated successfully!');
+        }
+
 }

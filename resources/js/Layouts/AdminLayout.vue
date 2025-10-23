@@ -28,7 +28,6 @@ const checkIfHasMessage = async () => {
   try{
     const response = await axios.get('/message/has')
     hasMessages.value = response.data;
-    console.log("has message: ", hasMessages.value)
   }catch(e){
     console.log("An error while checking if has message", e);  
   }
@@ -126,7 +125,7 @@ onMounted(() => {
             <div :class="{ 'icon-container': !isSidebarOpen }" class="icon-wrapper">
               <i class="bi bi-chat-dots link"></i>
 
-              <span v-if="hasMessages && (hasMessages - 1) != 0" class="has-message">{{ hasMessages - 1 }}</span>
+              <span v-if="hasMessages && (hasMessages) != 0" class="has-message">{{ hasMessages?.unique_senders }}</span>
             </div>
             <span v-if="isSidebarOpen">Message</span>
           </Link>

@@ -8,13 +8,25 @@ const props = defineProps({
   users: { type: Array, default: () => [] },
   active: { type: Number, default: 0 },
   hasMessages: { type: Array, default: () => [] },
+  currentUserId: {
+    type: Number,
+    default: 0
+  }
 });
-
+console.log("pinned chats: ", JSON.stringify(props.pinned))
 const pinnedChats = ref([]);
 const remainingUsers = ref([]);
 const getActiveMessage = ref(0);
 const sidebarStore = useSidebarStore();
+const getCurrentUserId = ref(0);
 
+
+watch(
+  () => props.currentUserId,
+  (id) => {
+    getCurrentUserId.value = id;
+  }, {immediate: true}
+)
 /** Helper - build message map keyed by sender_id */
 function buildMessageMap(messages = []) {
   const map = new Map();
@@ -38,18 +50,24 @@ function buildMessageMap(messages = []) {
 }
 
 watch(
-  () => [props.pinned, props.users, props.hasMessages],
-  ([pinned, users, hasMessages]) => {
+  () => [props.pinned, props.users, props.hasMessages, props.currentUserId],
+  ([pinned, users, hasMessages, currentId]) => {
     const messageMap = buildMessageMap(hasMessages);
     const unread = [];
     const withMessages = [];
     const withoutMessages = [];
     const bottomUsers = [];
+    
+    // Ensure currentId is treated as a number
+    const currentUserId = Number(currentId);
 
     const added = new Set();
 
     // --- 1. Pinned users
     for (const chat of pinned) {
+      // 🚩 EXCLUSION LOGIC 1: Skip if the chat ID matches the current user's ID
+      if (Number(chat.id) === currentUserId) continue;
+
       const info = messageMap.get(Number(chat.id));
       if (info?.unread) {
         unread.push({
@@ -79,6 +97,10 @@ watch(
     // --- 2. Remaining users (not pinned or already in hasMessages)
     for (const user of users) {
       const id = Number(user.id);
+      
+      // 🚩 EXCLUSION LOGIC 2: Skip if the user ID matches the current user's ID
+      if (id === currentUserId) continue;
+
       if (!id || added.has(id)) continue;
       const info = messageMap.get(id);
       if (info) continue; // skip users already with messages
@@ -113,7 +135,6 @@ const viewMessageFunc = (id) => {
   <div>
     <div class="list mt-2">
 
-      <!-- 🔹 Chats (pinned/unread/withMessages/withoutMessages) -->
       <div
         v-for="chat in pinnedChats"
         :key="'chat-' + chat.id"
@@ -140,10 +161,10 @@ const viewMessageFunc = (id) => {
         </div>
       </div>
 
-      <!-- 🔹 Remaining users (bottom of list, no duplicates, only name) -->
-      <div
+      <!-- <div
         v-for="user in remainingUsers"
         :key="'user-' + user.id"
+        @click="viewMessageFunc(user.id)"
         class="chat-link d-flex align-items-center mb-2 p-2 rounded text-decoration-none"
       >
         <img
@@ -152,9 +173,9 @@ const viewMessageFunc = (id) => {
           class="rounded-circle me-2 profile-pic"
         />
         <div class="flex-grow-1">
-          <strong v-if="sidebarStore.isSidebarOpen">{{ user?.name?.name || 'user' }}</strong>
+          <strong v-if="sidebarStore.isSidebarOpen">{{ user?.name || 'user' }}</strong>
         </div>
-      </div>
+      </div> -->
 
       <div class="extra-space-at-bottom"></div>
     </div>
@@ -179,6 +200,7 @@ function formatTime(val) {
 </script>
 
 <style scoped>
+/* styles remain the same */
 .list {
   max-height: 70vh;
   overflow-y: auto;
