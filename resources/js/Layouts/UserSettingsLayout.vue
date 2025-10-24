@@ -298,9 +298,9 @@ onMounted(() => {
 .notification-badge {
 position: absolute; /* Use absolute positioning */
   top: -0.5em; /* Adjust as needed */
-  right: -.5em; /* Adjust as needed */
-  width: 1.2em; /* Adjust as needed */
-  height: 1.1em; /* Adjust as needed */
+  right: -6em; /* Adjust as needed */
+  width: 1em; /* Adjust as needed */
+  height: .9em; /* Adjust as needed */
   color: white;
   border-radius: 50%;
   border: 2px solid white;

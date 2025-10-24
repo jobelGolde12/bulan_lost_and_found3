@@ -1,5 +1,5 @@
 <script setup>
-import UserSettingsLayout from '@/Layouts/UserSettingsLayout.vue'
+import AdminSettingsLayout from '@/Layouts/settings/AdminSettingsLayout.vue'
 import { Link, Head } from '@inertiajs/vue3'
 import PostsCard from '@/Components/user/PostsCard.vue'
 import axios from 'axios'
@@ -38,7 +38,7 @@ const fetchPendingPosts = async () => {
 </script>
 
 <template>
-  <UserSettingsLayout>
+  <AdminSettingsLayout>
     <Head title="My Posts" />
     <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-10 px-6 md:px-10">
       <div class="max-w-6xl mx-auto">
@@ -51,30 +51,6 @@ const fetchPendingPosts = async () => {
           </h1>
 
           <div class="flex items-center gap-3 p-1 bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200/60 shadow-sm">
-          <!-- Posts Icon -->
-          <button
-            @click="showOriginalPosts"
-            :class="['modern-icon-btn group', activeTab === 'posts' ? 'modern-active-tab' : '']"
-            title="Show Active Posts"
-          >
-            <div class="modern-icon-wrapper">
-              <i class="bi bi-grid-3x3-gap-fill text-lg"></i>
-            </div>
-            <span class="modern-tooltip">Active Posts</span>
-          </button>
-
-          <!-- Pending Posts Icon -->
-          <button
-            @click="fetchPendingPosts"
-            :class="['modern-icon-btn group', activeTab === 'pending' ? 'modern-active-tab' : '']"
-            title="Pending Posts"
-          >
-            <div class="modern-icon-wrapper">
-              <i class="bi bi-clock-history text-lg"></i>
-            </div>
-            <span class="modern-tooltip">Pending</span>
-          </button>
-
           <!-- Add Post Button -->
           <Link
             :href="route('reportItem')"
@@ -109,7 +85,7 @@ const fetchPendingPosts = async () => {
 
       </div>
     </div>
-  </UserSettingsLayout>
+  </AdminSettingsLayout>
 </template>
 
 <style scoped>

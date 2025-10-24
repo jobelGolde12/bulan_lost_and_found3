@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { Head, useForm, Link } from '@inertiajs/vue3'
+import { Head, useForm, Link, usePage } from '@inertiajs/vue3'
 
 // Form setup
 const form = useForm({
@@ -9,10 +9,10 @@ const form = useForm({
 
 // State
 const showConfirm = ref(false)
-
+const page = usePage().props.auth.user;
 // Handle delete request
 const submit = () => {
-  form.delete(route('profile.destroy'), {
+  form.delete(route('profile.destroyAccount', {id: page.id}), {
     onFinish: () => {
       form.reset('password')
       showConfirm.value = false

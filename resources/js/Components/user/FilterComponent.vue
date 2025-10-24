@@ -32,6 +32,9 @@
     </div> -->
    </div>
 
+   <div>
+    <FindMatchButton />
+   </div>
 
     <div class="change-text d-none d-lg-block">
       <p class="text-dark">

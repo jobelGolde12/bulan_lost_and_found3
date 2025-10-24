@@ -140,13 +140,13 @@ onBeforeUnmount(() => {
   justify-content: center;
 }
 .summary .lost {
-  color: #768fb8;
+  color: #FF6B6B;
 }
 .summary .found {
-  color: #4C9AFF;
+  color: #2ecc71;
 }
 .summary .claimed {
-  color: #2ecc71;
+  color: #4C9AFF;
 }
 @media screen and (max-width: 990px){
   .chart-wrapper{

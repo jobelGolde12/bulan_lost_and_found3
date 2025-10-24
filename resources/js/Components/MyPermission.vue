@@ -36,8 +36,8 @@ const toggleEmailPermission = () => {
 
 <template>
   <div class=" mb-3 d-flex flex-column" style="cursor: pointer;" @click="toggleExpand">
-    <div class="d-flex justify-content-start w-100">
-      <i class="bi bi-shield-lock me-3"></i>
+    <div class="d-flex justify-content-start w-100 ">
+      <i class="bi bi-shield-lock me-3 "></i>
       <span class="">My permission</span>
     </div>
     <transition name="fade">
@@ -62,5 +62,9 @@ const toggleEmailPermission = () => {
 .fade-enter-from, .fade-leave-to {
   opacity: 0;
   max-height: 0;
+}
+ .setting-icon {
+  background: linear-gradient(135deg, #ed8936, #dd6b20);
+  color: white;
 }
 </style>

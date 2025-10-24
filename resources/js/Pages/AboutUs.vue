@@ -4,6 +4,8 @@ import lostAndFoundLogo from "../../images/lost_and_found_logo.png";
 import hero from "../../images/aboutUs/hero.svg";
 import connection from "../../images/aboutUs/connection.svg";
 import dataReport from "../../images/aboutUs/data-reports.svg";
+import WelcomeFooter from "@/Components/welcome_page/WelcomeFooter.vue";
+
 </script>
 
 <template>
@@ -104,26 +106,7 @@ import dataReport from "../../images/aboutUs/data-reports.svg";
 </section>
 
     <!-- Footer -->
-    <footer class="bg-dark text-white text-center py-4">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-4 mb-3 mb-md-0">
-            <h5>Contact Info</h5>
-            <p>thephpemail@gmail.com</p>
-            <p>09930543293</p>
-            <p>Bulan, Sorsogon</p>
-          </div>
-          <div class="col-md-4 mb-3 mb-md-0">
-            <h5>Social Media</h5>
-            <p>Facebook | Twitter | Instagram</p>
-          </div>
-          <div class="col-md-4">
-            <h5>Quick Links</h5>
-            <p>Home | About Us | Terms & Conditions</p>
-          </div>
-        </div>
-      </div>
-    </footer>
+    <WelcomeFooter />
   </div>
 </template>
 

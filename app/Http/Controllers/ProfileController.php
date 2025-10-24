@@ -200,7 +200,7 @@ class ProfileController extends Controller
     ]);
 
     $user = $request->user();
-
+    $id = Auth::id();
     // Check if password matches
     if (!Hash::check($request->password, $user->password)) {
         return back()->withErrors(['password' => 'The password is incorrect.']);
@@ -227,7 +227,7 @@ class ProfileController extends Controller
 
     // 4. Items
     if (ItemModel::where('user_id', $user->id)->exists()) {
-        ItemModel::where('user_id', $user->id)->where('status', '!=', 'Claimed')->delete();
+        ItemModel::where('user_id', $user->id)->forceDelete();
     }
 
     // 5. Notifications
@@ -258,10 +258,10 @@ class ProfileController extends Controller
     // 9. Blocked Messages
     if (
         BlockedMessages::where('user_id', $user->id)->exists() ||
-        BlockedMessages::where('blocked_user_id', $user->id)->exists()
+        BlockedMessages::where('blocked_user', $user->id)->exists()
     ) {
         BlockedMessages::where('user_id', $user->id)
-            ->orWhere('blocked_user_id', $user->id)
+            ->orWhere('blocked_user', $user->id)
             ->delete();
     }
 

@@ -22,6 +22,8 @@ watch(
       isViewLater: !!item.view_later?.some((v) => v.item_id === item.id),
       isLoading: false,
     }));
+      console.log("items: ", itemContainer.value)
+
   },
   { immediate: true }
 );
@@ -104,7 +106,7 @@ const truncateText = (text, maxLength = 20) => {
     <div v-else class="card-grid__container">
       <article v-for="data in itemContainer" :key="data.id" class="item-card">
         <!-- For development edit  -->
-        <!-- <Link class="btn btn-dark" :href="route('item.edit', {id: data.id})">Edit</Link> -->
+        <!--  <Link class="btn btn-dark" :href="route('item.edit', {id: data.id})">Edit</Link>  -->
         <!-- Image Section -->
         <Link :href="route('viewItemInfoAsAdmin', { item: data?.id })" class="item-card__image-link">
           <div class="item-card__image-container">
@@ -135,7 +137,7 @@ const truncateText = (text, maxLength = 20) => {
           <!-- Footer -->
           <div class="item-card__footer">
             <!-- User Info -->
-            <Link :href="route('viewUserAsAdmin', { id: data.user?.id })" class="user-info">
+            <Link :href="route('viewUserAsAdmin', { id: 1 })" class="user-info">
               <div class="user-info__avatar">
                 <img
                   :src="data.user?.user_info?.profile_pic ? `/storage/${data.user.user_info.profile_pic}` : '/images/profile.jpeg'"

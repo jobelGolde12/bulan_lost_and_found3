@@ -16,9 +16,9 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\MyPermissionController;
 use App\Http\Controllers\NotificationTrashController;
 use App\Http\Controllers\PendingRequestController;
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\StorageCleaner;
 use App\Http\Controllers\TotalLostItem;
-use App\Http\Controllers\UserPostController;
 use App\Http\Controllers\UserTrashController;
 use App\Http\Controllers\ViewLaterController;
 use App\Http\Controllers\ViewMoreUsers;
@@ -210,7 +210,10 @@ Route::post('/storage-cleaner/delete-claimed', [StorageCleaner::class, 'deleteCl
 Route::get('/find-match', [FindMatchController::class, 'index'])->name('findMatch.index');
 
 Route::prefix('posts')->name('post.')->middleware('auth')->group(function (){
-    Route::get('/view', [UserPostController::class, 'index'])->name('view');
+    Route::get('/view', [PostController::class, 'index'])->name('view');
+    Route::get('/pending', [PostController::class, 'pending'])
+    ->name('pendingRequests.index');
+
 });
 require __DIR__.'/auth.php';
 

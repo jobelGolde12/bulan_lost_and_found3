@@ -121,7 +121,7 @@ onMounted(() => {
           <span v-if="isSidebarOpen">Settings</span>
         </Link>
 
-        <!-- ✅ MESSAGES LINK WITH GREEN BADGE -->
+        <!--  MESSAGES LINK WITH GREEN BADGE -->
         <Link
           :href="route('message.index')"
           :class="{ active: currentRoute === route('message.index') }"
@@ -152,7 +152,7 @@ onMounted(() => {
           </span>
         </Link>
 
-        <Link
+        <!-- <Link
           :href="route('my.pending')"
           :class="{ active: currentRoute === route('my.pending') }"
           class="btn btn-primary bg-primary text-light"
@@ -165,7 +165,7 @@ onMounted(() => {
             aria-hidden="true"
           ></span>
           <span v-if="isSidebarOpen">Pending Requests</span>
-        </Link>
+        </Link> -->
       </div>
     </div>
 

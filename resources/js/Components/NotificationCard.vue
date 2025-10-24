@@ -35,16 +35,19 @@ const deleteNotification = (id) => {
       },
     }
   );
-};const viewItem = (index, id, readStatus, title, itemId) => {
+};
+const viewItem = async (index, id, readStatus, title, itemId) => {
   const t = title.toLowerCase();
 
-  // mark as read if not already
   if (readStatus === 0) {
-    router.put(route("settings.modifyReadStatus", { notification: id }), {}, {
-      onSuccess: () => {
-        getData.value[index].read_status = 1;
-      },
-    });
+    await router.put(
+      route("settings.modifyReadStatus", { notification: id }),
+      {},
+      { preserveScroll: true }
+    );
+
+    // Update local state only after promise resolved
+    getData.value[index].read_status = 1;
   }
 
   if (!itemId) {
@@ -52,13 +55,11 @@ const deleteNotification = (id) => {
     return;
   }
 
-  // mapping for notification actions
   const actions = {
     resolved: () => {
       alert("Your reported item has been marked as resolved. Thank you for using our service!");
     },
     "face to face verification": () => {
-      console.log("called:", title);
       router.get(route("face.to.face", { id: itemId }));
     },
     approved: () => {
@@ -69,11 +70,10 @@ const deleteNotification = (id) => {
     },
   };
 
-  // find a matching key in actions
   const match = Object.keys(actions).find((key) => t.includes(key));
 
   if (match) {
-    actions[match](); // call the matched action
+    actions[match]();
   } else {
     alert("No redirect page defined for this title.");
   }

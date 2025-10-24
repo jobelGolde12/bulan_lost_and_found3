@@ -23,7 +23,6 @@ watch(
     () => props.user,
     (newItem) => {
         getUser.value = newItem;
-        console.log("user => ", getUser.value)
     },
     { immediate: true }
 );
@@ -32,8 +31,7 @@ const message = () => {
     if (props.isSelf) {
         router.get('/chat');
     } else {
-        modalQuestion.value = `Do you want to message ${getUser.value.name}?`;
-        showModal.value = true;
+        router.get(route('message.viewChat', {id: getUser.value.id}))
     }
 };
 
@@ -158,9 +156,10 @@ const handleModalResponse = (response) => {
                             class="action-btn action-btn--message"
                             @click="message"
                             :title="isSelf ? 'View your chats' : `Message ${getUser.name}`"
+                            v-if="!isSelf"
                         >
                             <i class="bi bi-chat-dots-fill"></i>
-                            <span>{{ isSelf ? 'My Chats' : 'Message' }}</span>
+                            <span>{{  'Message' }}</span>
                         </button>
                     </div>
                 </div>

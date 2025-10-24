@@ -11,23 +11,23 @@ import {Link} from "@inertiajs/vue3";
                     <div class="col-md-3">
                         <h5>Contact Info.</h5>
                         <ul class="list-unstyled">
-                            <li><a href="#">jobelgolde43@gmail.com</a></li>
-                            <li><a href="#">09930543293</a></li>
-                            <li><a href="#">Bonga, Bulan, Sor</a></li>
+                            <li><p>09098127615</p></li>
                         </ul>
                     </div>
-                    <!-- <div class="col-md-3">
+                    <div class="col-md-3">
                         <h5>Social media</h5>
                         <ul class="list-unstyled">
                             <li>
-                                <a href="#"
-                                    ><i
+                                <a href="https://www.facebook.com/pnpbulan.sorsogon"
+                                    >
+                                    <!-- <i
                                         class="bi bi-facebook text-light me-2"
                                     ></i
-                                    >Facebook</a
+                                    > -->
+                                    Facebook</a
                                 >
                             </li>
-                            <li>
+                            <!-- <li>
                                 <a href="#"
                                     ><i
                                         class="bi bi-twitter text-light me-2"
@@ -42,9 +42,9 @@ import {Link} from "@inertiajs/vue3";
                                     ></i
                                     >Instagram</a
                                 >
-                            </li>
+                            </li> -->
                         </ul>
-                    </div> -->
+                    </div>
                     <div class="col-md-3">
                         <h5>Quick Links</h5>
                         <ul class="list-unstyled">

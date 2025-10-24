@@ -162,7 +162,7 @@ const getProfileImage = (profilePic) => {
             <ViewItemInfoForAdminHeader
               :id="props?.created_by?.id || null"
               :item_id="props?.item.id"
-              :name="props?.created_by.name"
+              :name="props?.created_by?.name"
               :title="data?.title"
               :description="data?.description"
               :profile="getProfile"
