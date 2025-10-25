@@ -25,25 +25,49 @@ class AdminDashboard extends Controller
     public function index(){
         return Inertia::render('admin/Dashboard');
     }
-    public function item(){
-        $categories = ItemCategories::all();
-        //get only the specific viewLater data base sa id ni user
-        $userId = Auth::id();
-        $items = ItemModel::whereIn('status', ['Lost', 'Found'])
-        ->with('user', 'user.userInfo:id,user_id,profile_pic')
-        ->with(['viewLater' => function ($query) use ($userId) {
-        $query->where('user_id', $userId);
-        }])->orderBy('created_at', 'desc')->get();
+        public function item() 
+        { 
+            $categories = ItemCategories::all();
+            $userId = Auth::id();
 
-        $locations = LocationModel::select('id','name')->get();
+            $items = ItemModel::whereIn('status', ['Lost', 'Found'])
+                ->with('user', 'user.userInfo:id,user_id,profile_pic')
+                ->with(['viewLater' => function ($query) use ($userId) {
+                    $query->where('user_id', $userId);
+                }])
+                ->orderBy('created_at', 'desc')
+                ->paginate(20); 
+
+            $locations = LocationModel::select('id','name')->get();
 
             return Inertia::render('admin/Home', [
                 'categories' => $categories,
-                'items' => $items,
+                'items' => $items->items(), 
+                'hasMore' => $items->hasMorePages(), 
                 'role' => 'admin',
                 'locations' => $locations,
-        ]); 
-}
+            ]); 
+        }
+
+        public function loadMore(Request $request)
+        {
+            $page = $request->query('page', 1);
+            $userId = Auth::id();
+
+            $items = ItemModel::whereIn('status', ['Lost', 'Found'])
+                ->with('user', 'user.userInfo:id,user_id,profile_pic')
+                ->with(['viewLater' => function ($query) use ($userId) {
+                    $query->where('user_id', $userId);
+                }])
+                ->orderBy('created_at', 'desc')
+                ->paginate(20, ['*'], 'page', $page);
+
+            return response()->json([
+                'items' => $items->items(),
+                'hasMore' => $items->hasMorePages()
+            ]);
+        }
+
     public function filterByLocation($id){
 
         $currentLocation = LocationModel::findOrFail($id);
@@ -70,7 +94,9 @@ class AdminDashboard extends Controller
 }
 
     public function viewUsers(){
-        $users = User::with('userInfo')->get();
+        $users = User::with('userInfo')
+            ->whereNotNull('email_verified_at') // Only authenticated/verified emails
+            ->get();
         return Inertia::render('admin/users/Index', [
             'users' => $users,
         ]);

@@ -267,9 +267,10 @@
     gap: 0.75rem;
   }
   
-  .comment-form__avatar-img {
-    width: 40px;
-    height: 40px;
+  .comment-form__avatar .comment-form__avatar-img {
+     max-width: 70px;
+    min-width: 70px;
+    height: 35px;
   }
   
   .comment-form__input-group{

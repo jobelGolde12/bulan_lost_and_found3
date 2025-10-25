@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, onMounted, onUnmounted } from "vue";
 import { Link } from "@inertiajs/vue3";
 import axios from "axios";
 
@@ -11,77 +11,52 @@ const props = defineProps({
 });
 
 const itemContainer = ref([]);
+const page = ref(1);
+const hasMore = ref(true);
+const isLoadingMore = ref(false);
 
-// map incoming items to local reactive items with helper flags
-watch(
-  () => props.items,
-  (newItems) => {
-    itemContainer.value = newItems.map((item) => ({
-      ...item,
-      // local UI flags:
-      isViewLater: !!item.view_later?.some((v) => v.item_id === item.id),
-      isLoading: false,
-    }));
-      console.log("items: ", itemContainer.value)
+//  Initialize
+watch(() => props.items, (newItems) => {
+  itemContainer.value = newItems.map((item) => ({
+    ...item,
+    isViewLater: !!item.view_later?.some((v) => v.item_id === item.id),
+    isLoading: false,
+  }));
+}, { immediate: true });
 
-  },
-  { immediate: true }
-);
+//  Load More Items
+const loadMoreItems = async () => {
+  if (!hasMore.value || isLoadingMore.value) return;
 
-const viewLaterFunc = async (id) => {
-  const item = itemContainer.value.find((i) => i.id === id);
-  if (!item) return;
-
-  // if another request is already running, ignore extra clicks
-  if (item.isLoading) return;
-
-  // start loading UI
-  item.isLoading = true;
-
-  // keep previous state to revert on failure (defensive)
-  const prevState = item.isViewLater;
+  isLoadingMore.value = true;
+  page.value++;
 
   try {
-    const response = await axios.post(`/viewLater/add-view-later/${id}`);
-    const payload = response?.data;
+    const res = await axios.get(`/admin/items/load-more?page=${page.value}`);
+    const { items, hasMore: more } = res.data;
 
-    // Prefer explicit server-sent boolean state (is_view_later)
-    if (payload && typeof payload.is_view_later !== "undefined") {
-      item.isViewLater = !!payload.is_view_later;
-    }
-    // Or prefer an action string like 'added' / 'removed'
-    else if (payload && typeof payload.action === "string") {
-      const action = payload.action.toLowerCase();
-      if (action.includes("add") || action.includes("added")) {
-        item.isViewLater = true;
-      } else if (action.includes("remove") || action.includes("removed")) {
-        item.isViewLater = false;
-      } else {
-        // unknown action -> optimistic toggle
-        item.isViewLater = !prevState;
-      }
-    }
-    // If server doesn't return clear info, toggle optimistically
-    else {
-      item.isViewLater = !prevState;
-    }
+    itemContainer.value.push(...items.map(item => ({
+      ...item,
+      isViewLater: !!item.view_later?.some((v) => v.item_id === item.id),
+      isLoading: false,
+    })));
 
-    // Optionally: if the server returned an updated view_later array, sync it:
-    if (payload && Array.isArray(payload.view_later)) {
-      item.view_later = payload.view_later;
-      item.isViewLater = payload.view_later.some((v) => v.item_id === item.id);
-    }
-  } catch (e) {
-    // revert to previous confirmed state on error
-    console.error("viewLater error:", e);
-    item.isViewLater = prevState;
-    // Optionally show toast/notification about failure
+    hasMore.value = more;
   } finally {
-    item.isLoading = false;
+    isLoadingMore.value = false;
   }
 };
 
-// helpers (unchanged)
+// Scroll Detection
+const handleScroll = () => {
+  const triggerPoint =
+    window.innerHeight + window.scrollY >= document.body.offsetHeight - 50;
+
+  if (triggerPoint) {
+    loadMoreItems();
+  }
+};
+
 const formatDate = (dateString) => {
   if (!dateString) return "";
   const options = { year: "numeric", month: "long", day: "numeric" };
@@ -92,7 +67,10 @@ const truncateText = (text, maxLength = 20) => {
   if (!text) return "";
   return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
 };
+onMounted(() => window.addEventListener("scroll", handleScroll));
+onUnmounted(() => window.removeEventListener("scroll", handleScroll));
 </script>
+
 
 <template>
   <div class="card-grid">

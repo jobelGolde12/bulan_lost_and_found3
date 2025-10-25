@@ -46,6 +46,7 @@ watch(
   () => props.item,
   (newItem) => {
     data.value = newItem;
+    console.log("props data admin: ", data.value)
   },
   { immediate: true }
 );
@@ -243,11 +244,11 @@ const getProfileImage = (profilePic) => {
   <form @submit.prevent="addComment" class="comment-form">
     <div class="comment-form__header">
       <div class="comment-form__avatar">
-        <img
+        <!-- <img
           :src="getProfile == 'NA' ? '../../../images/profile.jpeg' : `/storage/${getProfile}`"
           alt="Your profile picture"
           class="comment-form__avatar-img"
-        />
+        /> -->
       </div>
       <div class="comment-form__input-group">
         <input

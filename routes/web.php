@@ -133,6 +133,8 @@ Route::get('/view-item-info/{item}', [ItemController::class, 'viewItemInfo'])->n
 Route::get('/view-item/{item}', [ItemController::class, 'viewItem'])->name('viewItem');
 Route::delete('delete-item/{id}', [ItemController::class, 'deleteItem'])->name('deleteItem');
 Route::get('/items', [AdminDashboard::class, 'item'])->name('items');
+Route::get('/admin/items/load-more', [AdminDashboard::class, 'loadMore'])
+    ->name('admin.items.loadMore');
 Route::get('/item/edit/{id}', [AdminDashboard::class, 'itemEdit'])->name('item.edit');
 Route::post('/item/update/{id}', [AdminDashboard::class, 'itemUpdate'])->name('item.update');
 Route::get('/items/location/filtered/{id}', [AdminDashboard::class, 'filterByLocation'])->name('filterByLocation');

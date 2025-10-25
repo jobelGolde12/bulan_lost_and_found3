@@ -53,6 +53,7 @@ const isSubmitting = ref(false);
 const errorMessage = ref(null);
 const maxSize = 5 * 1024 * 1024;
 const allowedTypes = ["image/jpeg", "image/png", "image/jpg", "image/gif", "image/svg+xml"];
+const showSuccess = ref(false)
 
 const preventDefault = (e) => {
   e.preventDefault();
@@ -101,9 +102,12 @@ const triggerFileInput = () => {
   fileInput.value.click();
 };
 
+const successMessage = ref(null);
+
 const submitForm = () => {
   isSubmitting.value = true;
   hasProfanity.value = false;
+  successMessage.value = null;
 
   form.transform((data) => {
     const formData = new FormData();
@@ -113,20 +117,24 @@ const submitForm = () => {
     }
     return formData;
   }).post(route("addItem"), {
+  preserveState: true,
+  preserveScroll: true,
     onSuccess: () => {
       isSubmitting.value = false;
-      alert("Submitted!");
+      showSuccess.value = true;
+      form.reset();
     },
     onError: (errors) => {
       isSubmitting.value = false;
       console.error("An error while posting item: ", errors);
-      
+
       if (errors && errors.description) {
         hasProfanity.value = true;
       }
     },
   });
 };
+
 </script>
 
 <template>
@@ -134,6 +142,11 @@ const submitForm = () => {
   <AdminLayout>
     <div class="main-container mb-5">
       <h1 class="text-3xl font-light text-center mt-6">Report Item</h1>
+      <div class="d-flex justify-content-end">
+        <div class="alert alert-info success-info" role="alert" v-if="showSuccess">
+         Successfully Reported.
+      </div>
+      </div>
 
       <div class="container mx-auto px-6 py-8">
         <!-- Bootstrap Alert for Profanity Error -->
@@ -278,9 +291,9 @@ const submitForm = () => {
 .main-container {
   width: 100%;
   min-height: 100vh;
-  height: 100vh;          /* ✅ add this */
+  height: 100vh;         
   overflow-x: hidden;
-  overflow-y: auto;       /* ✅ auto is smoother, you can keep scroll if you want */
+  overflow-y: auto;      
   margin-bottom: 3rem;
 }
 
@@ -314,4 +327,31 @@ const submitForm = () => {
 .btn-close:hover {
   opacity: 0.75;
 }
+.success-info {
+  position: fixed;
+  top: 20px;
+  right: -100%;
+  animation: slideInOut 3s ease-in-out forwards;
+  z-index: 9999;
+}
+
+@keyframes slideInOut {
+  0% {
+    right: -100%;
+    opacity: 0;
+  }
+  20% {
+    right: 20px;
+    opacity: 1;
+  }
+  80% {
+    right: 20px;
+    opacity: 1;
+  }
+  100% {
+    right: -100%;
+    opacity: 0;
+  }
+}
+
 </style>

@@ -160,16 +160,27 @@ public function search($id)
     return to_route('message.viewChat', ['id' => $id]);
 }
 
-    public function searchV2(Request $request){
-        $name = $request->input('name');
-        $matchedUsers = User::where('name', 'LIKE', "%{$name}%")
-        ->with('userInfo')
-        ->get(['id', 'name']);
-        
-        return response()->json([
-            'matchedUsers' => $matchedUsers,
-        ], 200);
-    }
+   public function searchV2(Request $request)
+        {
+            $currentUserId = Auth::id();
+            $name = $request->input('name');
+
+            $removedUser = RemovePinnedMessages::where('user_id', $currentUserId)->pluck('removed_user');
+            $blockedUser = BlockedMessages::where('user_id', $currentUserId)->pluck('blocked_user');
+
+            $excludedIds = $removedUser->toArray();
+            $excludedBlockedIds = $blockedUser->toArray();
+
+            $matchedUsers = User::where('name', 'LIKE', "%{$name}%")
+                ->whereNotIn('id', array_merge($excludedIds, $excludedBlockedIds))
+                ->where('id', '!=', $currentUserId) 
+                ->with('userInfo')
+                ->get(['id', 'name']);
+
+            return response()->json([
+                'matchedUsers' => $matchedUsers,
+            ], 200);
+        }
 
        public function viewChat($id)
 {

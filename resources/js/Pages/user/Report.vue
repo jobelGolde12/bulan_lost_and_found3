@@ -20,6 +20,7 @@ const props = defineProps({
 const user = usePage().props.auth?.user;
 const page = usePage();
 const hasProfanity = ref(false);
+const showSuccess = ref(false)
 
 // Watch for errors and flash messages for profanity detection
 watch(() => page.props.errors, (newErrors) => {
@@ -118,7 +119,7 @@ const submitForm = () => {
   }).post(route("addItem"), {
     onSuccess: () => {
       isSubmitting.value = false;
-      alert("Submitted! your item will be reviewed by admin. We will notify you once your item is approved.");
+      showSuccess.value = true;
     },
     onError: (e) => {
       isSubmitting.value = false;
@@ -137,9 +138,9 @@ const submitForm = () => {
 .main-container {
   width: 100%;
   min-height: 100vh;
-  height: 100vh;          /* ✅ add this */
+  height: 100vh;          
   overflow-x: hidden;
-  overflow-y: auto;       /* ✅ auto is smoother, you can keep scroll if you want */
+  overflow-y: auto;      
   margin-bottom: 3rem;
 }
 
@@ -173,6 +174,33 @@ const submitForm = () => {
 .btn-close:hover {
   opacity: 0.75;
 }
+.success-info {
+  position: fixed;
+  top: 20px;
+  right: -100%;
+  animation: slideInOut 5s ease-in-out forwards;
+  z-index: 9999;
+}
+
+@keyframes slideInOut {
+  0% {
+    right: -100%;
+    opacity: 0;
+  }
+  20% {
+    right: 20px;
+    opacity: 1;
+  }
+  80% {
+    right: 20px;
+    opacity: 1;
+  }
+  100% {
+    right: -100%;
+    opacity: 0;
+  }
+}
+
 </style>
 
 <template>
@@ -180,6 +208,11 @@ const submitForm = () => {
   <AuthenticatedLayout>
     <div class="main-container">
       <h1 class="text-3xl font-light text-center mt-6">Report Item</h1>
+       <div class="d-flex justify-content-end">
+            <div class="alert alert-info success-info" role="alert" v-if="showSuccess">
+            Submitted! your item will be reviewed by admin. We will notify you once your item is approved.
+          </div>
+        </div>
 
       <div class="container mx-auto px-6 py-8">
         <!-- Bootstrap Alert for Profanity Error -->
@@ -319,5 +352,8 @@ const submitForm = () => {
         </form>
       </div>
     </div>
+
+  <LoadingComponent  v-if="isSubmitting"/>
+
   </AuthenticatedLayout>
 </template>
