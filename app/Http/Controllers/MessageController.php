@@ -75,12 +75,12 @@ $pinnedUser = User::whereNotIn('id', $excludedIds)
         'profile_pic' => $user->userInfo->profile_pic ?? null,
     ]);
 
-return Inertia::render('Message', [
-    'pinned' => $pinnedUser ?: [],
-    'users' => $sortedUsers,
-    'currentUserId' => $currentUserId,
-    'hasMessages' => $hasMessages,
-]);
+    return Inertia::render('Message', [
+        'pinned' => $pinnedUser ?: [],
+        'users' => $sortedUsers,
+        'currentUserId' => $currentUserId,
+        'hasMessages' => $hasMessages,
+    ]);
 
 }
 
@@ -256,6 +256,7 @@ $data2 = MessageModel::where(function ($query) use ($id, $currentUserId) {
         $query->where('sender_id', $id)
               ->where('receiver_id', $currentUserId);
     })->orderBy('created_at', 'asc')
+    ->limit(15)
       ->get();
 
 $message = [
@@ -272,6 +273,53 @@ return Inertia::render('Message', [
 ]);
 
 }
+public function loadOlderMessages(Request $request)
+{
+    $currentUserId = Auth::id();
+    $otherUserId = $request->other_user_id;
+    $lastMessageId = $request->last_message_id;
+    
+    $limit = 15; // Number of messages per scroll load
+
+    $messagesQuery = MessageModel::where(function ($query) use ($currentUserId, $otherUserId) {
+        $query->where('sender_id', $currentUserId)
+              ->where('receiver_id', $otherUserId);
+    })
+    ->orWhere(function ($query) use ($currentUserId, $otherUserId) {
+        $query->where('sender_id', $otherUserId)
+              ->where('receiver_id', $currentUserId);
+    });
+
+    if ($lastMessageId) {
+        $messagesQuery->where('id', '<', $lastMessageId);
+    }
+
+    $messages = $messagesQuery->orderBy('id', 'desc')
+                ->limit($limit)
+                ->get()
+                ->sortBy('id')
+                ->values();
+
+    return response()->json($messages);
+}
+
+public function deleteMessage(Request $request)
+{
+    $messageId = $request->message_id;
+    $userId = Auth::id();
+
+    $message = MessageModel::where('id', $messageId)
+                ->where('sender_id', $userId)
+                ->first();
+
+    if (!$message) {
+        return response()->json(['error' => 'Unauthorized'], 403);
+    }
+
+    $message->delete();
+    return response()->json(['success' => true]);
+}
+
 
 public function remove($id){
     if(!$id){

@@ -189,6 +189,8 @@ Route::post('/messages/send', [MessageController::class, 'send'])->middleware('a
 Route::post('/remove-message/{id}', [MessageController::class, 'remove'])->name('message.remove');
 Route::post('/block-message/{id}', [MessageController::class, 'block'])->name('message.block');
 Route::middleware('auth')->get('/message/has', [AdminDashboard::class, 'hasMessage'])->name('message.has');
+Route::post('/messages/load-older', [MessageController::class, 'loadOlderMessages']);
+Route::delete('/messages/delete', [MessageController::class, 'deleteMessage']);
 
 // View more users (saro na route na ma iimud sa messages page) || iba ini sa view.users san admin
 Route::prefix('viewMoreUsers')->name('viewMoreUsers.')->middleware('auth')->group(function () {
