@@ -177,6 +177,7 @@ Route::get('/view-user-info-as-admin/{id}', [AdminDashboard::class, 'viewUser'])
 Route::delete('/delete-users/{id}', [TrashController::class, 'userDestroy'])->name('user.destroy');
 Route::patch('/target/resolved/{target}/{type}', [AdminDashboard::class, 'targetResolveCases']);
 Route::get('/get/target/resolved', [AdminDashboard::class, 'getTargetResolveCases']);
+Route::get('/barangay/items', [AdminDashboard::class, 'barangayItems'])->name('barangay.items');
 
 //message
 Route::get('/message', [MessageController::class, 'index'])->name('message.index');

@@ -46,7 +46,6 @@ watch(
   () => props.item,
   (newItem) => {
     data.value = newItem;
-    console.log("props data admin: ", data.value)
   },
   { immediate: true }
 );
@@ -61,7 +60,6 @@ watch(
   () => props.comments,
   (newItem) => {
     getComment.value = newItem;
-    console.log("comments: ", getComment.value)
 
   },
   { immediate: true }

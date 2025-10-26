@@ -66,7 +66,7 @@ const toggleFilter = () => {
             title="Filter notifications"
           >
             <i class="bi bi-filter me-1"></i>
-            <span style="font-size: 0.9rem;">
+            <span style="font-size: 0.9rem;" class="d-none d-lg-block">
               {{ 
                 filterStatus === "all" ? "All" :
                 filterStatus === "viewed" ? "Viewed" : "Unviewed" 
@@ -80,7 +80,7 @@ const toggleFilter = () => {
             title="Sort notifications"
           >
             <i class="bi bi-sort-down me-1"></i>
-            <span style="font-size: 0.9rem;">
+            <span style="font-size: 0.9rem;" class="d-none d-lg-block">
               {{ sortOrder === "latest" ? "Latest → Oldest" : "Oldest → Latest" }}
             </span>
           </div>

@@ -3,7 +3,7 @@
     <!-- Header Section -->
     <div class="dashboard-header">
       <div class="header-content">
-        <h1 class="dashboard-title">Barangay Overview </h1>
+        <h1 class="dashboard-title">Barangay Overview</h1>
       </div>
     </div>
 
@@ -16,7 +16,7 @@
           <input
             type="text"
             class="search-input"
-            placeholder="Search reports by title, date, barangay..."
+            placeholder="Search..."
             v-model="searchQuery"
           />
           <div class="search-actions">
@@ -87,36 +87,28 @@
     <!-- Statistics Cards -->
     <div class="stats-cards">
       <div class="stat-card total">
-        <div class="stat-icon">
-          <i class="bi bi-clipboard-data"></i>
-        </div>
+        <div class="stat-icon"><i class="bi bi-clipboard-data"></i></div>
         <div class="stat-content">
           <h3>{{ filteredReports.length }}</h3>
           <p>Total Reports</p>
         </div>
       </div>
       <div class="stat-card lost">
-        <div class="stat-icon">
-          <i class="bi bi-search"></i>
-        </div>
+        <div class="stat-icon"><i class="bi bi-search"></i></div>
         <div class="stat-content">
           <h3>{{ lostCount }}</h3>
           <p>Lost Items</p>
         </div>
       </div>
       <div class="stat-card found">
-        <div class="stat-icon">
-          <i class="bi bi-check-circle"></i>
-        </div>
+        <div class="stat-icon"><i class="bi bi-check-circle"></i></div>
         <div class="stat-content">
           <h3>{{ foundCount }}</h3>
           <p>Found Items</p>
         </div>
       </div>
       <div class="stat-card barangays">
-        <div class="stat-icon">
-          <i class="bi bi-geo-alt"></i>
-        </div>
+        <div class="stat-icon"><i class="bi bi-geo-alt"></i></div>
         <div class="stat-content">
           <h3>{{ barangayCount }}</h3>
           <p>Barangays</p>
@@ -126,10 +118,6 @@
 
     <!-- Barangay Summary -->
     <div class="summary-section">
-      <div class="section-header">
-    
-      </div>
-
       <div class="table-container">
         <table class="modern-table">
           <thead>
@@ -146,15 +134,12 @@
                 <span>Found</span>
                 <i class="bi bi-arrow-down-up sort-icon"></i>
               </th>
-              <th @click="sortTable('Total')" class="sortable">
-                <span>Total</span>
-                <i class="bi bi-arrow-down-up sort-icon"></i>
-              </th>
+              <th class="sortable"><span>Total</span></th>
             </tr>
           </thead>
           <tbody>
-            <tr 
-              v-for="(data, barangay) in sortedBarangaySummary" 
+            <tr
+              v-for="(data, barangay) in paginatedBarangaySummary"
               :key="barangay"
               class="table-row"
               @click="viewBarangayDetails(barangay)"
@@ -163,218 +148,206 @@
                 <i class="bi bi-geo-alt-fill barangay-icon"></i>
                 {{ barangay }}
               </td>
-              <td>
-                <span class="count-badge lost">{{ data.Lost }}</span>
-              </td>
-              <td>
-                <span class="count-badge found">{{ data.Found }}</span>
-              </td>
-              <td>
-                <span class="count-badge total">{{ data.Total }}</span>
-              </td>
+              <td><span class="count-badge lost">{{ data.Lost }}</span></td>
+              <td><span class="count-badge found">{{ data.Found }}</span></td>
+              <td><span class="count-badge total">{{ data.Lost + data.Found }}</span></td>
             </tr>
           </tbody>
         </table>
+
+        <!-- Load More Button -->
+        <div v-if="visibleCount < Object.keys(sortedBarangaySummary).length" class="load-more-container">
+          <button class="load-more-btn" @click="loadMore">Load More</button>
+        </div>
       </div>
 
-      <!-- Empty State -->
       <div v-if="Object.keys(sortedBarangaySummary).length === 0" class="empty-state">
         <i class="bi bi-inbox empty-icon"></i>
         <h3>No reports found</h3>
         <p>Try adjusting your search or filters</p>
       </div>
     </div>
+
+    <!-- View detail modal -->
+    <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
+      <div class="modal-container">
+        <div class="modal-header">
+          <h2>{{ selectedBarangay }}</h2>
+          <button class="close-btn" @click="closeModal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <ViewBarangay
+            v-if="showModal"
+            :barangay="selectedBarangay"
+            :data="selectedData"
+            @close="showModal = false"
+          />
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, defineProps, watch } from 'vue';
-import { router } from '@inertiajs/vue3';
+import { ref, computed, defineProps, watch } from 'vue'
+import { router } from '@inertiajs/vue3'
+import ViewBarangay from '@/Components/admin/ViewBarangay.vue'
 
 const props = defineProps({
-  items: {
-    type: Array,
-    default: () => [],
-  },
-});
+  items: { type: Array, default: () => [] },
+})
 
-const reports = ref([]);
-const selectedFilter = ref('');
-const searchQuery = ref('');
-const barangayFilter = ref('');
-const showAdvancedFilters = ref(false);
-const sortField = ref('barangay');
-const sortDirection = ref('asc');
+const reports = ref([])
+const selectedFilter = ref('')
+const searchQuery = ref('')
+const barangayFilter = ref('')
+const showAdvancedFilters = ref(false)
+const sortField = ref('barangay')
+const sortDirection = ref('asc')
 
+// ✅ Pagination
+const visibleCount = ref(10) // default 10 rows
+const loadMore = () => {
+  visibleCount.value += 10
+}
 
-// Utility functions
+// Utility: Extract barangay name
 const getBarangay = (location) => {
-  if (!location) return 'Unknown';
-  const match = location.match(/^(.+?)(?:\s\([^(]*\))?$/);
-  if (match && match[1]) {
-    return match[1].trim();
-  }
-  return location.trim();
-};
+  if (!location) return 'Unknown'
+  const match = location.match(/^(.+?)(?:\s\([^(]*\))?$/)
+  return match && match[1] ? match[1].trim() : location.trim()
+}
 
-// Watch for props update
+// Watch props
 watch(
   () => props.items,
   (data) => {
-    reports.value = data.map(item => ({
+    reports.value = data.map((item) => ({
       ...item,
       barangay: getBarangay(item.location),
-    }));
-    console.log("items: ", reports.value);
+    }))
   },
   { immediate: true }
-);
+)
 
+// Filters
+const changeFilter = (status) => (selectedFilter.value = status)
+const toggleBarangayFilter = (filter) =>
+  (barangayFilter.value = barangayFilter.value === filter ? '' : filter)
+const toggleAdvancedFilters = () =>
+  (showAdvancedFilters.value = !showAdvancedFilters.value)
 
-
-const formatDate = (dateString) => {
-  if (!dateString) return 'N/A';
-  const options = { year: 'numeric', month: 'long', day: 'numeric' };
-  return new Date(dateString).toLocaleDateString(undefined, options);
-};
-
-const getDuration = (dateString) => {
-  const created = new Date(dateString);
-  const now = new Date();
-  const diffDays = Math.floor((now - created) / (1000 * 60 * 60 * 24));
-  if (diffDays < 1) return 'Today';
-  if (diffDays === 1) return '1 day ago';
-  if (diffDays < 7) return `${diffDays} days ago`;
-  const diffWeeks = Math.floor(diffDays / 7);
-  if (diffWeeks < 4) return `${diffWeeks} week${diffWeeks > 1 ? 's' : ''} ago`;
-  const diffMonths = Math.floor(diffDays / 30);
-  if (diffMonths < 12) return `${diffMonths} month${diffMonths > 1 ? 's' : ''} ago`;
-  const diffYears = Math.floor(diffDays / 365);
-  if (diffYears >= 1) return `Unsolved (${diffYears} year${diffYears > 1 ? 's' : ''} ago)`;
-  return `${diffYears} year${diffYears > 1 ? 's' : ''} ago`;
-};
-
-// Filter logic
-const changeFilter = (status) => {
-  selectedFilter.value = status;
-};
-
-const toggleBarangayFilter = (filter) => {
-  barangayFilter.value = barangayFilter.value === filter ? '' : filter;
-};
-
-const toggleAdvancedFilters = () => {
-  showAdvancedFilters.value = !showAdvancedFilters.value;
-};
-
+// Sorting
 const sortTable = (field) => {
   if (sortField.value === field) {
-    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
   } else {
-    sortField.value = field;
-    sortDirection.value = 'asc';
+    sortField.value = field
+    sortDirection.value = 'asc'
   }
-};
+}
 
-// Computed properties
+// Filtered reports
 const filteredReports = computed(() => {
-  const query = searchQuery.value.toLowerCase();
+  const query = searchQuery.value.toLowerCase()
   let filtered = reports.value.filter((item) => {
-    const matchesStatus = !selectedFilter.value || item.status === selectedFilter.value;
+    const matchesStatus = !selectedFilter.value || item.status === selectedFilter.value
     const matchesSearch =
       item?.title?.toLowerCase().includes(query) ||
-      formatDate(item?.created_at)?.toLowerCase().includes(query) ||
-      item?.status?.toLowerCase().includes(query) ||
-      item?.barangay?.toLowerCase().includes(query);
-    
-    return matchesStatus && matchesSearch;
-  });
+      item?.barangay?.toLowerCase().includes(query) ||
+      item?.status?.toLowerCase().includes(query)
+    return matchesStatus && matchesSearch
+  })
 
-  // Apply barangay filter
+  // Apply barangay ranking filters (most lost/found)
   if (barangayFilter.value) {
-    const barangayData = barangaySummary.value;
+    const barangayData = barangaySummaryAll.value
     const sortedBarangays = Object.entries(barangayData)
-      .sort(([, a], [, b]) => {
-        if (barangayFilter.value === 'mostLost') {
-          return b.Lost - a.Lost;
-        } else if (barangayFilter.value === 'mostFound') {
-          return b.Found - a.Found;
-        }
-        return 0;
-      })
+      .sort(([, a], [, b]) =>
+        barangayFilter.value === 'mostLost'
+          ? b.Lost - a.Lost
+          : barangayFilter.value === 'mostFound'
+          ? b.Found - a.Found
+          : 0
+      )
       .slice(0, 5)
-      .map(([barangay]) => barangay);
+      .map(([barangay]) => barangay)
 
-    filtered = filtered.filter(item => sortedBarangays.includes(item.barangay));
+    filtered = filtered.filter((item) => sortedBarangays.includes(item.barangay))
   }
 
-  return filtered;
-});
+  return filtered
+})
 
+// Compute barangay summary
+const barangaySummaryAll = computed(() => {
+  const summary = {}
+  reports.value.forEach((item) => {
+    const barangay = item.barangay || 'Unknown'
+    if (!summary[barangay]) summary[barangay] = { Lost: 0, Found: 0, Total: 0 }
+    if (item.status === 'Lost') summary[barangay].Lost++
+    if (item.status === 'Found') summary[barangay].Found++
+    summary[barangay].Total++
+  })
+  return summary
+})
+
+// Barangay summary (based on current filter)
 const barangaySummary = computed(() => {
-  const summary = {};
+  const summary = {}
   filteredReports.value.forEach((item) => {
-    const barangay = item.barangay || 'Unknown';
-    if (!summary[barangay]) {
-      summary[barangay] = { Lost: 0, Found: 0, Total: 0 };
-    }
-    if (item.status === 'Lost') summary[barangay].Lost++;
-    if (item.status === 'Found') summary[barangay].Found++;
-    summary[barangay].Total++;
-  });
-  return summary;
-});
+    const barangay = item.barangay || 'Unknown'
+    if (!summary[barangay]) summary[barangay] = { Lost: 0, Found: 0, Total: 0 }
+    if (item.status === 'Lost') summary[barangay].Lost++
+    if (item.status === 'Found') summary[barangay].Found++
+    summary[barangay].Total++
+  })
+  return summary
+})
 
+// Sorted barangay summary
 const sortedBarangaySummary = computed(() => {
-  const entries = Object.entries(barangaySummary.value);
-  
-  return entries.sort(([aKey, aVal], [bKey, bVal]) => {
-    let aCompare, bCompare;
-    
-    if (sortField.value === 'barangay') {
-      aCompare = aKey.toLowerCase();
-      bCompare = bKey.toLowerCase();
-    } else {
-      aCompare = aVal[sortField.value];
-      bCompare = bVal[sortField.value];
-    }
-    
-    if (sortDirection.value === 'asc') {
-      return aCompare < bCompare ? -1 : aCompare > bCompare ? 1 : 0;
-    } else {
-      return aCompare > bCompare ? -1 : aCompare < bCompare ? 1 : 0;
-    }
-  }).reduce((acc, [key, value]) => {
-    acc[key] = value;
-    return acc;
-  }, {});
-});
+  const entries = Object.entries(barangaySummary.value)
+  return entries
+    .sort(([aKey, aVal], [bKey, bVal]) => {
+      const aCompare =
+        sortField.value === 'barangay' ? aKey.toLowerCase() : aVal[sortField.value]
+      const bCompare =
+        sortField.value === 'barangay' ? bKey.toLowerCase() : bVal[sortField.value]
+      if (sortDirection.value === 'asc') {
+        return aCompare < bCompare ? -1 : aCompare > bCompare ? 1 : 0
+      } else {
+        return aCompare > bCompare ? -1 : aCompare < bCompare ? 1 : 0
+      }
+    })
+    .reduce((acc, [key, value]) => ((acc[key] = value), acc), {})
+})
 
-// Statistics
-const lostCount = computed(() => filteredReports.value.filter(item => item.status === 'Lost').length);
-const foundCount = computed(() => filteredReports.value.filter(item => item.status === 'Found').length);
-const barangayCount = computed(() => Object.keys(barangaySummary.value).length);
+// ✅ Paginated summary
+const paginatedBarangaySummary = computed(() => {
+  const entries = Object.entries(sortedBarangaySummary.value).slice(0, visibleCount.value)
+  return Object.fromEntries(entries)
+})
 
-// Methods
-const getBarangayStatus = (data) => {
-  if (data.Lost > data.Found) return 'high-risk';
-  if (data.Found > data.Lost) return 'positive';
-  return 'neutral';
-};
+// Stats
+const lostCount = computed(() => filteredReports.value.filter((i) => i.status === 'Lost').length)
+const foundCount = computed(() => filteredReports.value.filter((i) => i.status === 'Found').length)
+const barangayCount = computed(() => Object.keys(barangaySummary.value).length)
 
-const viewBarangayDetails = (barangay) => {
-  // Navigate to barangay-specific view
-  console.log('View details for:', barangay);
-};
+// Modal logic
+const showModal = ref(false)
+const selectedBarangay = ref('')
+const selectedData = ref(null)
 
-const exportSummary = () => {
-  // Export functionality
-  console.log('Export summary');
-};
+function viewBarangayDetails(barangay) {
+  selectedBarangay.value = barangay
+  selectedData.value = sortedBarangaySummary.value[barangay]
+  showModal.value = true
+}
 
-const navigateTo = (id) => {
-  router.visit(route('viewItemInfoAsAdmin', { item: id }));
-};
+function closeModal() {
+  showModal.value = false
+}
 </script>
 
 <style scoped>
@@ -447,6 +420,7 @@ const navigateTo = (id) => {
   outline: none;
   font-size: 1rem;
   color: #2d3748;
+  overflow-x: hidden;
 }
 
 .search-input::placeholder {
@@ -781,7 +755,129 @@ const navigateTo = (id) => {
   margin: 0 0 0.5rem 0;
   color: #4a5568;
 }
+.table-container {
+  overflow-x: auto;
+}
 
+.modern-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.modern-table th,
+.modern-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.table-row {
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.table-row:hover {
+  background: #f9f9f9;
+}
+
+/* ===== Modal Styling ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  animation: fadeIn 0.3s ease;
+  height: 100vh;
+  overflow: scroll;
+}
+
+.modal-container {
+  background: #fff;
+  width: 900px;
+  max-width: 90%;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.3s ease;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.close-btn {
+  border: none;
+  background: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: #333;
+}
+
+.modal-body {
+  padding: 16px;
+}
+
+.modal-footer {
+  padding: 12px 16px;
+  border-top: 1px solid #eee;
+  text-align: right;
+}
+
+.btn {
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  border: none;
+}
+
+.btn-secondary {
+  background: #ccc;
+  color: #000;
+}
+.load-more-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.load-more-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.load-more-btn:hover {
+  background-color: #0056b3;
+}
+/* ===== Animations ===== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
 /* Responsive Design */
 @media (max-width: 768px) {
   .dashboard-container {
@@ -791,7 +887,10 @@ const navigateTo = (id) => {
   .dashboard-title {
     font-size: 2rem;
   }
-  
+  .search-wrapper{
+    max-width: 100%;
+    overflow: hidden;
+  }
   .controls-section {
     padding: 1.5rem;
   }

@@ -241,4 +241,31 @@ class AdminDashboard extends Controller
             return redirect()->route('dashboard')->with('success', 'Item updated successfully!');
         }
 
+        public function barangayItems(Request $request)
+    {
+
+            $userId = Auth::id();
+        $barangay = $request->query('barangay');
+        $status = $request->query('status');
+
+            $items = ItemModel::query()
+            ->when($barangay, fn($q) => $q->where('location', $barangay))
+            ->when($status, fn($q) => $q->where('status', $status))
+                ->with('user', 'user.userInfo:id,user_id,profile_pic')
+                ->with(['viewLater' => function ($query) use ($userId) {
+                    $query->where('user_id', $userId);
+                }])
+                ->orderBy('created_at', 'desc')
+            ->get();
+
+        if ($request->expectsJson()) {
+            return response()->json($items);
+        }
+
+        return response()->json( [
+            'barangay' => $barangay,
+            'status' => $status,
+            'items' => $items,
+        ]);
+    }
 }
