@@ -1,7 +1,9 @@
 <script setup>
 import { defineProps, ref, onMounted, onBeforeUnmount } from 'vue';
-import { Link, router } from '@inertiajs/vue3';
+import { Link, router, usePage } from '@inertiajs/vue3';
 import downloadAsPDF from './admin/item/downloadAsPDF.vue';
+
+const page = usePage();
 
 const props = defineProps({
   created_by: Object,
@@ -10,7 +12,6 @@ const props = defineProps({
   title: String,
   description: String
 });
-console.log("props : ", props.data)
 // Popup state
 const showPopup = ref(false);
 const popupRef = ref(null);
@@ -55,6 +56,15 @@ const handleDownload = async () => {
     isLoading.value = false;
   }
 };
+const forceDelete = () => {
+  if(confirm("Are you sure you want to delete this item? ")){
+      router.delete(route('forceDeleteItem', {id: props?.data?.id}), {}, {
+    onSuccess: () => alert('Item deleted.'),
+    onError: () => alert('An error occurred, please try again.')
+  });
+  }
+
+};
 </script>
 
 <template>
@@ -98,6 +108,12 @@ const handleDownload = async () => {
             <button class="button" data-bs-toggle="modal" data-bs-target="#downloadAsPDF">
               Download as PDF
             </button>
+            <button 
+            class="button" 
+            @click="forceDelete" 
+            title="Note! only if the user didn't follow the privacy and policy."
+            v-if="page.props.auth?.user.id === props.created_by?.id"
+            >Delete Post</button>
           </div>
         </div>
       </div>

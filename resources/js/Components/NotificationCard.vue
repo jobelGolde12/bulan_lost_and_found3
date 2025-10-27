@@ -106,7 +106,9 @@ const formatDate = (dateString) => {
         <small class="text-muted">{{ formatDate(data.created_at) }}</small>
       </div>
 
-      <div v-if="data.read_status == 0" class="not-read ms-2"></div>
+      <div 
+      v-if="data.read_status == 0 && !data?.title.includes('Post Deleted')" 
+      class="not-read ms-2"></div>
     </div>
   </div>
 
@@ -118,6 +120,7 @@ const formatDate = (dateString) => {
     <a
       href="#"
       class="text-decoration-none fw-bold btn btn-primary"
+      v-if="!data?.title.includes('Post Deleted') || !data?.title.includes('Approved')"
       @click.prevent="viewItem(index, data.id, data.read_status, data.title, data.item_id)"
     >
       View

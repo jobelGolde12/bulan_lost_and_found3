@@ -5,7 +5,7 @@ import { defineProps, onMounted, ref, watch, nextTick, onBeforeUnmount } from 'v
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
 import axios from 'axios';
-
+import { router } from '@inertiajs/vue3';
 // Setup CSRF Token
 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
@@ -312,7 +312,9 @@ onBeforeUnmount(() => {
     window.Echo.leave(`chat.${props.currentUserId}`);
   }
 });
-
+const moreUsers = () => {
+  router.visit(route('viewMoreUsers.index'));
+}
 
 </script>
 
@@ -333,7 +335,7 @@ onBeforeUnmount(() => {
                 class="rounded-circle me-2" width="41" height="40" style="max-height: 42px; min-height: 40px; max-width: 40px;" />
           <div>
             <span class="d-block fw-semibold username">{{ getMessage?.data1?.name }}</span>
-            <small class="text-success online-text">Online</small>
+            <!-- <small class="text-success online-text">Online</small> -->
           </div>
         </div>
         <i class="bi bi-three-dots-vertical fs-5 d-flex action1" @click.stop="togglePopup"></i>
@@ -400,10 +402,33 @@ onBeforeUnmount(() => {
 
     <!-- For the popup (togglePopup) -->
      <PopupForMessage :show="showPopup" ref="popupRef" :id="getMessage?.data1?.id"/>
-    <div class="container-fluid d-flex flex-column gap-3 justify-content-center align-items-center fs-4" v-if="!getMessage?.data1?.name">
-      <img src="../../images/message/select-message.svg" alt="Select message" class="img-fluid" 
-      style="max-width: 300px;"/>
-      No message selected
+
+    <div class="container-fluid" v-if="!getMessage?.data1?.name">
+        <div class="empty-state-container d-flex flex-column justify-content-center align-items-center position-relative">
+            <!-- Floating background elements -->
+            <div class="floating-elements">
+                <div class="floating-element"></div>
+                <div class="floating-element"></div>
+                <div class="floating-element"></div>
+            </div>
+            
+            <!-- Main illustration -->
+            <img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/svg/1f4ac.svg" 
+                 alt="Select message" 
+                 class="empty-state-illustration pulse-animation">
+            
+            <!-- Text content -->
+            <h2 class="empty-state-title">No Message Selected</h2>
+            <p class="empty-state-subtitle">
+                Select a conversation from the list or start a new one to begin messaging.
+            </p>
+            
+            <!-- Action button -->
+            <button type="button" class="action-button text-dark" @click="moreUsers">
+                <i class="bi bi-people-fill"></i>
+                Find More Users
+            </button>
+        </div>
     </div>
   </div>
 </MessageLayout>
@@ -415,7 +440,7 @@ onBeforeUnmount(() => {
   border-color: #d1e7dd;
 }
 .username {
-  transform: translateY(25%);
+  transform: translateY(0%);
 }
 .message-bubble {
   width: auto;
@@ -502,5 +527,144 @@ onBeforeUnmount(() => {
   opacity: 0;
   transition: opacity 0.2s ease;
 }
-
+ .empty-state-container {
+            min-height: 70vh;
+            padding: 2rem 1rem;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+        }
+        
+        .empty-state-container:hover {
+            box-shadow: var(--hover-shadow);
+        }
+        
+        .empty-state-illustration {
+            max-width: 280px;
+            filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.1));
+            transition: var(--transition);
+        }
+        
+        .empty-state-illustration:hover {
+            transform: translateY(-5px);
+            filter: drop-shadow(0 15px 20px rgba(0, 0, 0, 0.15));
+        }
+        
+        .empty-state-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin: 1.5rem 0 0.5rem;
+            letter-spacing: -0.5px;
+        }
+        
+        .empty-state-subtitle {
+            font-size: 1.1rem;
+            color: #718096;
+            max-width: 500px;
+            text-align: center;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+        
+        .action-button {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 12px;
+            padding: 0.75rem 1.5rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: white;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            width: 100%;
+            max-width: 240px;
+            margin-top: 1rem;
+        }
+        
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+        
+        .action-button:active {
+            transform: translateY(0);
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        .floating-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+            z-index: -1;
+            border-radius: 20px;
+        }
+        
+        .floating-element {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            opacity: 0.7;
+        }
+        
+        .floating-element:nth-child(1) {
+            width: 60px;
+            height: 60px;
+            top: 10%;
+            left: 10%;
+            animation: float 15s infinite linear;
+        }
+        
+        .floating-element:nth-child(2) {
+            width: 40px;
+            height: 40px;
+            top: 70%;
+            left: 80%;
+            animation: float 12s infinite linear reverse;
+        }
+        
+        .floating-element:nth-child(3) {
+            width: 30px;
+            height: 30px;
+            top: 30%;
+            left: 85%;
+            animation: float 18s infinite linear;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            100% {
+                transform: translate(30px, 30px) rotate(360deg);
+            }
+        }
+        
+        .container-fluid {
+            padding: 2rem;
+        }
 </style>

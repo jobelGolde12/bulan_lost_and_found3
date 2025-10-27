@@ -214,7 +214,7 @@ private function getCachedProfanityWords()
 
     // para sa dashboard (sa na himo san kada user na item)
     public function viewItemInfo($item){
-        $getItem = ItemModel::with('comments.userInfo')->findOrFail($item);
+        $getItem = ItemModel::with('comments.user.userInfo')->findOrFail($item);
         $created_by = User::find($getItem?->user_id);
         $profile = UserInfo::where('user_id' , $getItem->user_id)->value('profile_pic');
         $currentUser = Auth::id();
@@ -228,19 +228,21 @@ private function getCachedProfanityWords()
     }
 
     //kapag in view ni admin ang item
-        public function viewItemInfoAsAdmin($item){
-            $getItem = ItemModel::with('comments.userInfo')->findOrFail($item);
-            $created_by = User::find($getItem?->user_id);
-            $profile = UserInfo::where('user_id' , $getItem->user_id)->value('profile_pic');
-             $currentUser = Auth::id();
+       public function viewItemInfoAsAdmin($item)
+        {
+            $getItem = ItemModel::with(['comments.user.userInfo']) 
+                ->findOrFail($item);
+
+            $currentUser = Auth::id();
+
             return Inertia::render('admin/ViewItemInfoAsAdmin', [
                 'item' => $getItem,
-                'created_by' => $created_by,
-                'profile' => $profile ?: 'NA',
                 'comments' => $getItem->comments,
-                 'currentUser' => $currentUser ?: null,
+                'currentUser' => $currentUser ?: null,
             ]);
         }
+
+
     // para sa pending request
     public function viewPending($item){
         $getItem = PendingRequest::findOrFail($item);
@@ -369,7 +371,12 @@ public function markAsResolve($id, $userId)
             'read_status' => 0
         ]);
         $item->forceDelete();
-        return redirect()->route('items')->with(['success' => 'item deleted successfully...']);
+        
+        if(Auth::user()->role === 'admin'){
+            return redirect()->route('items')->with(['success' => 'item deleted successfully...']);
+        }else{
+            return redirect()->route('dashboard')->with(['success' => 'item deleted successfully...']);
+        }
     }
 
     // Sa message admin san view item info

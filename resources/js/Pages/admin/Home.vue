@@ -149,7 +149,6 @@ const handleSearch = () => {
         :role="props.role"
         v-model:items="getItems"
         v-model:category="selectedCategory"
-        v-model:loading="isItemLoading"
         />
       </div>
       <!-- Items List -->

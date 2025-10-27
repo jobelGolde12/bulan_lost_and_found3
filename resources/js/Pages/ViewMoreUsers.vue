@@ -2,7 +2,8 @@
 import PopupForViewMoreUsers from "@/Components/message/PopupForViewMoreUsers.vue";
 import ToggleAllOrBlocked from "@/Components/message/ToggleAllOrBlocked.vue";
 import { ref, watch, computed, defineProps, onMounted, onBeforeUnmount } from "vue";
-import { Head } from "@inertiajs/vue3";
+import { Head, router } from "@inertiajs/vue3";
+
 const props = defineProps({
     users: Array,
     blocked_users: Array,
@@ -91,6 +92,9 @@ onMounted(() => {
 onBeforeUnmount(() => {
     document.removeEventListener("click", handleClickOutside);
 });
+function goBack() {
+    router.get(route('message.index'))
+}
 </script>
 
 <template>
@@ -105,6 +109,10 @@ onBeforeUnmount(() => {
                 </div>
                 <!-- Search -->
                 <div class="input-group d-flex justify-content-end search-container">
+                    <button @click="goBack" class="fs-5 me-3 btn btn-light">
+                        <i class="bi bi-caret-left  "></i>
+                        Go Back
+                    </button>
                     <span class="input-group-text">
                         <i class="bi bi-search"></i>
                     </span>
@@ -133,7 +141,7 @@ onBeforeUnmount(() => {
                         <tr v-for="user in filteredUsers" :key="user.id">
                             <td class="d-flex flex-row gap-2 align-items-center">
                                 <div>
-                                    <img :src="user?.user_info?.profile_pic" alt="Profile" class="profile-pic" />
+                                    <img :src="user?.user_info?.profile_pic ? `/storage/${user?.user_info?.profile_pic}` : '../../images/profile.jpeg'" alt="Profile" class="profile-pic" />
                                 </div>
                                 <div :class="{'text-muted': getBlockedUsers.includes(user.id)}">
                                     {{ user.name }}

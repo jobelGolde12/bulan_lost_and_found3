@@ -73,6 +73,7 @@ const moreUsers = () => {
 .action-container .list button:hover {
   background: #f0ecec;
 }
+
 @media screen and (max-width: 756px){
   .action-container {
     right: 10%;

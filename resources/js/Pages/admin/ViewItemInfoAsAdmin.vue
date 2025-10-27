@@ -272,13 +272,14 @@ const getProfileImage = (profilePic) => {
           :key="data.id"
         >
           <div class="comment-card__header">
-            <div class="comment-card__user">
+            <Link :href="route('viewUserAsAdmin', {id: data?.user?.id})" class="comment-card__user text-decoration-none">
               <img
                 :src="getProfileImage(data?.user_info?.profile_pic)"
                 alt="User profile"
                 class="comment-card__avatar"
               />
-            </div>
+              <span class="text-dark" style="width: 200px;">{{ data?.user?.name || 'user' }}</span>
+            </Link>
             
             <div class="comment-card__meta">
               <time class="comment-card__date">

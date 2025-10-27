@@ -178,6 +178,7 @@ class AdminDashboard extends Controller
             if ($status) {
                 if ($status === 'Unsolved') {
                     $query->whereDate('created_at', '<=', now()->subYear());
+                    $query->where('status', ['Lost', 'Found']);
                 } elseif ($status === 'Resolved') {
                     $query->where('status', 'Claimed');
                 } else {

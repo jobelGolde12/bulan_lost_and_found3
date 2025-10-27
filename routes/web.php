@@ -56,7 +56,7 @@ Route::get('/about-us', function(){
 Route::get('/report-item', [ItemController::class, 'reportItem'])->name('reportItem');
 Route::post('/add-item', [ItemController::class, 'store'])->name('addItem');
 Route::get('/view-item-info-as-admin/{item}', [ItemController::class, 'viewItemInfoAsAdmin'])->name('viewItemInfoAsAdmin');
-Route::delete('/force-delete-item/{id}', [ItemController::class, 'forceDelete'])->name('forceDeleteItem');//Kapag d nag follow c user sa privacy & policy
+Route::delete('/force-delete-item/{id}', [ItemController::class, 'forceDelete'])->name('forceDeleteItem');
 
 
 //Permission

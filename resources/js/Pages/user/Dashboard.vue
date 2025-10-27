@@ -147,7 +147,12 @@ const handleSearch = () => {
           :currentLocation="getCurrentLocation"
           />
          </div>
-        <FilterComponent @filterSelected="handleFilterChange" :role="props.role"/>
+        <FilterComponent 
+        @filterSelected="handleFilterChange" 
+        :role="props.role"
+        v-model:items="getItems"
+        v-model:category="selectedCategory"
+        />
       </div>
 
       <!-- Items List -->

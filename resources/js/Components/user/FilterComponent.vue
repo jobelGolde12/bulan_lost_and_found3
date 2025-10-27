@@ -17,7 +17,7 @@
       </div>
     </div>
 
-    <div>
+    <div v-if="user.role === 'admin'">
       <FindMatchButton />
     </div>
 
@@ -58,7 +58,11 @@
 import { ref, defineProps, defineModel } from "vue";
 import FindMatchButton from "../admin/dashboard/FindMatchButton.vue";
 import axios from "axios";
+import { usePage } from "@inertiajs/vue3";
 
+const page = usePage();
+
+const user = page.props.auth?.user;
 const selectedFilter = ref("");
 const items = defineModel("items");
 const category = defineModel("category");

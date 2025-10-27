@@ -23,7 +23,6 @@ watch(
   () => props.notifications,
   (i) => {
     getData.value = i;
-    console.log("Notifications updated:", getData.value);
   },
   { immediate: true }
 );
