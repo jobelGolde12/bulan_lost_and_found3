@@ -115,7 +115,7 @@ onUnmounted(() => window.removeEventListener("scroll", handleScroll));
           <!-- Footer -->
           <div class="item-card__footer">
             <!-- User Info -->
-            <Link :href="route('viewUserAsAdmin', { id: 1 })" class="user-info">
+            <Link :href="route('viewUserAsAdmin', { id: data?.user?.id })" class="user-info">
               <div class="user-info__avatar">
                 <img
                   :src="data.user?.user_info?.profile_pic ? `/storage/${data.user.user_info.profile_pic}` : '/images/profile.jpeg'"

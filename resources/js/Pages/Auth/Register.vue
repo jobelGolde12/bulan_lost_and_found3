@@ -14,11 +14,22 @@ const form = useForm({
   contact: "",
 });
 
+const firstName = ref("");
+const middleInitial = ref("");
+const lastName = ref("");
+
 const submit = () => {
-  if(form.contact.length < 11) {
+  if (form.contact.length < 11) {
     alert("Contact number must be at least 11 digits.");
     return;
   }
+
+  // Combine name fields before submit
+  form.name =
+    `${firstName.value} ${middleInitial.value ? middleInitial.value + "." : ""} ${lastName.value}`
+      .trim()
+      .replace(/\s+/g, " ");
+
   form.post(route("register"), {
     onFinish: () => form.reset("password", "password_confirmation"),
     onSuccess: () => {
@@ -98,20 +109,46 @@ const agreeInTermsAndPolicy = ref(false);
       <h2 class="text-dark text-center fw-semibold mt-5">Register now!</h2>
 
       <div>
-        <InputLabel for="name" value="Name" />
-        <TextInput
-          id="name"
-          type="text"
-          class="mt-1 block w-full"
-          v-model="form.name"
-          required
-          autofocus
-          autocomplete="name"
-          style="border-radius: 10px"
-          placeholder="your name"
-        />
-        <InputError class="mt-2" :message="form.errors.name" />
-      </div>
+  <InputLabel value="Name" />
+
+  <div class="row">
+    <div class="col-5">
+      <TextInput
+        type="text"
+        class="mt-1 block w-full"
+        v-model="firstName"
+        required
+        placeholder="First Name"
+        style="border-radius: 10px"
+      />
+    </div>
+
+    <div class="col-2">
+      <TextInput
+        type="text"
+        class="mt-1 block w-full text-center"
+        v-model="middleInitial"
+        maxlength="1"
+        placeholder="M"
+        style="border-radius: 10px"
+      />
+    </div>
+
+    <div class="col-5">
+      <TextInput
+        type="text"
+        class="mt-1 block w-full"
+        v-model="lastName"
+        required
+        placeholder="Last Name"
+        style="border-radius: 10px"
+      />
+    </div>
+  </div>
+
+  <InputError class="mt-2" :message="form.errors.name" />
+</div>
+
 
       <div class="mt-4">
         <InputLabel for="email" value="Email" />

@@ -111,6 +111,7 @@ onMounted(() => {
 
   if (Array.isArray(props.message.data2)) {
     messages.value = [...props.message.data2];
+    
   }
 
   nextTick(() => {
@@ -270,12 +271,46 @@ const sortMessages = () => {
   );
 };
 
+let isChannelInitialized = false;
+
 onMounted(() => {
+  // Init messages & UI setup
+  getPinnedvalue.value = Array.isArray(props.pinned)
+    ? props.pinned
+    : Object.values(props.pinned);
+
+  if (Array.isArray(props.message.data2)) {
+    messages.value = [...props.message.data2];
+  }
+
+  nextTick(scrollToBottom);
+
+  // ✅ Setup channel once only
+  if (!isChannelInitialized) {
+    setupChannel(props.currentUserId);
+    isChannelInitialized = true;
+  }
+
+  document.addEventListener('click', handleClickOutside);
   document.addEventListener("click", hideAllDropdowns);
+
+  if (chatBox.value) {
+    chatBox.value.addEventListener("scroll", () => {
+      if (chatBox.value.scrollTop === 0) {
+        loadOlderMessages();
+      }
+    });
+  }
 });
 
 onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside);
   document.removeEventListener("click", hideAllDropdowns);
+
+  if (echoChannel) {
+    echoChannel.stopListening('NewMessageSent');
+    window.Echo.leave(`chat.${props.currentUserId}`);
+  }
 });
 
 

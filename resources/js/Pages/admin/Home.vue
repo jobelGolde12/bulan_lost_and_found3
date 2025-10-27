@@ -6,7 +6,7 @@ import { defineProps, ref, watch, computed } from "vue";
 import CategoriesList from "@/Components/user/CategoriesList.vue";
 import ItemCardForAdmin from "@/Components/admin/ItemCardForAdmin.vue";
 import FIlterByLocation from "@/Components/user/FIlterByLocation.vue";
-
+import LoadingItem from "@/Components/LoadingItem.vue";
 const props = defineProps({
   categories: {
     type: Array,
@@ -41,6 +41,7 @@ const searchForm = useForm({ query: "" });
 const getItems = ref([...props.items]);
 const getLocations = ref([]);
 const getCurrentLocation = ref("Location");
+let isItemLoading = ref(false);
 const getCurrentItemCategory = computed(() => {
   return [...new Set(getItems.value.map(item => item.category))];
 });
@@ -143,14 +144,16 @@ const handleSearch = () => {
           :currentLocation="getCurrentLocation"
           />
          </div>
-        <FilterComponent @filterSelected="handleFilterChange" :role="props.role"/>
+        <FilterComponent 
+        @filterSelected="handleFilterChange" 
+        :role="props.role"
+        v-model:items="getItems"
+        v-model:category="selectedCategory"
+        v-model:loading="isItemLoading"
+        />
       </div>
       <!-- Items List -->
       <ItemCardForAdmin :items="getItems"/>
-
-      <div class="container" v-if="getItems.length === 0">
-        <h1 class="text-dark text-center text-muted">No item found...</h1>
-      </div>
     </div>
   </AdminLayout>
 </template>

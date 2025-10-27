@@ -48,6 +48,32 @@ class AdminDashboard extends Controller
                 'locations' => $locations,
             ]); 
         }
+        public function filterItems($status, $category)
+        {
+            $userId = Auth::id();
+
+            $query = ItemModel::with('user', 'user.userInfo:id,user_id,profile_pic')
+                    ->whereNot('status', 'Claimed')
+                    ->with(['viewLater' => function ($query) use ($userId) {
+                        $query->where('user_id', $userId);
+                    }]);
+
+            // Filter category
+            if ($category !== 'all') {
+                $query->where('category', $category);
+            }
+
+            // Filter status
+            if ($status !== 'all') {
+                $query->where('status', $status);
+            }
+
+            $items = $query->orderBy('created_at', 'desc')->get();
+
+            return response()->json($items);
+        }
+
+
 
         public function loadMore(Request $request)
         {
