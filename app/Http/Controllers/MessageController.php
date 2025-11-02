@@ -9,6 +9,7 @@ use App\Models\RemovePinnedMessages;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
@@ -92,12 +93,13 @@ $pinnedUser = User::whereNotIn('id', $excludedIds)
             'receiver_id' => 'required|exists:users,id',
             'content' => 'required|string|max:1000',
         ]);
-
         // Create a new message
+       $encryptedMessage = Crypt::encryptString($validatedData['content']);
+
         $message = MessageModel::create([
             'sender_id' => Auth::id(),
             'receiver_id' => $validatedData['receiver_id'],
-            'message' => $validatedData['content'],
+            'message' => $encryptedMessage,
         ]);
 
         // Broadcast the message
@@ -107,7 +109,7 @@ $pinnedUser = User::whereNotIn('id', $excludedIds)
             $message->message,
             $message->created_at
         ));
-
+        $message->message = Crypt::decryptString($message->message);
         return response()->json($message, 201);
     }
 
@@ -256,8 +258,12 @@ $data2 = MessageModel::where(function ($query) use ($id, $currentUserId) {
         $query->where('sender_id', $id)
               ->where('receiver_id', $currentUserId);
     })->orderBy('created_at', 'asc')
-    ->limit(15)
-      ->get();
+      ->limit(15)
+      ->get()
+      ->map(function ($msg) {
+          $msg->message = Crypt::decryptString($msg->message);
+          return $msg;
+      });
 
 $message = [
     'data1' => $data1,

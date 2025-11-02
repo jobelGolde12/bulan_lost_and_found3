@@ -1,7 +1,6 @@
 <script setup>
-import { computed, onMounted } from "vue";
+import { computed, ref } from "vue";
 import { Link } from "@inertiajs/vue3";
-import { ref } from "vue";
 
 const props = defineProps({
   items: {
@@ -9,22 +8,36 @@ const props = defineProps({
     default: [],
   },
 });
-let viewLater = ref(false);
+
 const itemContainer = computed(() => props.items);
-console.log('items => ' + JSON.stringify(props.items)); 
+
+// Track expanded descriptions per item
+const expanded = ref({});
+
+const toggleExpand = (id) => {
+  expanded.value[id] = !expanded.value[id];
+};
+
+// Helper function to limit description
+const getDisplayDescription = (desc, id) => {
+  if (!desc) return "";
+  const words = desc.split(" ");
+  if (words.length <= 9) return desc;
+  if (expanded.value[id]) return desc;
+  return words.slice(0, 9).join(" ") + "...";
+};
 </script>
 
 <template>
-    <!-- Ang purpose san PendingCard.vue 
-    para may siway ang PendingCard 
-    sa vueItemAs admin sa backend -->
-  <div class="card-container container-fluid d-flex flex-row flex-wrap mt-4 gap-3 justify-content-center" v-if="itemContainer">
-    <div
-      class="card bg-light"
-      v-for="data in itemContainer"
-      :key="data.id"
-    >
-      <Link :href="route('view.pending', { item: data?.id })" class="text-decoration-none">
+  <div
+    class="card-container container-fluid d-flex flex-row flex-wrap mt-4 gap-3 justify-content-center"
+    v-if="itemContainer"
+  >
+    <div class="card bg-light" v-for="data in itemContainer" :key="data.id">
+      <Link
+        :href="route('view.pending', { item: data?.id })"
+        class="text-decoration-none"
+      >
         <div class="image-container">
           <img
             :src="data.image_url"
@@ -34,34 +47,51 @@ console.log('items => ' + JSON.stringify(props.items));
           />
         </div>
       </Link>
-        <div class="card-body">
-              <div class="d-flex flex-column gap-0 m-0 p-0">
-                <h5 class="card-title text-dark mb-0 fw-bolder">{{ data.title }}</h5>
-                <p class="card-text text-muted m-0">{{ data.description }}</p>
-                <p class="text-success m-0">{{ data.category || 'null' }}</p>
-               </div>
 
-          <div class="container-fluid bottom d-flex flex-row justify-content-between align-items-center px-0 pt-2">
-             <div class="left">
-                  <Link
-                :href="route('view.userAsUser', {id: data?.user.id})"
-                class=" ps-0 d-flex flex-row gap-2 align-items-center text-dark text-decoration-none"
-                >
-                  <div><img :src="`/storage/${data.user?.user_info?.profile_pic}`  || '../../images/profile.jpeg'" alt="profile" class="default-profile"></div>
-                      <div class="owner_name">{{ data.user?.name || 'user' }}</div>
-               </Link>
-            </div>
+      <div class="card-body">
+        <div class="d-flex flex-column gap-0 m-0 p-0">
+          <h5 class="card-title text-dark mb-0 fw-bolder">{{ data.title }}</h5>
 
-            <!-- <div class="right">
-              <i class="btn btn-light bi bi-bookmark" title="View later" :class="{'bi-bookmar-fill' : viewLater}"></i>
-            </div> -->
+          <p class="card-text text-muted m-0">
+            {{ getDisplayDescription(data.description, data.id) }}
+            <span
+              v-if="data.description && data.description.split(' ').length > 9"
+              class="see-more"
+              @click="toggleExpand(data.id)"
+            >
+              {{ expanded[data.id] ? "See less" : "See more" }}
+            </span>
+          </p>
+
+          <p class="text-success m-0">{{ data.category || "null" }}</p>
+        </div>
+
+        <div
+          class="container-fluid bottom d-flex flex-row justify-content-between align-items-center px-0 pt-2"
+        >
+          <div class="left">
+            <Link
+              :href="route('view.userAsUser', { id: data?.user.id })"
+              class="ps-0 d-flex flex-row gap-2 align-items-center text-dark text-decoration-none"
+            >
+              <div>
+                <img
+                  :src="`/storage/${data.user?.user_info?.profile_pic}` || '../../images/profile.jpeg'"
+                  alt="profile"
+                  class="default-profile"
+                />
+              </div>
+              <div class="owner_name">{{ data.user?.name || "user" }}</div>
+            </Link>
           </div>
         </div>
+      </div>
     </div>
+
     <div class="container text-center" v-if="itemContainer.length === 0">
       No Item.
     </div>
-    <!-- Para may extra space sa baba -->
+
     <div class="container-bottom mt-5"></div>
   </div>
 </template>
@@ -84,38 +114,32 @@ console.log('items => ' + JSON.stringify(props.items));
   padding: 15px;
   background-color: white;
   cursor: pointer;
-    /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s, box-shadow 0.2s; */
   border: none;
 }
-.card .card-body .bottom{
+
+.card .card-body .bottom {
   position: relative;
   bottom: 0;
 }
-/* .card:hover {
-  transform: scale(1.03);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-  background: rgba(200, 195, 195, 0.1);
-} */
 
 .image-container {
   width: 100%;
-  height: 200px; 
+  height: 200px;
   overflow: hidden;
   border-radius: 8px;
-  overflow: hidden;
 }
 
 .image-container .card-img-top {
   width: 100%;
   height: 100%;
-  object-fit: cover; 
-  object-position: top; 
-  transition: .5s;
+  object-fit: cover;
+  object-position: top;
+  transition: 0.5s;
 }
-.image-container .card-img-top:hover{
+
+.image-container .card-img-top:hover {
   transform: scale(1.1);
-  filter: brightness(.8);
+  filter: brightness(0.8);
 }
 
 .card-body {
@@ -126,11 +150,20 @@ console.log('items => ' + JSON.stringify(props.items));
   width: 100%;
   height: 200px;
 }
-.default-profile{
+
+.default-profile {
   width: 30px;
   height: 30px;
   border-radius: 50%;
 }
+
+.see-more {
+  color: #007bff;
+  cursor: pointer;
+  font-weight: 500;
+  margin-left: 5px;
+}
+
 @media (max-width: 768px) {
   .card {
     max-width: 100%;

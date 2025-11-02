@@ -176,11 +176,11 @@ onMounted(() => {
   backdrop-filter: blur(10px);
 }
 
-.sidebar__toggle:hover {
+/* .sidebar__toggle:hover {
   background: rgba(255, 255, 255, 1);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
+} */
 
 .sidebar__toggle--rotated {
   transform: rotate(180deg);
@@ -207,13 +207,6 @@ onMounted(() => {
   background: transparent;
   border: 1px solid transparent;
   cursor: pointer;
-}
-
-.nav-item:hover {
-  background: rgba(255, 255, 255, 0.8);
-  color: #334155;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 .nav-item--active {
@@ -252,10 +245,6 @@ onMounted(() => {
   justify-content: center;
   transition: transform 0.3s ease;
   position: relative;
-}
-
-.nav-item:hover .nav-item__icon {
-  transform: scale(1.1);
 }
 
 .nav-item--active .nav-item__icon {

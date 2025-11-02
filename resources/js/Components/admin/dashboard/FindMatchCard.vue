@@ -23,9 +23,10 @@ watch(
 const matched = computed(() => {
   return itemContainer.value.flatMap(item => item.matchedLostItems || []);
 });
+
 const viewItem = (getId) => {
-  router.get(route('viewItemInfoAsAdmin', {id: getId}))
-}
+  router.get(route('viewItemInfoAsAdmin', { id: getId }));
+};
 </script>
 
 <template>
@@ -36,14 +37,18 @@ const viewItem = (getId) => {
         <h2 class="text-muted">No Matched Items</h2>
       </div>
 
-      <!-- Matched Items List with Scroll -->
+      <!-- Matched Items List -->
       <div v-else class="scroll-container">
         <div
           v-for="(item, index) in itemContainer"
           :key="index"
-          class="card bg-light border-0 mb-4"
+          class="card bg-light border-0 mb-4 relative-card"
+          :class="{
+            'lost-gradient': item.status === 'Lost',
+            'found-gradient': item.status === 'Found'
+          }"
         >
-          <div class="card-body">
+          <div class="card-body position-relative">
             <div class="row mb-3">
               <div class="col">
                 <h5 class="text-secondary lost-text">Lost</h5>
@@ -91,7 +96,7 @@ const viewItem = (getId) => {
                     :src="item.foundItem.image_url || 'https://via.placeholder.com/100'"
                     alt="Found Item"
                     class="mb-2 pointer"
-                     @click="viewItem(item.foundItem.id)"
+                    @click="viewItem(item.foundItem.id)"
                   />
                 </div>
                 <div class="fw-bold fs-5 mt-3">{{ item.foundItem.title }}</div>
@@ -115,25 +120,54 @@ const viewItem = (getId) => {
 .page-container {
   height: 100vh;
   overflow-y: auto;
-  padding-bottom: 5rem; 
+  padding-bottom: 5rem;
 }
 
 .card {
   border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+}
+
+/* Gradient effects */
+.relative-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 18%;
+  opacity: 0.7;
+  filter: blur(12px);
+  transition: opacity 0.3s ease;
+  z-index: 0;
+}
+
+.lost-gradient::before {
+  left: 0;
+  background: linear-gradient(90deg, rgba(255, 67, 67, 0.9), rgba(255, 67, 67, 0));
+}
+
+.found-gradient::before {
+  right: 0;
+  background: linear-gradient(-90deg, rgba(0, 132, 255, 0.9), rgba(0, 132, 255, 0));
 }
 
 .image-container {
   width: 320px;
   height: 320px;
   overflow: hidden;
-  padding: 0;
 }
 
 .image-container img {
-  position: relative;
   width: 100%;
   height: 100%;
   transition: 0.5s;
+  object-fit: cover;
 }
 
 .image-container:hover img {
@@ -152,7 +186,8 @@ const viewItem = (getId) => {
 .found-text {
   transform: translateX(45%);
 }
-.pointer{
+
+.pointer {
   cursor: pointer;
 }
 </style>

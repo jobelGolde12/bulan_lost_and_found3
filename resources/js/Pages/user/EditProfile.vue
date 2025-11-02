@@ -40,7 +40,7 @@ const submit = () => {
   if (!form.profile_pic) {
     delete dataToSubmit.profile_pic;
   }
-
+    console.log("id: ", props?.user.id || 'NA')
   form.post(route("user.update.post", { id: props.user.id }), {
     data: dataToSubmit,
     forceFormData: true,

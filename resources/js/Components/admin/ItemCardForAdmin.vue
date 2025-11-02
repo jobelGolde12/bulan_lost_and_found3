@@ -84,7 +84,7 @@ onUnmounted(() => window.removeEventListener("scroll", handleScroll));
     <div v-else class="card-grid__container">
       <article v-for="data in itemContainer" :key="data.id" class="item-card">
         <!-- For development edit  -->
-        <!--  <Link class="btn btn-dark" :href="route('item.edit', {id: data.id})">Edit</Link>  -->
+         <!-- <Link class="btn btn-dark" :href="route('item.edit', {id: data.id})">Edit</Link>  -->
         <!-- Image Section -->
         <Link :href="route('viewItemInfoAsAdmin', { item: data?.id })" class="item-card__image-link">
           <div class="item-card__image-container">

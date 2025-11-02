@@ -22,6 +22,27 @@ class ViewMoreUsers extends Controller
             'toggleStatus' => 'all' //Para sa ToggleAllOrBlocked component
         ]);
     }
+    public function loadMoreUsers($offset)
+    {
+        $limit = 10;
+
+        // Blocked users list
+        $blockedUser = BlockedMessages::where('user_id', Auth::id())->get(['id', 'blocked_user']);
+        $excludedBlockedIds = $blockedUser->pluck('blocked_user')->toArray();
+
+        // Get users with pagination via offset + limit
+        $users = User::with('userInfo')
+            ->orderBy('id', 'ASC')
+            ->skip($offset)
+            ->take($limit)
+            ->get();
+
+        return response()->json([
+            'users' => $users,
+            'blocked_users' => $excludedBlockedIds,
+        ]);
+    }
+
     public function unBlock($id){
         $blockedUser = BlockedMessages::where('blocked_user', $id)->firstOrFail();
         $blockedUser->delete();

@@ -199,6 +199,8 @@ Route::prefix('viewMoreUsers')->name('viewMoreUsers.')->middleware('auth')->grou
     Route::get('/view-all-the-users', [ViewMoreUsers::class, 'index'])->name('index');
     Route::delete('/unblock-user/{id}', [ViewMoreUsers::class, 'unBlock'])->name('unBlock');
     Route::get('/view-all-blocked-users', [ViewMoreUsers::class, 'viewAllBlocked'])->name('blocked');
+    Route::get('/load-more-users/{offset}', [ViewMoreUsers::class, 'loadMoreUsers'])
+    ->name('loadMore');
 });
 
 //view user para sa user (diri admin)

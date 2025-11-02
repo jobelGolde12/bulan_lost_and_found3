@@ -46,26 +46,39 @@ class SettingsController extends Controller
 
     // sa user pakadto padin ang route sa notification 
     // since mao ang default na route niya
-    public function notifications()
-    {
-        $notification = NotificationModel::where("user_id", Auth::id())->get();
-      $hasUnread = NotificationModel::where('user_id', Auth::id())->where('read_status', 0)->exists();   
-        if(Auth::user()->role == 'admin'){
-            return Inertia::render('Settings/admin/Notifications', [
-                'notification' => $notification,
-                'hasUnread' => $hasUnread,
-            ]);
-        }else{
+            public function notifications()
+        {
+            $userId = Auth::id();
+
+            // Exclude notifications with "Post Deleted" in title (case-insensitive)
+            $notification = NotificationModel::where('user_id', $userId)
+                ->whereRaw('LOWER(title) NOT LIKE ?', ['%post deleted%'])
+                ->get();
+
+            $hasUnread = NotificationModel::where('user_id', $userId)
+                ->where('read_status', 0)
+                ->whereRaw('LOWER(title) NOT LIKE ?', ['%post deleted%'])
+                ->exists();
+
+            if (Auth::user()->role === 'admin') {
+                return Inertia::render('Settings/admin/Notifications', [
+                    'notification' => $notification,
+                    'hasUnread' => $hasUnread,
+                ]);
+            }
+
             return Inertia::render('Settings/user/Notifications', [
                 'notifications' => $notification,
-                'hasUnread' => $hasUnread
+                'hasUnread' => $hasUnread,
             ]);
         }
-    }
+
 
     public function announcements()
     {
-        $ann = AnnouncementModel::with(['user:id,name,role', 'userProfile:id,profile_pic'])->get();
+        $ann = AnnouncementModel::with(['user:id,name,role', 'userProfile:id,profile_pic'])
+        ->orderBy('created_at', 'desc')
+        ->get();
         if(Auth::user()->role == 'admin'){
             return Inertia::render('Settings/admin/Announcement', [
                 'ann' => $ann,

@@ -148,7 +148,6 @@ const getProfileImage = (profilePic) => {
   // Otherwise, assume it's stored in /storage
   return `/storage/${profilePic}`;
 };
-
 </script>
 
 <template>

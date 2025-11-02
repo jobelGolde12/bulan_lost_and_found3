@@ -385,19 +385,25 @@ const moreUsers = () => {
 
       </div>
 
-      <div class="p-3 border-top bg-white" v-if="getMessage?.data1?.name">
-        <div class="input-group">
-          <input
-            type="text"
+          <div class="p-3 border-top bg-white" v-if="getMessage?.data1?.name">
+        <div class="d-flex align-items-end gap-2">
+          <textarea
             v-model="newMessage"
-            @keyup.enter="sendMessage"
-            class="form-control"
-            placeholder="Type a message..." />
+            @input="e => { 
+              e.target.style.height = 'auto'; 
+              e.target.style.height = e.target.scrollHeight + 'px'; 
+            }"
+            @keyup.enter.exact.prevent="sendMessage"
+            class="form-control flex-grow-1 auto-resize-textarea"
+            rows="1"
+            placeholder="Type a message..."
+          ></textarea>
           <button class="btn btn-success" @click="sendMessage">
             Send <i class="bi bi-send ms-1"></i>
           </button>
         </div>
-      </div>
+    </div>
+
     </div>
 
     <!-- For the popup (togglePopup) -->
@@ -527,6 +533,15 @@ const moreUsers = () => {
   opacity: 0;
   transition: opacity 0.2s ease;
 }
+.auto-resize-textarea {
+  resize: none;
+  overflow: hidden;
+  min-height: 40px;
+  max-height: 200px;
+  line-height: 1.5;
+  transition: height 0.2s ease;
+}
+
  .empty-state-container {
             min-height: 70vh;
             padding: 2rem 1rem;

@@ -67,6 +67,9 @@ const forceDelete = () => {
   }
 
 };
+console.log("id: ", props?.id || 'NA')
+console.log("name: ", props?.name || 'NA')
+
 </script>
 
 <template>

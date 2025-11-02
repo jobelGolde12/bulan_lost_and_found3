@@ -19,7 +19,9 @@ use Inertia\Inertia;
 class PendingRequestController extends Controller
 {
     public function index(){
-        $items = PendingRequest::with(['user:id,name', 'user.userInfo:id,user_id,profile_pic'])->get();
+        $items = PendingRequest::with(['user:id,name', 'user.userInfo:id,user_id,profile_pic'])
+        ->orderBy('created_at', 'desc')
+        ->get();
         return Inertia::render('admin/ViewPendingRequest', [
             'items' => $items
         ]);

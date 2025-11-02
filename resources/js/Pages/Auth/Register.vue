@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
@@ -17,6 +17,7 @@ const form = useForm({
 const firstName = ref("");
 const middleInitial = ref("");
 const lastName = ref("");
+const contactError = ref("");
 
 const submit = () => {
   if (form.contact.length < 11) {
@@ -49,6 +50,44 @@ const toggleConfirmPassword = () => {
   showConfirmPassword.value = !showConfirmPassword.value;
 };
 const agreeInTermsAndPolicy = ref(false);
+
+watch(
+  () => form.contact,
+  (newVal) => {
+    // If empty input
+    if (!newVal) {
+      contactError.value = "";
+      return;
+    }
+
+    // If contains letters or non-numeric characters
+    if (!/^\d+$/.test(newVal)) {
+      contactError.value = "Phone number must contain only digits (0–9).";
+      return;
+    }
+
+    // If not starting with 0
+    if (!/^0/.test(newVal)) {
+      contactError.value = "Phone number must start with 0.";
+      return;
+    }
+
+    // If not exactly 11 digits
+    if (newVal.length < 11) {
+      contactError.value = "Phone number must be 11 digits long.";
+      return;
+    }
+
+    if (newVal.length > 11) {
+      contactError.value = "Phone number must not exceed 11 digits.";
+      return;
+    }
+
+    //  Valid phone number → clear message
+    contactError.value = "";
+  }
+);
+
 </script>
 
 <style scoped>
@@ -165,19 +204,24 @@ const agreeInTermsAndPolicy = ref(false);
         <InputError class="mt-2" :message="form.errors.email" />
       </div>
 
-      <div class="mt-3">
-        <InputLabel for="contact" value="Contact" />
-        <TextInput
-          id="contact"
-          type="text"
-          class="mt-1 block w-full"
-          v-model="form.contact"
-          required
-          autofocus
-          style="border-radius: 10px"
-          placeholder="09460162987"
-        />
-      </div>
+        <div class="mt-3">
+          <InputLabel for="contact" value="Contact" />
+          <TextInput
+            id="contact"
+            type="text"
+            class="mt-1 block w-full"
+            v-model="form.contact"
+            required
+            autofocus
+            style="border-radius: 10px"
+            placeholder="09460162987"
+          />
+
+          <!-- Real-time validation message -->
+          <p v-if="contactError" class="text-danger small mt-1">
+            {{ contactError }}
+          </p>
+        </div>
 
       <div class="mt-4 password-wrapper">
         <InputLabel for="password" value="Create Password" />

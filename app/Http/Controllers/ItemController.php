@@ -35,7 +35,7 @@ class ItemController extends Controller
     $request->validate([
         'name' => 'required|string|max:255',
         'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:5120',
-        'description' => 'required|string|max:255',
+        'description' => 'required|string|max:1000',
         'category' => 'required|string',
         'location' => 'required|string|max:255',
         'user_id' => 'required|integer',
@@ -234,11 +234,16 @@ private function getCachedProfanityWords()
                 ->findOrFail($item);
 
             $currentUser = Auth::id();
+             $created_by = User::find($getItem?->user_id);
+            $profile = UserInfo::where('user_id' , $getItem->user_id)->value('profile_pic');
 
             return Inertia::render('admin/ViewItemInfoAsAdmin', [
                 'item' => $getItem,
                 'comments' => $getItem->comments,
                 'currentUser' => $currentUser ?: null,
+                 'created_by' => $created_by,
+                 'profile' => $profile ?: 'NA',
+
             ]);
         }
 

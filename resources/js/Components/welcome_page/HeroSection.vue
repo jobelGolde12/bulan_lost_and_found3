@@ -30,7 +30,7 @@ import { Link } from '@inertiajs/vue3';
 
       <div class="video-wrapper mx-auto">
         <video
-          src="../../../videos/welcome_vid1.mp4"
+          src="../../../videos/welcome_vid2.mp4"
           autoplay
           muted
           loop

@@ -29,26 +29,37 @@ class ProfileController extends Controller
     /**
      * Display the user's profile form.
      */
-    public function index(){
-        $userInfo = UserInfo::where('user_id', Auth::id())->first();
-        $permission = MyPermissionModel::where('user_id', Auth::id())->first();
-        $hasUnreadNotifications = NotificationModel::where('user_id', Auth::id())
-            ->where('read_status', false)
-            ->exists();
-        if(Auth::check() && Auth::user()->role === 'admin'){
-            return Inertia::render('admin/Profile', [
-                'userInfo' => $userInfo, 
-                'permission' => $permission,
-                'hasUnreadNotifications' => $hasUnreadNotifications,
-            ]);
-        }else{
+        public function index()
+        {
+            if (!Auth::check()) {
+                return redirect()->route('login');
+            }
+
+            $userId = Auth::id();
+
+            $userInfo = UserInfo::where('user_id', $userId)->first();
+            $permission = MyPermissionModel::where('user_id', $userId)->first();
+
+            $hasUnreadNotifications = NotificationModel::where('user_id', $userId)
+                ->where('read_status', 0) 
+                ->whereRaw('LOWER(title) NOT LIKE ?', ['%post deleted%'])
+                ->exists();
+
+            if (Auth::user()->role === 'admin') {
+                return Inertia::render('admin/Profile', [
+                    'userInfo' => $userInfo,
+                    'permission' => $permission,
+                    'hasUnreadNotifications' => $hasUnreadNotifications,
+                ]);
+            }
+
             return Inertia::render('user/Profile', [
                 'userInfo' => $userInfo,
                 'permission' => $permission,
                 'hasUnreadNotifications' => $hasUnreadNotifications,
             ]);
         }
-    }
+
     public function edit(Request $request): Response
     {
         $user = User::find(Auth::id());
@@ -155,9 +166,8 @@ class ProfileController extends Controller
 
     $userInfo = UserInfo::where('user_id', $id)->first();
 
-    if (!$userInfo) {
-        return response()->json(['error' => 'User info not found'], 404);
-    }
+      // Find or create the user's info record
+    $userInfo = UserInfo::firstOrNew(['user_id' => $id]);
 
     try {
     $validated = $request->validate([

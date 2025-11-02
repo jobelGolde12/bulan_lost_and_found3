@@ -27,6 +27,7 @@ watch(
   },
   { immediate: true }
 );
+console.log("has notification: ", props.hasUnreadNotifications)
 </script>
 
 <template>

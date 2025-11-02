@@ -81,10 +81,10 @@ onBeforeUnmount(() => {
 <template>
   <div class="chart-wrapper">
     <!-- Chart -->
-    <div ref="chartRef" class="chart-box"></div>
+    <div ref="chartRef" class="chart-box d-none d-sm-block d-lg-block"></div>
 
     <!-- Summary -->
-    <div class="summary d-none d-lg-block">
+    <div class="summary">
       <div class="summary-title">Number of Cases Recorded in the System</div>
 
       <div class="summary-stats">
@@ -202,12 +202,19 @@ onBeforeUnmount(() => {
   }
 }
 @media screen and (max-width: 576px) {
-  .summary-title {
-    font-size: 0.8rem;
+    .summary {
+    align-items: center !important;
+    text-align: center !important;
+    margin-left: 2rem;
+    padding-right: 0; 
+    width: 500px;
   }
-  .chart-wrapper{
-    margin-top: 2rem;
-    transform: translateY(0%);
+  .summary-title {
+    font-size: 1rem;
+  }
+  .summary-stats {
+    justify-content: center;
+    gap: 1.25rem;
   }
 }
 </style>
