@@ -18,6 +18,30 @@ const firstName = ref("");
 const middleInitial = ref("");
 const lastName = ref("");
 const contactError = ref("");
+const passwordMessage = ref("");
+const passwordMessageColor = ref("text-danger");
+
+// 🔒 Real-time password validation
+watch(
+  () => form.password,
+  (newVal) => {
+    if (!newVal) {
+      passwordMessage.value = "";
+      return;
+    }
+
+    const strongRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+
+    if (!strongRegex.test(newVal)) {
+      passwordMessage.value =
+        "Password must be at least 8 characters and contain both letters and numbers.";
+      passwordMessageColor.value = "text-danger";
+    } else {
+      passwordMessage.value = "✅ Strong password";
+      passwordMessageColor.value = "text-success";
+    }
+  }
+);
 
 const submit = () => {
   if (form.contact.length < 11) {
@@ -25,7 +49,6 @@ const submit = () => {
     return;
   }
 
-  // Combine name fields before submit
   form.name =
     `${firstName.value} ${middleInitial.value ? middleInitial.value + "." : ""} ${lastName.value}`
       .trim()
@@ -39,7 +62,7 @@ const submit = () => {
   });
 };
 
-// Toggle password visibility
+// 👁 Toggle password visibility
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
 
@@ -51,28 +74,25 @@ const toggleConfirmPassword = () => {
 };
 const agreeInTermsAndPolicy = ref(false);
 
+// 📞 Real-time contact validation
 watch(
   () => form.contact,
   (newVal) => {
-    // If empty input
     if (!newVal) {
       contactError.value = "";
       return;
     }
 
-    // If contains letters or non-numeric characters
     if (!/^\d+$/.test(newVal)) {
       contactError.value = "Phone number must contain only digits (0–9).";
       return;
     }
 
-    // If not starting with 0
     if (!/^0/.test(newVal)) {
       contactError.value = "Phone number must start with 0.";
       return;
     }
 
-    // If not exactly 11 digits
     if (newVal.length < 11) {
       contactError.value = "Phone number must be 11 digits long.";
       return;
@@ -83,11 +103,9 @@ watch(
       return;
     }
 
-    //  Valid phone number → clear message
     contactError.value = "";
   }
 );
-
 </script>
 
 <style scoped>
@@ -100,7 +118,7 @@ watch(
   width: 100vw;
   height: 100vh;
   overflow-x: hidden;
-  overflow-y:scroll;
+  overflow-y: scroll;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -127,7 +145,8 @@ watch(
   transform: translateY(0%);
   cursor: pointer;
 }
-.terms-text{
+
+.terms-text {
   transform: translateY(35%);
 }
 
@@ -148,46 +167,45 @@ watch(
       <h2 class="text-dark text-center fw-semibold mt-5">Register now!</h2>
 
       <div>
-  <InputLabel value="Name" />
+        <InputLabel value="Name" />
 
-  <div class="row">
-    <div class="col-5">
-      <TextInput
-        type="text"
-        class="mt-1 block w-full"
-        v-model="firstName"
-        required
-        placeholder="First Name"
-        style="border-radius: 10px"
-      />
-    </div>
+        <div class="row">
+          <div class="col-5">
+            <TextInput
+              type="text"
+              class="mt-1 block w-full"
+              v-model="firstName"
+              required
+              placeholder="First Name"
+              style="border-radius: 10px"
+            />
+          </div>
 
-    <div class="col-2">
-      <TextInput
-        type="text"
-        class="mt-1 block w-full text-center"
-        v-model="middleInitial"
-        maxlength="1"
-        placeholder="M"
-        style="border-radius: 10px"
-      />
-    </div>
+          <div class="col-2">
+            <TextInput
+              type="text"
+              class="mt-1 block w-full text-center"
+              v-model="middleInitial"
+              maxlength="1"
+              placeholder="M"
+              style="border-radius: 10px"
+            />
+          </div>
 
-    <div class="col-5">
-      <TextInput
-        type="text"
-        class="mt-1 block w-full"
-        v-model="lastName"
-        required
-        placeholder="Last Name"
-        style="border-radius: 10px"
-      />
-    </div>
-  </div>
+          <div class="col-5">
+            <TextInput
+              type="text"
+              class="mt-1 block w-full"
+              v-model="lastName"
+              required
+              placeholder="Last Name"
+              style="border-radius: 10px"
+            />
+          </div>
+        </div>
 
-  <InputError class="mt-2" :message="form.errors.name" />
-</div>
-
+        <InputError class="mt-2" :message="form.errors.name" />
+      </div>
 
       <div class="mt-4">
         <InputLabel for="email" value="Email" />
@@ -204,24 +222,23 @@ watch(
         <InputError class="mt-2" :message="form.errors.email" />
       </div>
 
-        <div class="mt-3">
-          <InputLabel for="contact" value="Contact" />
-          <TextInput
-            id="contact"
-            type="text"
-            class="mt-1 block w-full"
-            v-model="form.contact"
-            required
-            autofocus
-            style="border-radius: 10px"
-            placeholder="09460162987"
-          />
+      <div class="mt-3">
+        <InputLabel for="contact" value="Contact" />
+        <TextInput
+          id="contact"
+          type="text"
+          class="mt-1 block w-full"
+          v-model="form.contact"
+          required
+          autofocus
+          style="border-radius: 10px"
+          placeholder="09460162987"
+        />
 
-          <!-- Real-time validation message -->
-          <p v-if="contactError" class="text-danger small mt-1">
-            {{ contactError }}
-          </p>
-        </div>
+        <p v-if="contactError" class="text-danger small mt-1">
+          {{ contactError }}
+        </p>
+      </div>
 
       <div class="mt-4 password-wrapper">
         <InputLabel for="password" value="Create Password" />
@@ -233,13 +250,18 @@ watch(
           required
           autocomplete="new-password"
           style="border-radius: 10px"
-          placeholder="8 letters and long"
+          placeholder="8 characters, letters & numbers"
         />
         <i
           :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
           class="eye-icon"
           @click="togglePassword"
+          :style="{ transform: passwordMessage ? 'translateY(-90%)' : 'translateY(0%)' }"
         ></i>
+        <!--  Real-time password message -->
+        <p v-if="passwordMessage" :class="[passwordMessageColor, 'small', 'mt-1']">
+          {{ passwordMessage }}
+        </p>
         <InputError class="mt-2" :message="form.errors.password" />
       </div>
 
@@ -253,7 +275,7 @@ watch(
           required
           autocomplete="new-password"
           style="border-radius: 10px"
-          placeholder="8 letters and long"
+          placeholder="Confirm your password"
         />
         <i
           :class="showConfirmPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
@@ -263,14 +285,14 @@ watch(
         <InputError class="mt-2" :message="form.errors.password_confirmation" />
       </div>
 
-      <div
-        class="mt-4 d-flex flex-row gap-2 align-items-center justify-content-start"
-      >
+      <div class="mt-4 d-flex flex-row gap-2 align-items-center justify-content-start">
         <input type="checkbox" v-model="agreeInTermsAndPolicy" />
         <div>
           <p class="terms-text">
             I agree to the
-            <Link :href="route('view.privacy')" class="text-dark text-underline ">terms and policy</Link>
+            <Link :href="route('view.privacy')" class="text-dark text-underline">
+              terms and policy
+            </Link>
           </p>
         </div>
       </div>
@@ -285,7 +307,7 @@ watch(
         </button>
         <div class="mt-4">
           Already registered?
-          <Link :href="route('login')" class="text-primary"> signin </Link>
+          <Link :href="route('login')" class="text-primary">signin</Link>
         </div>
       </div>
     </form>

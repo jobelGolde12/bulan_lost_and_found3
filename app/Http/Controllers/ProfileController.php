@@ -278,8 +278,8 @@ class ProfileController extends Controller
     // 10. Logout the user
     Auth::logout();
 
-    // 11. Delete the user record
-    $user->delete();
+    // 11. Delete the user record forcely
+    $user->forceDelete();
 
     // 12. Invalidate session
     $request->session()->invalidate();

@@ -4,13 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Models\ItemModel;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class FindMatchController extends Controller
 {
     public function index(Request $request)
     {
+        $items = ItemModel::all();
+        Log::info(['items => ' => $items->toArray()]);
+
         $keyword = strtolower(trim($request->input('keyword')));
 
         // Load all lost items
@@ -31,37 +34,69 @@ class FindMatchController extends Controller
 
         foreach ($foundItems as $foundItem) {
             $matchedLostItems = $lostItems->filter(function ($lostItem) use ($foundItem, $keyword) {
-                // Normalize location & category
-                $lostLocation = strtolower(trim($lostItem->location));
-                $foundLocation = strtolower(trim($foundItem->location));
+                // Normalize category - require exact category match
                 $lostCategory = strtolower(trim($lostItem->category));
                 $foundCategory = strtolower(trim($foundItem->category));
 
-                // Require location + category match
-                if ($lostLocation !== $foundLocation || $lostCategory !== $foundCategory) {
+                // Category must match exactly
+                if ($lostCategory !== $foundCategory) {
                     return false;
                 }
 
-                // Break titles into words
-                $lostTitleWords = array_unique(preg_split('/\s+/', strtolower($lostItem->title)));
-                $foundTitleWords = array_unique(preg_split('/\s+/', strtolower($foundItem->title)));
+                // Combine title + description words for both items
+                $lostText = strtolower(trim(($lostItem->title ?? '') . ' ' . ($lostItem->description ?? '')));
+                $foundText = strtolower(trim(($foundItem->title ?? '') . ' ' . ($foundItem->description ?? '')));
 
-                // Check if at least one word from found title exists in lost title
-                $sharedWords = array_intersect($lostTitleWords, $foundTitleWords);
+                // Split into words
+                $lostWords = array_unique(preg_split('/\s+/', $lostText));
+                $foundWords = array_unique(preg_split('/\s+/', $foundText));
 
-                // If keyword is provided, enforce that it must be present in title
-                $keywordMatch = true;
-                if ($keyword) {
-                    $keywordMatch = in_array($keyword, $lostTitleWords) || in_array($keyword, $foundTitleWords);
+                // Remove filler words
+                $stopWords = ['a', 'an', 'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'it', 'this', 'that', 'from'];
+                $lostWords = array_diff($lostWords, $stopWords);
+                $foundWords = array_diff($foundWords, $stopWords);
+
+                // --- Improved matching logic ---
+
+                $sharedWords = [];
+                foreach ($lostWords as $lw) {
+                    foreach ($foundWords as $fw) {
+                        similar_text($lw, $fw, $percent);
+                        // consider words similar if 70% or more alike
+                        if ($percent >= 70) {
+                            $sharedWords[] = $lw;
+                            break;
+                        }
+                    }
                 }
 
+                // --- Enhanced keyword logic ---
+                $keywordMatch = true;
+                if (!empty($keyword)) {
+                    $keywordMatch = false;
+                    // check if keyword appears anywhere in the text
+                    if (str_contains($lostText, $keyword) || str_contains($foundText, $keyword)) {
+                        $keywordMatch = true;
+                    } else {
+                        // fuzzy keyword matching
+                        foreach (array_merge($lostWords, $foundWords) as $word) {
+                            similar_text($keyword, $word, $percent);
+                            if ($percent >= 70) {
+                                $keywordMatch = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                // Return true if there are shared words AND keyword roughly matches
                 return !empty($sharedWords) && $keywordMatch;
             });
 
             if ($matchedLostItems->isNotEmpty()) {
                 $matches[] = [
                     'foundItem' => $foundItem,
-                    'matchedLostItems' => $matchedLostItems->values()
+                    'matchedLostItems' => $matchedLostItems->values(),
                 ];
             }
         }

@@ -16,6 +16,7 @@ watch(
   () => props.items,
   (newItem) => {
     itemContainer.value = newItem;
+    console.log("matched: ", itemContainer.value)
   },
   { immediate: true }
 );

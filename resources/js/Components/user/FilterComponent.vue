@@ -17,9 +17,6 @@
       </div>
     </div>
 
-    <div v-if="user.role === 'admin'">
-      <FindMatchButton />
-    </div>
 
     <div class="change-text d-none d-lg-block">
       <p class="text-dark">

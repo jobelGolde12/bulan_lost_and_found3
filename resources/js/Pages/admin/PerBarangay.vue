@@ -89,7 +89,7 @@
       <div class="stat-card total">
         <div class="stat-icon"><i class="bi bi-clipboard-data"></i></div>
         <div class="stat-content">
-          <h3>{{ filteredReports.length }}</h3>
+          <h3>{{ totalReports }}</h3>
           <p>Total Reports</p>
         </div>
       </div>
@@ -187,7 +187,6 @@
     </div>
   </div>
 </template>
-
 <script setup>
 import { ref, computed, defineProps, watch } from 'vue'
 import { router } from '@inertiajs/vue3'
@@ -205,11 +204,8 @@ const showAdvancedFilters = ref(false)
 const sortField = ref('barangay')
 const sortDirection = ref('asc')
 
-// ✅ Pagination
-const visibleCount = ref(10) // default 10 rows
-const loadMore = () => {
-  visibleCount.value += 10
-}
+// === Visible barangays logic (half-first then all) ===
+const visibleCount = ref(0)
 
 // Utility: Extract barangay name
 const getBarangay = (location) => {
@@ -295,6 +291,7 @@ const barangaySummaryAll = computed(() => {
 // Barangay summary (based on current filter)
 const barangaySummary = computed(() => {
   const summary = {}
+
   filteredReports.value.forEach((item) => {
     const barangay = item.barangay || 'Unknown'
     if (!summary[barangay]) summary[barangay] = { Lost: 0, Found: 0, Total: 0 }
@@ -302,6 +299,16 @@ const barangaySummary = computed(() => {
     if (item.status === 'Found') summary[barangay].Found++
     summary[barangay].Total++
   })
+
+  // Exclude barangays that have no Lost or Found when "All" is active
+  if (selectedFilter.value === '') {
+    for (const key in summary) {
+      if (summary[key].Lost === 0 && summary[key].Found === 0) {
+        delete summary[key]
+      }
+    }
+  }
+
   return summary
 })
 
@@ -323,7 +330,21 @@ const sortedBarangaySummary = computed(() => {
     .reduce((acc, [key, value]) => ((acc[key] = value), acc), {})
 })
 
-// ✅ Paginated summary
+// ✅ Show half first, then all on "Load More"
+watch(
+  sortedBarangaySummary,
+  (newSummary) => {
+    const total = Object.keys(newSummary).length
+    visibleCount.value = Math.ceil(total / 2)
+  },
+  { immediate: true }
+)
+
+const loadMore = () => {
+  visibleCount.value = Object.keys(sortedBarangaySummary.value).length
+}
+
+// Paginated barangay summary
 const paginatedBarangaySummary = computed(() => {
   const entries = Object.entries(sortedBarangaySummary.value).slice(0, visibleCount.value)
   return Object.fromEntries(entries)
@@ -348,7 +369,11 @@ function viewBarangayDetails(barangay) {
 function closeModal() {
   showModal.value = false
 }
+const totalReports = computed(() => {
+  return lostCount.value + foundCount.value
+})
 </script>
+
 
 <style scoped>
 .dashboard-container1 {

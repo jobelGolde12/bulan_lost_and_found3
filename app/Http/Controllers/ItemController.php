@@ -41,7 +41,7 @@ class ItemController extends Controller
         'user_id' => 'required|integer',
         'owner_phone_number' => 'nullable|string|max:255|min:11',
         'status' => 'required|string|in:lost,found', 
-        'date' => 'required|date|before_or_equal:today'
+        'date' => 'required|date'
     ]);
 
     //  Upload image to storage/app/public/images

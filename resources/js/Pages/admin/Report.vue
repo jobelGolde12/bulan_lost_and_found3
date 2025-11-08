@@ -20,6 +20,7 @@ const props = defineProps({
 const user = usePage().props.auth?.user;
 const page = usePage();
 const hasProfanity = ref(false);
+const dateAlert = ref(false);
 
 // Watch for errors and flash messages
 watch(() => page.props.errors, (newErrors) => {
@@ -108,17 +109,66 @@ const submitForm = () => {
   isSubmitting.value = true;
   hasProfanity.value = false;
   successMessage.value = null;
+  dateAlert.value = false;
 
+  // Ensure form.date is not empty
+  if (!form.date) {
+    isSubmitting.value = false;
+    dateAlert.value = true;
+    return;
+  }
+
+  // Convert input to Date object (datetime-local gives local time)
+  const selectedDate = new Date(form.date);
+  const now = new Date();
+
+  //  Normalize both to minutes (ignore seconds/milliseconds)
+  const selectedNormalized = new Date(
+    selectedDate.getFullYear(),
+    selectedDate.getMonth(),
+    selectedDate.getDate(),
+    selectedDate.getHours(),
+    selectedDate.getMinutes(),
+    0, 0
+  );
+
+  const nowNormalized = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    now.getHours(),
+    now.getMinutes(),
+    0, 0
+  );
+
+  //  Reject if selected date is equal to or after now
+  if (selectedNormalized.getTime() >= nowNormalized.getTime()) {
+    isSubmitting.value = false;
+    dateAlert.value = true;
+    return;
+  }
+
+  //  Convert to MySQL datetime format safely
+  const d = selectedDate;
+  const formattedDate = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}:${String(d.getSeconds()).padStart(2, "0")}`;
+
+  //  Use transform() to pass formatted date safely without mutating form
   form.transform((data) => {
     const formData = new FormData();
+
     for (const key in data) {
-      if (key === 'image' && !data[key]) continue;
-      formData.append(key, data[key]);
+      if (key === "image" && !data[key]) continue;
+      if (key === "date") {
+        formData.append("date", formattedDate);
+      } else {
+        formData.append(key, data[key]);
+      }
     }
-    return formData;
+
+  return formData;
   }).post(route("addItem"), {
-  preserveState: true,
-  preserveScroll: true,
+    preserveState: true,
+    preserveScroll: true,
     onSuccess: () => {
       isSubmitting.value = false;
       showSuccess.value = true;
@@ -126,8 +176,7 @@ const submitForm = () => {
     },
     onError: (errors) => {
       isSubmitting.value = false;
-      console.error("An error while posting item: ", errors);
-
+      console.error("An error occurred while posting item:", errors);
       if (errors && errors.description) {
         hasProfanity.value = true;
       }
@@ -269,7 +318,20 @@ const submitForm = () => {
 
           <div>
             <label>Date Lost/Found</label>
-            <input type="date" class="form-control py-3" v-model="form.date" required>
+            <input type="datetime-local" class="form-control py-3" v-model="form.date" required>
+            <div
+              v-if="dateAlert"
+              class="alert alert-warning alert-dismissible fade show"
+              role="alert"
+            >
+              <strong>Invalid Date!</strong> You cannot report an item with a date and time equal to or later than the current moment.
+              <button
+                type="button"
+                class="btn-close"
+                @click="dateAlert = false"
+                aria-label="Close"
+              ></button>
+            </div>
           </div>
 
           <button
