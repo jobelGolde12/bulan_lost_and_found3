@@ -27,6 +27,7 @@
         "laravel-echo": "^2.1.6",
         "pinia": "^3.0.2",
         "pusher-js": "^8.4.0",
-        "vue-echarts": "^7.0.3"
+        "vue-echarts": "^7.0.3",
+        "ziggy-js": "^2.6.0"
     }
 }
