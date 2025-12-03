@@ -1,0 +1,125 @@
+
+.main-container {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+}
+.sidebar {
+    background-color: #fff;
+    transition: all 0.3s ease;
+    overflow-y: hidden;
+    height: 100vh;
+    padding: 20px;
+    width: 350px;
+    z-index: 1000;
+    position: relative;
+    /* border-radius: 0 30px 30px 0; */
+}
+.sidebar.closed {
+    width: 70px;
+    padding: 10px 0;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+.modern-input {
+  border-radius: 50px;
+  padding: 0.6rem 1rem;
+  font-size: 0.95rem;
+  border: 1px solid #dee2e6;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease-in-out;
+}
+
+.modern-input:focus {
+  border-color: #28a745;
+  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+/* Modern button */
+.modern-btn {
+  background: linear-gradient(135deg, #28a745, #218838);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  transition: all 0.2s ease-in-out;
+}
+
+.modern-btn:hover {
+  background: linear-gradient(135deg, #218838, #1e7e34);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
+}
+
+/* Form spacing */
+.search-form {
+  background: #fff;
+  border-radius: 50px;
+  padding: 0.3rem 0.6rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.right {
+    width: calc(100% - 280px);
+    transition: width 0.3s ease;
+    overflow-y: auto;
+    height: 100%;
+}
+.sidebar.closed ~ .right {
+    width: calc(100% - 70px);
+}
+@media screen and (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: 250px;
+        height: 100%;
+        padding: 20px;
+        border-radius: 0;
+    }
+    .sidebar.open {
+        left: 0;
+    }
+    .sidebar.closed {
+        left: -100%;
+    }
+    .right {
+        width: 100% !important;
+    }
+    .sidebar.open ~ .right {
+        filter: brightness(0.6);
+    }
+}
+
+.pointer {
+    cursor: pointer;
+}
+.pinned-chat-action {
+    display: none;
+}
+.action2 {
+    display: none;
+    position: absolute;
+    right: -15%;
+    width: 150px;
+    height: 150px;
+    background: #f5f5f5;
+    margin-top: 3rem;
+}
+.message-text{
+    position: relative;
+    transform: translateY(20%);
+    font-size: 1.4rem;
+}
+.back {
+    position: relative;
+    display: inline-block;
+    transform: translateY(11%);
+    cursor: pointer;
+    font-size: 1.4rem;
+}
+.back:hover{
+  font-weight: bolder;
+}

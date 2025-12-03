@@ -1,0 +1,102 @@
+<script setup>
+import { Head } from "@inertiajs/vue3";
+import AdminSettingsLayout from "@/Layouts/settings/AdminSettingsLayout.vue";
+import NotificationCard from "@/Components/NotificationCard.vue";
+import { defineProps, ref, watch, computed } from "vue";
+
+const props = defineProps({
+    notification: {
+        type: Array,
+        default: () => [],
+    },
+});
+
+const getData = ref([]);
+const sortOrder = ref("latest");
+const filterStatus = ref("all"); 
+watch(
+    () => props.notification,
+    (i) => {
+        getData.value = i;
+    },
+    { immediate: true }
+);
+
+
+const filteredAndSortedNotifications = computed(() => {
+  let data = [...getData.value];
+
+  if (filterStatus.value === "viewed") {
+    data = data.filter(n => n.read_status === 1);
+  } else if (filterStatus.value === "unviewed") {
+    data = data.filter(n => n.read_status === 0);
+  }
+
+  data.sort((a, b) => {
+    const dateA = new Date(a.created_at);
+    const dateB = new Date(b.created_at);
+    return sortOrder.value === "latest" ? dateB - dateA : dateA - dateB;
+  });
+
+  return data;
+});
+
+const toggleSortOrder = () => {
+  sortOrder.value = sortOrder.value === "latest" ? "oldest" : "latest";
+};
+
+const toggleFilter = () => {
+  if (filterStatus.value === "all") filterStatus.value = "unviewed";
+  else if (filterStatus.value === "unviewed") filterStatus.value = "viewed";
+  else filterStatus.value = "all";
+};
+</script>
+
+<template>
+    <div>
+        <Head title="Notifications" />
+        <AdminSettingsLayout>
+             <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="mb-0">Notifications</h1>
+
+        <div class="d-flex align-items-center gap-5 me-4">
+          <div
+            class="text-dark fs-5 pointer d-flex align-items-center pointer"
+            @click="toggleFilter"
+            title="Filter notifications"
+          >
+            <i class="bi bi-filter me-1"></i>
+            <span style="font-size: 0.9rem;" class="d-none d-lg-block">
+              {{ 
+                filterStatus === "all" ? "All" :
+                filterStatus === "viewed" ? "Viewed" : "Unviewed" 
+              }}
+            </span>
+          </div>
+
+          <div
+            class="text-dark fs-5 pointer d-flex align-items-center"
+            @click="toggleSortOrder"
+            title="Sort notifications"
+          >
+            <i class="bi bi-sort-down me-1"></i>
+            <span style="font-size: 0.9rem;" class="d-none d-lg-block">
+              {{ sortOrder === "latest" ? "Latest → Oldest" : "Oldest → Latest" }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="container text-center" v-if="filteredAndSortedNotifications.length < 1">
+        No notification found.
+      </div>
+     <NotificationCard :notification="filteredAndSortedNotifications" v-else/>
+        </AdminSettingsLayout>
+    </div>
+</template>
+
+<style scoped>
+.pointer {
+  cursor: pointer;
+}
+</style>

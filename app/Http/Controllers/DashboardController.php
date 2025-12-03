@@ -1,0 +1,124 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\AnnouncementModel;
+use App\Models\ItemCategories;
+use App\Models\ItemModel;
+use App\Models\LocationModel;
+use App\Models\PendingRequest;
+use App\Models\TotalFound;
+use App\Models\TotalLost;
+use App\Models\User;
+use App\Models\ViewLaterModel;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
+
+class DashboardController extends Controller
+{
+    public function index(){
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
+        
+        $categories = ItemCategories::all();
+        $pendingRequestCount = PendingRequest::where('pending_status', 'pending')->count(); //Para sa admin (dashboard)
+
+        $totalLost = TotalLost::all();
+        $totalFound = TotalFound::all();
+        $announcement = AnnouncementModel::all();
+        if (Auth::check() && Auth::user()->role === 'user') { 
+            
+        //get only the specific viewLater data base sa id ni user
+        $userId = Auth::id();
+        $items = ItemModel::select('id','user_id', 'title', 'description', 'category', 'status', 'image_url', 'created_at')
+        ->whereIn('status', ['Lost', 'Found'])
+        ->with(['user', 'user.userInfo:id,user_id,profile_pic'])
+        ->with(['viewLater' => function ($query) use ($userId) {
+        $query->where('user_id', $userId);
+         }])->orderBy('created_at', 'desc')->get();
+        
+         $isHavePending = PendingRequest::where('user_id', Auth::id())->exists();
+         $locations = LocationModel::select('id', 'name')->get();
+            return Inertia::render('user/Dashboard', [
+                'categories' => $categories,
+                'items' => $items,
+                'isHavePending' => $isHavePending,
+                'announcement' => $announcement,
+                'locations' => $locations   
+        ]); 
+        }else if (Auth::check() && Auth::user()->role === 'admin') { 
+            $userCount = User::count();
+            $getItemAsAdmin = ItemModel::all();
+            $recentLostAndFound = ItemModel::whereMonth('created_at', Carbon::now()->month)
+            ->whereYear('created_at', Carbon::now()->year)
+            ->orderBy('created_at', 'desc')->get();
+            $overAllResolved = ItemModel::where('status', 'Claimed')->count();
+
+            $oneYearAgo = Carbon::now()->subYear()->startOfDay();
+              $allLost = ItemModel::where('status', 'Lost')
+            ->whereNotNull('created_at')
+            ->where('created_at', '>', $oneYearAgo)
+            ->orderByDesc('created_at')
+            ->get(['id', 'title', 'created_at']);
+
+            $allFound = ItemModel::where('status', 'Found')
+            ->where('created_at', '>', $oneYearAgo)
+            ->get(["id", "title", "created_at"]);
+            $unSolved = ItemModel::where('created_at', '<=', $oneYearAgo)
+            ->whereIn('status', ['Lost', 'Found']) 
+            ->get(["id", "title", "created_at"]);
+
+    
+            // move to storage cleaner if more than 1000 items 
+            if($getItemAsAdmin->count() > 1000){
+                 return Inertia::render('admin/storageCleaner/Index', [
+                'totalItems' => $getItemAsAdmin->count(),
+           ]); 
+            }else{
+                 return Inertia::render('admin/Dashboard', [
+                'categories' => $categories,
+                'items' => $getItemAsAdmin,
+                'pending_request_count' => $pendingRequestCount,
+                'user_count' => $userCount,
+                'recentLostAndFound' => $recentLostAndFound,
+                'overall_resolved' => $overAllResolved,
+                'totalLost' => $totalLost,
+                'totalFound' => $totalFound,
+                'allLost' => $allLost,
+                'allFound' => $allFound,
+                'unSolved' => $unSolved,
+        ]); 
+            }
+           
+        }
+    }
+    public function filterByLocation($id){
+        $userId = Auth::id();
+        $currentLocation = LocationModel::findOrFail($id);
+        $categories = ItemCategories::all();
+        $announcement = AnnouncementModel::all();
+
+        $items = ItemModel::select('id','user_id', 'title', 'description', 'category', 'status', 'image_url', 'created_at')
+        ->whereIn('status', ['Lost', 'Found'])
+        ->where('location', $currentLocation->name)
+        ->with(['user', 'user.userInfo:id,user_id,profile_pic'])
+        ->with(['viewLater' => function ($query) use ($userId) {
+        $query->where('user_id', $userId);
+         }])->orderBy('created_at', 'desc')->get();
+        
+         $isHavePending = PendingRequest::where('user_id', Auth::id())->exists();
+         $locations = LocationModel::select('id', 'name')->get();
+            return Inertia::render('user/Dashboard', [
+                'categories' => $categories,
+                'items' => $items,
+                'isHavePending' => $isHavePending,
+                'announcement' => $announcement,
+                'currentLocation' => $currentLocation->name,
+                'locations' => $locations,
+        ]); 
+    }
+}
