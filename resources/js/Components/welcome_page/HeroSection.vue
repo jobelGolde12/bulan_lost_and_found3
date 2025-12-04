@@ -27,18 +27,6 @@ import { Link } from '@inertiajs/vue3';
           Get started <i class="bi bi-arrow-right"></i>
         </Link>
       </div>
-
-      <!-- <div class="video-wrapper mx-auto">
-        <video
-          src="../../../videos/welcome_vid2.mp4"
-          autoplay
-          muted
-          loop
-          playsinline
-        >
-          Your browser does not support the video tag!
-        </video>
-      </div> -->
     </section>
   </div>
 </template>
