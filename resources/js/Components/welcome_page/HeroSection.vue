@@ -27,6 +27,7 @@ import { Link } from '@inertiajs/vue3';
           Get started <i class="bi bi-arrow-right"></i>
         </Link>
       </div>
+      
     </section>
   </div>
 </template>
