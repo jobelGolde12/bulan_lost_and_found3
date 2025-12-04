@@ -28,7 +28,7 @@ import { Link } from '@inertiajs/vue3';
         </Link>
       </div>
 
-      <div class="video-wrapper mx-auto">
+      <!-- <div class="video-wrapper mx-auto">
         <video
           src="../../../videos/welcome_vid2.mp4"
           autoplay
@@ -38,7 +38,7 @@ import { Link } from '@inertiajs/vue3';
         >
           Your browser does not support the video tag!
         </video>
-      </div>
+      </div> -->
     </section>
   </div>
 </template>

@@ -1,0 +1,1 @@
+import{q as o}from"./app-CkqW5iWM.js";import{d as s}from"./index-B9KxEp99.js";var t;const r=(t=s.usePage().auth)==null?void 0:t.user.role,i=o("routeChange",{state:()=>({text:r=="admin"?"Item":"Announcement"}),actions:{updateText(e){this.text=e}}});export{i as t};
